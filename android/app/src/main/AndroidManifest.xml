@@ -1,6 +1,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.project_s">
-   <application
+
+    <!-- Tambahkan perizinan yang diperlukan di sini -->
+    <uses-permission android:name="android.permission.CALL_PHONE"/>
+    <uses-permission android:name="android.permission.SEND_SMS"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <application
         android:label="Qriya"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">

@@ -1,64 +1,100 @@
-import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_database/ui/firebase_animated_list.dart';
+import 'package:flutter/material.dart';
 import 'package:project_s/pages/home_page.dart';
+import 'update_data_mekanik.dart';
 
 class MekanikPage extends StatefulWidget {
   const MekanikPage({Key? key}) : super(key: key);
 
   @override
-  _MekanikPageState createState() => _MekanikPageState();
+  State<MekanikPage> createState() => _MekanikPageState();
 }
 
 class _MekanikPageState extends State<MekanikPage> {
-  final TextEditingController _idMekanikController = TextEditingController();
-  final TextEditingController _namaMekanikController = TextEditingController();
-  final TextEditingController _alamatController = TextEditingController();
-  final TextEditingController _noHpController = TextEditingController();
+  Query dbRef = FirebaseDatabase.instance.ref().child('mekanik');
+  DatabaseReference reference =
+      FirebaseDatabase.instance.ref().child('mekanik');
 
-  final databaseReference = FirebaseDatabase.instance.reference();
-
-  void saveData() {
-    String idMekanik = _idMekanikController.text.trim();
-    String namaMekanik = _namaMekanikController.text.trim();
-    String alamat = _alamatController.text.trim();
-    String noHp = _noHpController.text.trim();
-
-    if (idMekanik.isNotEmpty &&
-        namaMekanik.isNotEmpty &&
-        alamat.isNotEmpty &&
-        noHp.isNotEmpty) {
-      databaseReference.child('mekanik').child(idMekanik).set({
-        'namaMekanik': namaMekanik,
-        'alamat': alamat,
-        'noHp': noHp,
-      }).then((_) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Data mekanik berhasil disimpan')));
-        _clearFields();
-      }).catchError((error) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text('Terjadi kesalahan saat menyimpan data mekanik')));
-      });
-    } else {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Mohon lengkapi semua field')));
-    }
-  }
-
-  void _clearFields() {
-    _idMekanikController.clear();
-    _namaMekanikController.clear();
-    _alamatController.clear();
-    _noHpController.clear();
-  }
-
-  @override
-  void dispose() {
-    _idMekanikController.dispose();
-    _namaMekanikController.dispose();
-    _alamatController.dispose();
-    _noHpController.dispose();
-    super.dispose();
+  Widget listItem({required Map mekanik}) {
+    return Container(
+      margin: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(5),
+      height: 110,
+      color: Color.fromARGB(255, 211, 176, 900),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'ID: ${mekanik['idMekanik']}',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+          ),
+          const SizedBox(
+            height: 5,
+          ),
+          Text(
+            'Nama: ${mekanik['namaMekanik']}',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+          ),
+          const SizedBox(
+            height: 5,
+          ),
+          Text(
+            'Alamat: ${mekanik['alamat']}',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+          ),
+          const SizedBox(
+            height: 5,
+          ),
+          Text(
+            'Nomor HP: ${mekanik['noHp']}',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  // Implementasi navigasi ke halaman UpdateRecord dengan membawa data mekanik
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) =>
+                            UpdateRecord(mekanikKey: mekanik['key'])),
+                  );
+                },
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.edit,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(
+                width: 6,
+              ),
+              GestureDetector(
+                onTap: () {
+                  reference.child(mekanik['key']).remove();
+                },
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.delete,
+                      color: Colors.red[700],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          )
+        ],
+      ),
+    );
   }
 
   @override
@@ -74,74 +110,20 @@ class _MekanikPageState extends State<MekanikPage> {
             );
           },
         ),
-        title: Text('Halaman Mekanik'),
+        title: Text('Data Mekanik'),
         backgroundColor: Color.fromARGB(255, 219, 42, 15),
       ),
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              'ID Mekanik:',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 10),
-            TextField(
-              controller: _idMekanikController,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'ID Mekanik',
-              ),
-            ),
-            SizedBox(height: 20),
-            Text(
-              'Nama Mekanik:',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 10),
-            TextField(
-              controller: _namaMekanikController,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Nama Mekanik',
-              ),
-            ),
-            SizedBox(height: 20),
-            Text(
-              'Alamat:',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 10),
-            TextField(
-              controller: _alamatController,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Alamat Mekanik',
-              ),
-            ),
-            SizedBox(height: 20),
-            Text(
-              'Nomor HP:',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 10),
-            TextField(
-              controller: _noHpController,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Nomor HP Mekanik',
-              ),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: saveData,
-              child: Text('Simpan'),
-              style: ElevatedButton.styleFrom(
-                primary: Color.fromARGB(255, 219, 42, 15),
-              ),
-            ),
-          ],
+      body: Container(
+        height: double.infinity,
+        child: FirebaseAnimatedList(
+          query: dbRef,
+          itemBuilder: (BuildContext context, DataSnapshot snapshot,
+              Animation<double> animation, int index) {
+            Map mekanik = snapshot.value as Map;
+            mekanik['key'] = snapshot.key;
+
+            return listItem(mekanik: mekanik);
+          },
         ),
       ),
     );

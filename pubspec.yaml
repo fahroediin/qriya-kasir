@@ -42,6 +42,7 @@ dependencies:
   google_sign_in: ^5.0.4
   flutter_svg: ^1.1.5
   intl: ^0.17.0
+  flutter_typeahead:
 dev_dependencies:
   flutter_test:
     sdk: flutter
