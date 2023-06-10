@@ -11,7 +11,6 @@ class UpdateRecord extends StatefulWidget {
 }
 
 class _UpdateRecordState extends State<UpdateRecord> {
-  final TextEditingController idMekanikController = TextEditingController();
   final TextEditingController namaMekanikController = TextEditingController();
   final TextEditingController alamatController = TextEditingController();
   final TextEditingController noHpController = TextEditingController();
@@ -27,10 +26,8 @@ class _UpdateRecordState extends State<UpdateRecord> {
 
   void getMekanikData() async {
     DataSnapshot snapshot = await dbRef.child(widget.mekanikKey).get();
-
     Map mekanik = snapshot.value as Map;
 
-    idMekanikController.text = mekanik['idMekanik'];
     namaMekanikController.text = mekanik['namaMekanik'];
     alamatController.text = mekanik['alamat'];
     noHpController.text = mekanik['noHp'];
@@ -40,73 +37,70 @@ class _UpdateRecordState extends State<UpdateRecord> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Updating record'),
+        title: const Text('Edit Mekanik'),
+        backgroundColor: Color.fromARGB(255, 219, 42, 15), // Ubah warna AppBar
       ),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
-              const SizedBox(height: 50),
+              const SizedBox(
+                height: 20,
+              ),
               const Text(
-                'Updating data in Firebase Realtime Database',
+                'UPDATE MEKANIK',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.w500,
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 30),
-              TextField(
-                controller: idMekanikController,
-                keyboardType: TextInputType.text,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'ID Mekanik',
-                  hintText: 'Enter ID Mekanik',
-                ),
+              const SizedBox(
+                height: 30,
               ),
-              const SizedBox(height: 30),
               TextField(
                 controller: namaMekanikController,
-                keyboardType: TextInputType.text,
+                keyboardType: TextInputType.number,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                   labelText: 'Nama Mekanik',
-                  hintText: 'Enter Nama Mekanik',
+                  hintText: 'Masukkan Nama Mekanik',
                 ),
               ),
-              const SizedBox(height: 30),
+              const SizedBox(
+                height: 30,
+              ),
               TextField(
                 controller: alamatController,
-                keyboardType: TextInputType.text,
+                keyboardType: TextInputType.phone,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                   labelText: 'Alamat',
-                  hintText: 'Enter Alamat',
+                  hintText: 'Masukkan alamat',
                 ),
               ),
-              const SizedBox(height: 30),
+              const SizedBox(
+                height: 30,
+              ),
               TextField(
                 controller: noHpController,
                 keyboardType: TextInputType.phone,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
-                  labelText: 'No. HP',
-                  hintText: 'Enter No. HP',
+                  labelText: 'No HP',
+                  hintText: 'Masukkan nomer hp',
                 ),
               ),
-              const SizedBox(height: 30),
               MaterialButton(
                 onPressed: () {
-                  Map<String, String> mekanikData = {
-                    'idMekanik': idMekanikController.text,
+                  Map<String, dynamic> mekanik = {
                     'namaMekanik': namaMekanikController.text,
                     'alamat': alamatController.text,
                     'noHp': noHpController.text,
                   };
 
-                  dbRef.child(widget.mekanikKey).update(mekanikData).then((_) {
+                  dbRef.child(widget.mekanikKey).update(mekanik).then((_) {
                     Navigator.pop(context);
                   }).catchError((error) {
                     showDialog(
@@ -129,9 +123,9 @@ class _UpdateRecordState extends State<UpdateRecord> {
                   });
                 },
                 child: const Text('Update Data'),
-                color: Colors.blue,
+                color: Color.fromARGB(255, 219, 42, 15),
                 textColor: Colors.white,
-                minWidth: 300,
+                minWidth: 500,
                 height: 40,
               ),
             ],

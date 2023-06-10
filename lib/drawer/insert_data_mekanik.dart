@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:project_s/pages/home_page.dart';
+import 'mekanik.dart';
 
-class MekanikPage extends StatefulWidget {
-  const MekanikPage({Key? key}) : super(key: key);
+class AddMekanikPage extends StatefulWidget {
+  const AddMekanikPage({Key? key}) : super(key: key);
 
   @override
-  _MekanikPageState createState() => _MekanikPageState();
+  _AddMekanikPageState createState() => _AddMekanikPageState();
 }
 
-class _MekanikPageState extends State<MekanikPage> {
+class _AddMekanikPageState extends State<AddMekanikPage> {
   final TextEditingController _idMekanikController = TextEditingController();
   final TextEditingController _namaMekanikController = TextEditingController();
   final TextEditingController _alamatController = TextEditingController();
@@ -32,9 +33,15 @@ class _MekanikPageState extends State<MekanikPage> {
         'alamat': alamat,
         'noHp': noHp,
       }).then((_) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Data mekanik berhasil disimpan')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Mekanik succesfully added')));
         _clearFields();
+
+        // Navigasi ke halaman MekanikPage setelah data berhasil disimpan
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => MekanikPage()),
+        );
       }).catchError((error) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text('Terjadi kesalahan saat menyimpan data mekanik')));
@@ -70,67 +77,56 @@ class _MekanikPageState extends State<MekanikPage> {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => HomePage()),
+              MaterialPageRoute(builder: (context) => MekanikPage()),
             );
           },
         ),
-        title: Text('Halaman Mekanik'),
+        title: Text('Tambah Mekanik'),
         backgroundColor: Color.fromARGB(255, 219, 42, 15),
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(10.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
-              'ID Mekanik:',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
             SizedBox(height: 10),
             TextField(
               controller: _idMekanikController,
-              decoration: InputDecoration(
+              keyboardType: TextInputType.text,
+              decoration: const InputDecoration(
                 border: OutlineInputBorder(),
-                hintText: 'ID Mekanik',
+                labelText: 'ID Mekanik',
+                hintText: '',
               ),
-            ),
-            SizedBox(height: 20),
-            Text(
-              'Nama Mekanik:',
-              style: TextStyle(fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 10),
             TextField(
               controller: _namaMekanikController,
-              decoration: InputDecoration(
+              keyboardType: TextInputType.name,
+              decoration: const InputDecoration(
                 border: OutlineInputBorder(),
-                hintText: 'Nama Mekanik',
+                labelText: 'Nama Mekanik',
+                hintText: '',
               ),
-            ),
-            SizedBox(height: 20),
-            Text(
-              'Alamat:',
-              style: TextStyle(fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 10),
             TextField(
               controller: _alamatController,
-              decoration: InputDecoration(
+              keyboardType: TextInputType.text,
+              decoration: const InputDecoration(
                 border: OutlineInputBorder(),
-                hintText: 'Alamat Mekanik',
+                labelText: 'Alamat',
+                hintText: '',
               ),
-            ),
-            SizedBox(height: 20),
-            Text(
-              'Nomor HP:',
-              style: TextStyle(fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 10),
             TextField(
               controller: _noHpController,
-              decoration: InputDecoration(
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
                 border: OutlineInputBorder(),
-                hintText: 'Nomor HP Mekanik',
+                labelText: 'Nomer HP',
+                hintText: '',
               ),
             ),
             SizedBox(height: 20),

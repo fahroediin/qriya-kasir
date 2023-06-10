@@ -229,7 +229,7 @@ class _SparepartPageState extends State<SparepartPage> {
                         'Kode Barang: ${barang['kode_barang']}\nHarga: Rp. ${barang['harga_barang']}\nJumlah: ${barang['jumlah_barang']}',
                       ),
                       trailing: IconButton(
-                        icon: Icon(Icons.delete),
+                        icon: Icon(Icons.update),
                         onPressed: () {
                           setState(() {
                             _dataBarang.remove(barang);

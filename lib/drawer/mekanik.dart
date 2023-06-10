@@ -1,8 +1,10 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:project_s/pages/home_page.dart';
-import 'update_data_mekanik.dart';
+import 'insert_data_mekanik.dart'; // Import halaman tambah data mekanik
+import 'update_data_mekanik.dart'; // Import halaman update data mekanik
 
 class MekanikPage extends StatefulWidget {
   const MekanikPage({Key? key}) : super(key: key);
@@ -16,41 +18,68 @@ class _MekanikPageState extends State<MekanikPage> {
   DatabaseReference reference =
       FirebaseDatabase.instance.ref().child('mekanik');
 
+  TextEditingController searchController = TextEditingController();
+  late List<Map> filteredList;
+  bool isSearching = false;
+
+  @override
+  void initState() {
+    super.initState();
+    filteredList = [];
+  }
+
   Widget listItem({required Map mekanik}) {
     return Container(
       margin: const EdgeInsets.all(10),
-      padding: const EdgeInsets.all(5),
-      height: 110,
-      color: Color.fromARGB(255, 211, 176, 900),
+      padding: const EdgeInsets.all(10),
+      height: 160,
+      decoration: BoxDecoration(
+        color: Color.fromARGB(255, 232, 192, 145),
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.5),
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: Offset(0, 3),
+          ),
+        ],
+      ),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'ID: ${mekanik['idMekanik']}',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+            'ID                 : ${mekanik['key']}',
+            style: GoogleFonts.lato(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-          const SizedBox(
-            height: 5,
-          ),
+          SizedBox(height: 8),
           Text(
-            'Nama: ${mekanik['namaMekanik']}',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+            'Nama            : ${mekanik['namaMekanik']}',
+            style: GoogleFonts.lato(
+              fontSize: 18,
+              fontWeight: FontWeight.w400,
+            ),
           ),
-          const SizedBox(
-            height: 5,
-          ),
+          SizedBox(height: 4),
           Text(
-            'Alamat: ${mekanik['alamat']}',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+            'Alamat         : ${mekanik['alamat']}',
+            style: GoogleFonts.lato(
+              fontSize: 18,
+              fontWeight: FontWeight.w400,
+            ),
           ),
-          const SizedBox(
-            height: 5,
-          ),
+          SizedBox(height: 4),
           Text(
-            'Nomor HP: ${mekanik['noHp']}',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+            'Nomor HP : ${mekanik['noHp']}',
+            style: GoogleFonts.lato(
+              fontSize: 18,
+              fontWeight: FontWeight.w400,
+            ),
           ),
+          Spacer(),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -61,40 +90,67 @@ class _MekanikPageState extends State<MekanikPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (_) =>
-                            UpdateRecord(mekanikKey: mekanik['key'])),
+                      builder: (_) => UpdateRecord(mekanikKey: mekanik['key']),
+                    ),
                   );
                 },
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.edit,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                  ],
+                child: Icon(
+                  Icons.edit,
+                  color: Theme.of(context).primaryColor,
                 ),
               ),
-              const SizedBox(
-                width: 6,
-              ),
+              SizedBox(width: 15),
               GestureDetector(
                 onTap: () {
-                  reference.child(mekanik['key']).remove();
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text('Confirm'),
+                        content: Text('Hapus data mekanik?'),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop(); // Tutup dialog
+                            },
+                            child: Text('No'),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              // Hapus data
+                              reference.child(mekanik['key']).remove();
+                              Navigator.of(context).pop(); // Tutup dialog
+                            },
+                            child: Text('Yes'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
                 },
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.delete,
-                      color: Colors.red[700],
-                    ),
-                  ],
+                child: Icon(
+                  Icons.delete,
+                  color: Colors.red[700],
                 ),
               ),
             ],
-          )
+          ),
         ],
       ),
     );
+  }
+
+  void searchList(String query) {
+    if (query.isNotEmpty) {
+      setState(() {
+        isSearching = true;
+        filteredList = filteredList
+            .where((mekanik) => mekanik['namaMekanik']
+                .toLowerCase()
+                .contains(query.toLowerCase()))
+            .toList();
+      });
+    }
   }
 
   @override
@@ -110,20 +166,84 @@ class _MekanikPageState extends State<MekanikPage> {
             );
           },
         ),
-        title: Text('Data Mekanik'),
+        title: Text(
+          'Data Mekanik',
+          style: TextStyle(
+            fontFamily: 'Roboto',
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         backgroundColor: Color.fromARGB(255, 219, 42, 15),
       ),
-      body: Container(
-        height: double.infinity,
-        child: FirebaseAnimatedList(
-          query: dbRef,
-          itemBuilder: (BuildContext context, DataSnapshot snapshot,
-              Animation<double> animation, int index) {
-            Map mekanik = snapshot.value as Map;
-            mekanik['key'] = snapshot.key;
+      body: SingleChildScrollView(
+        child: Container(
+          height: MediaQuery.of(context).size.height,
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: TextField(
+                  controller: searchController,
+                  onChanged: searchList,
+                  decoration: InputDecoration(
+                    labelText: 'Cari Mekanik',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: isSearching
+                    ? SingleChildScrollView(
+                        child: Column(
+                          children: filteredList.map((mekanik) {
+                            return Column(
+                              children: [
+                                listItem(mekanik: mekanik),
+                                SizedBox(height: 8),
+                                Divider(color: Colors.grey[400]),
+                              ],
+                            );
+                          }).toList(),
+                        ),
+                      )
+                    : FirebaseAnimatedList(
+                        query: dbRef,
+                        itemBuilder: (BuildContext context,
+                            DataSnapshot snapshot,
+                            Animation<double> animation,
+                            int index) {
+                          Map mekanik = snapshot.value as Map;
+                          mekanik['key'] = snapshot.key;
 
-            return listItem(mekanik: mekanik);
-          },
+                          return Column(
+                            children: [
+                              listItem(mekanik: mekanik),
+                              SizedBox(height: 8),
+                              Divider(color: Colors.grey[400]),
+                            ],
+                          );
+                        },
+                      ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // Implementasi navigasi ke halaman tambah data mekanik
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => AddMekanikPage()),
+          );
+        },
+        child: Icon(Icons.add),
+        backgroundColor: Color.fromARGB(255, 219, 42, 15),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(20)),
         ),
       ),
     );
