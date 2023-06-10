@@ -6,10 +6,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:project_s/drawer/bantuan.dart';
 import 'package:project_s/pages/pelanggan.dart';
 import 'package:project_s/drawer/calculator.dart';
-import 'package:project_s/drawer/sukuCadang.dart';
+import 'package:project_s/drawer/sparepart.dart';
 import 'package:project_s/pages/login_page.dart';
 import 'package:project_s/pages/servis.dart';
-import 'package:project_s/pages/sparepart.dart';
+import 'package:project_s/pages/listSparepart.dart';
 import 'package:project_s/drawer/mekanik.dart';
 import 'package:project_s/drawer/report.dart';
 import 'package:project_s/drawer/about.dart';
@@ -259,7 +259,7 @@ class _HomePageState extends State<HomePage> {
                         PageRouteBuilder(
                           pageBuilder:
                               (context, animation, secondaryAnimation) =>
-                                  SparepartPage(),
+                                  ListSparepartPage(),
                           transitionsBuilder:
                               (context, animation, secondaryAnimation, child) {
                             var begin = Offset(1.0, 0.0);
@@ -378,7 +378,7 @@ class _HomePageState extends State<HomePage> {
               onTap: () {
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
-                    builder: (context) => SukuCadangPage(),
+                    builder: (context) => SparepartPage(),
                   ),
                 );
               },

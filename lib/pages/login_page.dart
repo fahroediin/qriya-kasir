@@ -19,8 +19,7 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
   final GlobalKey<FormState> _key = GlobalKey<FormState>();
   late ScaffoldMessengerState _scaffoldMessengerState;
-  bool _obscurePassword =
-      true; // Variabel untuk menunjukkan apakah password tersembunyi atau tidak
+  bool _obscurePassword = true;
 
   @override
   void initState() {
@@ -111,6 +110,7 @@ class _LoginPageState extends State<LoginPage> {
                     child: TextFormField(
                       controller: _emailController,
                       validator: _emailValidator,
+                      style: GoogleFonts.lato(fontSize: 20),
                       decoration: InputDecoration(
                         enabledBorder: OutlineInputBorder(
                           borderSide: BorderSide(color: Colors.white),
@@ -133,8 +133,8 @@ class _LoginPageState extends State<LoginPage> {
                     child: TextFormField(
                       controller: _passwordController,
                       validator: _passwordValidator,
-                      obscureText:
-                          _obscurePassword, // Menggunakan variabel untuk menentukan apakah password tersembunyi
+                      obscureText: _obscurePassword,
+                      style: GoogleFonts.lato(fontSize: 20),
                       decoration: InputDecoration(
                         enabledBorder: OutlineInputBorder(
                           borderSide: BorderSide(color: Colors.white),
@@ -148,7 +148,6 @@ class _LoginPageState extends State<LoginPage> {
                         fillColor: Color.fromARGB(255, 247, 243, 244),
                         filled: true,
                         suffixIcon: IconButton(
-                          // Tombol untuk toggle hide/unhide password
                           onPressed: () {
                             setState(() {
                               _obscurePassword = !_obscurePassword;
@@ -164,54 +163,42 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Text(
-                        'Lupa password?',
-                        style: TextStyle(
-                          fontWeight: FontWeight.normal,
-                          fontSize: 18,
-                        ),
-                      ),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  PageRouteBuilder(
-                                    pageBuilder: (context, animation,
-                                        secondaryAnimation) {
-                                      return ForgotPasswordPage();
-                                    },
-                                    transitionsBuilder: (context, animation,
-                                        secondaryAnimation, child) {
-                                      return FadeTransition(
-                                        opacity: animation,
-                                        child: child,
-                                      );
-                                    },
-                                  ),
-                                );
-                              },
-                              child: Text(
-                                'Reset',
-                                style: TextStyle(
-                                  color: Color.fromARGB(255, 220, 53, 3),
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20,
-                                ),
+                        padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              PageRouteBuilder(
+                                pageBuilder:
+                                    (context, animation, secondaryAnimation) {
+                                  return ForgotPasswordPage();
+                                },
+                                transitionsBuilder: (context, animation,
+                                    secondaryAnimation, child) {
+                                  return FadeTransition(
+                                    opacity: animation,
+                                    child: child,
+                                  );
+                                },
                               ),
+                            );
+                          },
+                          child: Text(
+                            'Forgot password?',
+                            style: TextStyle(
+                              color: Color.fromARGB(255, 220, 53, 3),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
                             ),
-                          ],
+                          ),
                         ),
                       ),
                     ],
                   ),
-                  SizedBox(height: 20),
+                  SizedBox(height: 70),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 25.0),
                     child: SizedBox(
@@ -234,6 +221,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                   ),
+                  SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -246,29 +234,18 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (_) => RegisterPage(
-                                            showLoginPage: () {},
-                                          )),
-                                );
-                              },
-                              child: Text(
-                                'Register',
-                                style: TextStyle(
-                                  color: Color.fromARGB(255, 220, 53, 3),
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20,
-                                ),
-                              ),
+                        child: GestureDetector(
+                          onTap: () {
+                            widget.showRegisterPage();
+                          },
+                          child: Text(
+                            'Register',
+                            style: TextStyle(
+                              color: Color.fromARGB(255, 220, 53, 3),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
                             ),
-                          ],
+                          ),
                         ),
                       ),
                     ],

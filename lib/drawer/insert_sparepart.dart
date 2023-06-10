@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:project_s/drawer/sparepart.dart';
 import 'package:project_s/pages/home_page.dart';
 
-class SukuCadangPage extends StatefulWidget {
-  const SukuCadangPage({Key? key}) : super(key: key);
+class InputSparepartPage extends StatefulWidget {
+  const InputSparepartPage({Key? key}) : super(key: key);
 
   @override
-  _SukuCadangPageState createState() => _SukuCadangPageState();
+  _InputSparepartPageState createState() => _InputSparepartPageState();
 }
 
-class _SukuCadangPageState extends State<SukuCadangPage>
+class _InputSparepartPageState extends State<InputSparepartPage>
     with TickerProviderStateMixin {
   final TextEditingController _idSparepartController = TextEditingController();
   final TextEditingController _namaSparepartController =
@@ -47,38 +48,21 @@ class _SukuCadangPageState extends State<SukuCadangPage>
         'hargaSparepart': hargaSparepart,
         'stokSparepart': stokSparepart,
       }).then((_) {
-        final snackBar =
-            SnackBar(content: Text('Data suku cadang berhasil disimpan'));
-        ScaffoldMessenger.of(context).showSnackBar(
-          snackBar,
-        );
+        final snackBar = SnackBar(content: Text('Berhasil menyimpan data'));
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
         _clearFields();
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => SparepartPage()),
+        );
       }).catchError((error) {
         final snackBar =
             SnackBar(content: Text('Gagal menyimpan data suku cadang: $error'));
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: SlideTransition(
-              position: Tween<Offset>(
-                begin: Offset(0.0, 1.0),
-                end: Offset.zero,
-              ).animate(CurvedAnimation(
-                parent: AnimationController(
-                  vsync: this,
-                  duration: Duration(milliseconds: 500),
-                ),
-                curve: Curves.easeOut,
-              )),
-              child: snackBar,
-            ),
-          ),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
       });
     } else {
       final snackBar = SnackBar(content: Text('Mohon lengkapi semua field'));
-      ScaffoldMessenger.of(context).showSnackBar(
-        snackBar,
-      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
   }
 
@@ -111,11 +95,11 @@ class _SukuCadangPageState extends State<SukuCadangPage>
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => HomePage()),
+              MaterialPageRoute(builder: (context) => SparepartPage()),
             );
           },
         ),
-        title: Text('Input Suku Cadang'),
+        title: Text('Tambah Suku Cadang'),
         backgroundColor: Color.fromARGB(255, 219, 42, 15),
       ),
       body: Padding(
@@ -123,81 +107,52 @@ class _SukuCadangPageState extends State<SukuCadangPage>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
-              'ID Sparepart:',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
             SizedBox(height: 10),
             TextField(
               controller: _idSparepartController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
-                hintText: 'ID Sparepart',
+                labelText: 'ID Sparepart',
               ),
-            ),
-            SizedBox(height: 20),
-            Text(
-              'Nama Sparepart:',
-              style: TextStyle(fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 10),
             TextField(
               controller: _namaSparepartController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
-                hintText: 'Nama Sparepart',
+                labelText: 'Nama Sparepart',
               ),
-            ),
-            SizedBox(height: 20),
-            Text(
-              'Merk Sparepart:',
-              style: TextStyle(fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 10),
             TextField(
               controller: _merkSparepartController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
-                hintText: 'Merk Sparepart',
+                labelText: 'Merk Sparepart',
               ),
-            ),
-            SizedBox(height: 20),
-            Text(
-              'Spec Sparepart:',
-              style: TextStyle(fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 10),
             TextField(
               controller: _specSparepartController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
-                hintText: 'Spec Sparepart',
+                labelText: 'Spec Sparepart',
               ),
-            ),
-            SizedBox(height: 20),
-            Text(
-              'Harga Sparepart:',
-              style: TextStyle(fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 10),
             TextField(
               controller: _hargaSparepartController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
-                hintText: 'Harga Sparepart',
+                labelText: 'Harga Sparepart',
               ),
-            ),
-            SizedBox(height: 20),
-            Text(
-              'Stok Sparepart:',
-              style: TextStyle(fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 10),
             TextField(
               controller: _stokSparepartController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
-                hintText: 'Stok Sparepart',
+                labelText: 'Stok Sparepart',
               ),
             ),
             SizedBox(height: 20),
