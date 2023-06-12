@@ -14,6 +14,34 @@ class AboutPage extends StatelessWidget {
     }
   }
 
+  void _showDeveloperModal(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Developer'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Nama: Imam Fahrudin'),
+              SizedBox(height: 8),
+              Text('Repositori Github: github.com/fahroediin'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Tutup'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,43 +59,32 @@ class AboutPage extends StatelessWidget {
         title: Text('Tentang Aplikasi'),
       ),
       body: Container(
+        padding: EdgeInsets.all(16.0),
+        alignment: Alignment.center,
         color: Colors.grey[200],
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(
-              'assets/qriya_icon.png',
+              'assets/qriya-logo.png',
               width: 120,
               height: 120,
             ),
             SizedBox(height: 16),
             Text(
-              'Qriya',
+              'Aplikasi Kasir',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 24,
               ),
             ),
-            SizedBox(height: 8),
-            Text(
-              'Aplikasi Kasir Aira Motor Padangjaya versi 0.1',
-              style: TextStyle(
-                fontSize: 18,
-              ),
-            ),
-            SizedBox(height: 16),
-            Text(
-              'Developer By : Imam Fahrudin',
-              style: TextStyle(
-                fontSize: 18,
-              ),
-            ),
             SizedBox(height: 16),
             ElevatedButton(
-              onPressed: _launchGithubUrl,
-              child: Text('Kunjungi Repositori'),
+              onPressed: () => _showDeveloperModal(context),
+              child: Text('Kenali Developer'),
               style: ElevatedButton.styleFrom(
                 primary: Color.fromARGB(255, 219, 42, 15),
+                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               ),
             ),
           ],

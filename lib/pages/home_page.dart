@@ -32,6 +32,7 @@ class _HomePageState extends State<HomePage> {
   DatabaseReference _databaseReference = FirebaseDatabase.instance.reference();
 
   int _dataCount = 0;
+  int _transaksiPenjualanCount = 0;
 
   @override
   void initState() {
@@ -121,8 +122,8 @@ class _HomePageState extends State<HomePage> {
                       'Transaksi Hari ini : 10',
                       style: TextStyle(
                           fontSize: 25,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black),
+                          fontWeight: FontWeight.normal,
+                          color: Color.fromARGB(255, 63, 63, 62)),
                     ),
                   ),
                   Container(
@@ -131,18 +132,18 @@ class _HomePageState extends State<HomePage> {
                       'Servis : $_dataCount',
                       style: TextStyle(
                           fontSize: 25,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black),
+                          fontWeight: FontWeight.normal,
+                          color: Color.fromARGB(255, 63, 63, 62)),
                     ),
                   ),
                   Container(
                     margin: EdgeInsets.only(top: 5),
                     child: Text(
-                      'Penjualan : 10',
+                      'Penjualan : (${_transaksiPenjualanCount.toString()})',
                       style: TextStyle(
                           fontSize: 25,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black),
+                          fontWeight: FontWeight.normal,
+                          color: Color.fromARGB(255, 63, 63, 62)),
                     ),
                   )
                 ],
@@ -358,7 +359,7 @@ class _HomePageState extends State<HomePage> {
                         Image.asset(
                           'assets/client.png',
                           height: 125,
-                          width: 350,
+                          width: 300,
                         ),
                         SizedBox(height: 8.0),
                         Text(
@@ -427,12 +428,34 @@ class _HomePageState extends State<HomePage> {
               onTap: () {
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
+                    builder: (context) => LaporanPage(),
+                  ),
+                );
+              },
+              leading: Icon(Icons.storage),
+              title: Text('Laporan'),
+            ),
+            ListTile(
+              onTap: () {
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
                     builder: (context) => CalculatorApp(),
                   ),
                 );
               },
               leading: Icon(Icons.calculate),
               title: Text('Kalkulator'),
+            ),
+            ListTile(
+              onTap: () {
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (context) => AboutPage(),
+                  ),
+                );
+              },
+              leading: Icon(Icons.filter_b_and_w_rounded),
+              title: Text('Tentang Aplikasi'),
             ),
             // Add more options here for other drawers
             ListTile(

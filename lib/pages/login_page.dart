@@ -66,11 +66,11 @@ class _LoginPageState extends State<LoginPage> {
     if (formEmail == null || formEmail.isEmpty) {
       return 'Email tidak boleh kosong';
     }
-
-    String pattern = r'\w+@\w+\.\w+';
+    String pattern = r'^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)*(\.[a-zA-Z]{2,})$';
     RegExp regex = RegExp(pattern);
-    if (!regex.hasMatch(formEmail)) return 'Format Alamat Email tidak valid.';
-
+    if (!regex.hasMatch(formEmail)) {
+      return 'Format Alamat Email tidak valid.';
+    }
     return null;
   }
 

@@ -35,20 +35,37 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Image.asset(
-              'assets/splashscreen.png',
-              width: 400.0,
-              height: 400.0,
+      body: Stack(
+        children: [
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Image.asset(
+                  'assets/qriya-logo.png',
+                  width: 400.0,
+                  height: 400.0,
+                ),
+                CircularProgressIndicator(
+                  backgroundColor: Colors.grey,
+                ),
+              ],
             ),
-            CircularProgressIndicator(
-              backgroundColor: Colors.grey,
+          ),
+          Positioned(
+            bottom: 10.0,
+            width: MediaQuery.of(context).size.width,
+            child: Center(
+              child: Text(
+                'Versi 0.5.0',
+                style: TextStyle(
+                  fontSize: 12.0,
+                  color: Colors.black,
+                ),
+              ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
