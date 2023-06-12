@@ -48,17 +48,6 @@ class _UpdateRecordState extends State<UpdateRecord> {
               const SizedBox(
                 height: 20,
               ),
-              const Text(
-                'UPDATE MEKANIK',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w500,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(
-                height: 30,
-              ),
               TextField(
                 controller: namaMekanikController,
                 keyboardType: TextInputType.number,
@@ -92,6 +81,7 @@ class _UpdateRecordState extends State<UpdateRecord> {
                   hintText: 'Masukkan nomer hp',
                 ),
               ),
+              SizedBox(height: 10),
               MaterialButton(
                 onPressed: () {
                   Map<String, dynamic> mekanik = {
@@ -99,7 +89,6 @@ class _UpdateRecordState extends State<UpdateRecord> {
                     'alamat': alamatController.text,
                     'noHp': noHpController.text,
                   };
-
                   dbRef.child(widget.mekanikKey).update(mekanik).then((_) {
                     Navigator.pop(context);
                   }).catchError((error) {

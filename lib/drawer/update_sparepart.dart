@@ -69,15 +69,6 @@ class _UpdateRecordState extends State<UpdateRecord> {
             child: Column(
               children: [
                 const SizedBox(height: 20),
-                const Text(
-                  'UPDATE SPAREPART',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 30),
                 TextField(
                   controller: namaSparepartController,
                   decoration: const InputDecoration(

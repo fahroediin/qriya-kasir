@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:project_s/drawer/bantuan.dart';
-import 'package:project_s/pages/pelanggan.dart';
+import 'package:project_s/drawer/pelanggan.dart';
+import 'package:project_s/pages/insert_pelanggan.dart';
+import 'insert_pelanggan.dart';
 import 'package:project_s/drawer/calculator.dart';
 import 'package:project_s/drawer/sparepart.dart';
 import 'package:project_s/pages/login_page.dart';
@@ -304,7 +306,7 @@ class _HomePageState extends State<HomePage> {
                         PageRouteBuilder(
                           pageBuilder:
                               (context, animation, secondaryAnimation) =>
-                                  PelangganPage(),
+                                  InputPelangganPage(),
                           transitionsBuilder:
                               (context, animation, secondaryAnimation, child) {
                             var begin = Offset(1.0, 0.0);
@@ -384,6 +386,17 @@ class _HomePageState extends State<HomePage> {
               },
               leading: Icon(Icons.storage),
               title: Text('Data Sparepart'),
+            ),
+            ListTile(
+              onTap: () {
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (context) => Pelanggan(),
+                  ),
+                );
+              },
+              leading: Icon(Icons.storage),
+              title: Text('Data Pelanggan'),
             ),
             ListTile(
               onTap: () {
