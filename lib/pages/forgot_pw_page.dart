@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'login_page.dart';
+
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({Key? key}) : super(key: key);
 
@@ -27,45 +29,48 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     final RegExp emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,}$');
 
     if (email.isEmpty) {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            content: Text('Masukkan email anda terlebih dahulu'),
-          );
-        },
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Masukkan email anda terlebih dahulu'),
+        ),
       );
     } else if (!emailRegex.hasMatch(email)) {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            content: Text('Format email tidak valid'),
-          );
-        },
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Format email tidak valid'),
+        ),
       );
     } else {
       try {
         await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              content:
-                  Text('Link reset password telah dikirim, cek email anda'),
-            );
-          },
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Link reset password telah dikirim, cek email anda'),
+          ),
+        );
+
+        // Navigasi ke halaman login setelah mengirim link reset password
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => LoginPage(
+                    showRegisterPage: () {},
+                  )),
         );
       } on FirebaseAuthException catch (e) {
-        print(e);
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
+        if (e.code == 'user-not-found') {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Email tidak terdaftar, masukkan email yang benar'),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
               content: Text(e.message.toString()),
-            );
-          },
-        );
+            ),
+          );
+        }
       }
     }
   }
@@ -112,7 +117,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               width: double.infinity,
               child: TextField(
                 controller: _emailController,
-                style: GoogleFonts.robotoSlab(
+                style: GoogleFonts.roboto(
                   fontSize: 20,
                   color: Color.fromARGB(255, 10, 10, 10),
                 ),

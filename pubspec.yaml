@@ -76,6 +76,8 @@ flutter:
   - assets/login.png
   - assets/forgot.png
   - assets/airamotor.png
+  #Register asset
+  - assets/register.png
   #drawer asset
   - assets/about.png
   - assets/mekanik.png

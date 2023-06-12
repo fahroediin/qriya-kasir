@@ -54,7 +54,7 @@ class _LoginPageState extends State<LoginPage> {
         } else if (e.code == 'wrong-password') {
           _showSnackBar('Password salah');
         } else {
-          _showSnackBar('Terjadi kesalahan saat login');
+          _showSnackBar('Email dan Password tidak boleh kosong');
         }
       } catch (e) {
         _showSnackBar('Terjadi kesalahan saat login');
@@ -69,7 +69,7 @@ class _LoginPageState extends State<LoginPage> {
 
     String pattern = r'\w+@\w+\.\w+';
     RegExp regex = RegExp(pattern);
-    if (!regex.hasMatch(formEmail)) return 'Invalid E-mail Address format.';
+    if (!regex.hasMatch(formEmail)) return 'Format Alamat Email tidak valid.';
 
     return null;
   }
@@ -109,8 +109,6 @@ class _LoginPageState extends State<LoginPage> {
                     padding: const EdgeInsets.symmetric(horizontal: 25.0),
                     child: TextFormField(
                       controller: _emailController,
-                      validator: _emailValidator,
-                      style: GoogleFonts.lato(fontSize: 20),
                       decoration: InputDecoration(
                         enabledBorder: OutlineInputBorder(
                           borderSide: BorderSide(color: Colors.white),
@@ -124,6 +122,7 @@ class _LoginPageState extends State<LoginPage> {
                         fillColor: Color.fromARGB(255, 247, 243, 244),
                         filled: true,
                       ),
+                      validator: _emailValidator,
                     ),
                   ),
                   SizedBox(height: 10.0),
@@ -132,9 +131,7 @@ class _LoginPageState extends State<LoginPage> {
                         horizontal: 25.0, vertical: 10),
                     child: TextFormField(
                       controller: _passwordController,
-                      validator: _passwordValidator,
                       obscureText: _obscurePassword,
-                      style: GoogleFonts.lato(fontSize: 20),
                       decoration: InputDecoration(
                         enabledBorder: OutlineInputBorder(
                           borderSide: BorderSide(color: Colors.white),
@@ -160,6 +157,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                       ),
+                      validator: _passwordValidator,
                     ),
                   ),
                   Row(
@@ -187,7 +185,7 @@ class _LoginPageState extends State<LoginPage> {
                             );
                           },
                           child: Text(
-                            'Forgot password?',
+                            'Forgot password',
                             style: TextStyle(
                               color: Color.fromARGB(255, 220, 53, 3),
                               fontWeight: FontWeight.bold,
@@ -221,7 +219,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 10),
+                  SizedBox(height: 100),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -229,14 +227,20 @@ class _LoginPageState extends State<LoginPage> {
                         'Don`t have an account?',
                         style: TextStyle(
                           fontWeight: FontWeight.normal,
-                          fontSize: 18,
+                          fontSize: 20,
                         ),
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 5.0),
                         child: GestureDetector(
                           onTap: () {
-                            widget.showRegisterPage();
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => RegisterPage(
+                                        showLoginPage: () {},
+                                      )),
+                            );
                           },
                           child: Text(
                             'Register',

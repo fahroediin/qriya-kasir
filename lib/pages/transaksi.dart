@@ -3,21 +3,20 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:project_s/pages/home_page.dart';
 
-class PenjualanPage extends StatefulWidget {
+class TransaksiPenjualanPage extends StatefulWidget {
   @override
-  _PenjualanPageState createState() => _PenjualanPageState();
+  _TransaksiPenjualanPageState createState() => _TransaksiPenjualanPageState();
 }
 
-class _PenjualanPageState extends State<PenjualanPage> {
+class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
   final _formKey = GlobalKey<FormState>();
   DateTime _selectedDate = DateTime.now();
   String? _idPenjualan;
   String? _namaPembeli;
-  String? _idSparepart;
-  String? _namaSparepart;
-  int? _jumlahItem;
-  int? _hargaSparepart;
-  int? _totalBayar;
+  List<Map<String, dynamic>> _items = [];
+  double _totalHarga = 0;
+  double _bayar = 0;
+  double _kembalian = 0;
 
   @override
   void initState() {
@@ -32,10 +31,6 @@ class _PenjualanPageState extends State<PenjualanPage> {
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      setState(() {
-        _totalBayar = _hargaSparepart! * _jumlahItem!;
-      });
-
       saveTransaksiPenjualan();
     }
   }
@@ -44,15 +39,16 @@ class _PenjualanPageState extends State<PenjualanPage> {
     DatabaseReference reference =
         FirebaseDatabase.instance.reference().child('transaksiPenjualan');
 
-    reference.push().set({
+    Map<String, dynamic> data = {
       'idPenjualan': _idPenjualan,
       'namaPembeli': _namaPembeli,
-      'idSparepart': _idSparepart,
-      'namaSparepart': _namaSparepart,
-      'jumlahItem': _jumlahItem,
-      'hargaSparepart': _hargaSparepart,
-      'totalBayar': _totalBayar,
-    }).then((_) {
+      'items': _items,
+      'totalHarga': _totalHarga,
+      'bayar': _bayar,
+      'kembalian': _kembalian,
+    };
+
+    reference.push().set(data).then((_) {
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -94,6 +90,56 @@ class _PenjualanPageState extends State<PenjualanPage> {
     });
   }
 
+  void _addItem() {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+      Map<String, dynamic> item = {
+        'idSparepart': '',
+        'namaSparepart': '',
+        'jumlahItem': 0,
+        'hargaSparepart': 0,
+      };
+      setState(() {
+        _items.add(item);
+      });
+    }
+  }
+
+  void _updateItem(int index, String field, dynamic value) {
+    setState(() {
+      _items[index][field] = value;
+    });
+    calculateTotalHarga();
+  }
+
+  void calculateTotalHarga() {
+    double total = 0;
+    for (var item in _items) {
+      double harga =
+          item['hargaSparepart'] != null ? item['hargaSparepart'] : 0;
+      int jumlah = item['jumlahItem'] != null ? item['jumlahItem'] : 0;
+      total += harga * jumlah;
+    }
+    setState(() {
+      _totalHarga = total;
+    });
+  }
+
+  void _updateBayar(String value) {
+    double? bayar = double.tryParse(value);
+    if (bayar != null) {
+      _bayar = bayar;
+      calculateKembalian();
+    }
+  }
+
+  void calculateKembalian() {
+    double kembalian = _bayar - _totalHarga;
+    setState(() {
+      _kembalian = kembalian;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     var textStyle = TextStyle(fontWeight: FontWeight.bold);
@@ -102,13 +148,31 @@ class _PenjualanPageState extends State<PenjualanPage> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.push(
+            Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => HomePage()),
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    HomePage(),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  var begin = Offset(1.0, 0.0);
+                  var end = Offset.zero;
+                  var curve = Curves.ease;
+
+                  var tween = Tween(begin: begin, end: end)
+                      .chain(CurveTween(curve: curve));
+
+                  return SlideTransition(
+                    position: animation.drive(tween),
+                    child: child,
+                  );
+                },
+                transitionDuration: Duration(milliseconds: 300),
+              ),
             );
           },
         ),
-        title: Text('Halaman Penjualan'),
+        title: Text('Transaksi Penjualan'),
         backgroundColor: Color.fromARGB(255, 219, 42, 15),
       ),
       body: Padding(
@@ -142,48 +206,101 @@ class _PenjualanPageState extends State<PenjualanPage> {
                 ),
                 SizedBox(height: 10),
                 Text(
-                  'ID Sparepart',
+                  'Item',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-                TextFormField(
-                  onSaved: (value) => _idSparepart = value,
-                  decoration: InputDecoration(
-                    hintText: 'Masukkan ID Sparepart',
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: _items.length,
+                  itemBuilder: (context, index) {
+                    return Column(
+                      children: [
+                        SizedBox(height: 10),
+                        Text(
+                          'Sparepart ${index + 1}',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        TextFormField(
+                          onChanged: (value) =>
+                              _updateItem(index, 'idSparepart', value),
+                          decoration: InputDecoration(
+                            hintText: 'Masukkan ID Sparepart',
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        TextFormField(
+                          onChanged: (value) =>
+                              _updateItem(index, 'namaSparepart', value),
+                          decoration: InputDecoration(
+                            hintText: 'Masukkan Nama Sparepart',
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        TextFormField(
+                          onChanged: (value) => _updateItem(
+                              index, 'jumlahItem', int.tryParse(value)),
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            hintText: 'Masukkan Jumlah Item',
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        TextFormField(
+                          onChanged: (value) => _updateItem(
+                              index, 'hargaSparepart', double.tryParse(value)),
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            hintText: 'Masukkan Harga Sparepart',
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+                SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: _addItem,
+                  child: Icon(Icons.add),
+                  style: ElevatedButton.styleFrom(
+                    shape: CircleBorder(),
+                    padding: EdgeInsets.all(16),
                   ),
                 ),
                 SizedBox(height: 10),
                 Text(
-                  'Nama Sparepart',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  'Jumlah yang Harus Dibayar:',
+                  style: textStyle,
                 ),
                 TextFormField(
-                  onSaved: (value) => _namaSparepart = value,
+                  initialValue: _totalHarga.toString(),
+                  readOnly: true,
                   decoration: InputDecoration(
-                    hintText: 'Masukkan Nama Sparepart',
+                    hintText: 'Jumlah yang Harus Dibayar',
                   ),
                 ),
                 SizedBox(height: 10),
                 Text(
-                  'Jumlah Item',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  'Bayar:',
+                  style: textStyle,
                 ),
                 TextFormField(
-                  onSaved: (value) => _jumlahItem = int.tryParse(value!),
+                  onChanged: (value) => _updateBayar(value),
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
-                    hintText: 'Masukkan Jumlah Item',
+                    hintText: 'Masukkan Jumlah Bayar',
                   ),
                 ),
                 SizedBox(height: 10),
                 Text(
-                  'Harga Sparepart',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  'Kembalian:',
+                  style: textStyle,
                 ),
                 TextFormField(
-                  onSaved: (value) => _hargaSparepart = int.tryParse(value!),
-                  keyboardType: TextInputType.number,
+                  initialValue: _kembalian.toString(),
+                  readOnly: true,
                   decoration: InputDecoration(
-                    hintText: 'Masukkan Harga Sparepart',
+                    hintText: 'Kembalian',
                   ),
                 ),
                 SizedBox(height: 10),
@@ -191,12 +308,6 @@ class _PenjualanPageState extends State<PenjualanPage> {
                   onPressed: _submitForm,
                   child: Text('Bayar'),
                 ),
-                SizedBox(height: 10),
-                if (_totalBayar != null)
-                  Text(
-                    'Nominal yang Harus Dibayar: Rp $_totalBayar',
-                    style: textStyle,
-                  ),
               ],
             ),
           ),

@@ -79,7 +79,7 @@ class _HomePageState extends State<HomePage> {
         children: [
           Image.asset(
             'assets/airamotor.png',
-            height: 150,
+            height: 170,
             width: 400,
           ),
           SizedBox(height: 0),
@@ -89,8 +89,17 @@ class _HomePageState extends State<HomePage> {
               height: 150,
               width: 400,
               decoration: BoxDecoration(
-                color: Color.fromRGBO(83, 152, 217, 0.9),
+                color: Color.fromRGBO(254, 143, 143, 1),
                 borderRadius: BorderRadius.circular(8),
+                boxShadow: [
+                  BoxShadow(
+                    color: Color.fromARGB(255, 71, 67, 67)
+                        .withOpacity(0.5), // Warna bayangan
+                    spreadRadius: 2, // Penyebaran bayangan
+                    blurRadius: 2, // Ukuran blur bayangan
+                    offset: Offset(0, 3), // Posisi bayangan
+                  ),
+                ],
               ),
               child: Column(
                 children: [
@@ -129,7 +138,7 @@ class _HomePageState extends State<HomePage> {
                   Container(
                     margin: EdgeInsets.only(top: 5),
                     child: Text(
-                      'Penjualan : 2',
+                      'Penjualan : 10',
                       style: TextStyle(
                           fontSize: 25,
                           fontWeight: FontWeight.bold,
@@ -190,7 +199,11 @@ class _HomePageState extends State<HomePage> {
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                        primary: Color.fromARGB(255, 244, 143, 177)),
+                      primary: Color.fromARGB(255, 237, 211, 210),
+                      elevation: 5, // Menambahkan elevasi untuk efek bayangan
+                      shadowColor: Colors.grey
+                          .withOpacity(1), // Warna bayangan (shadow color)
+                    ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -216,7 +229,7 @@ class _HomePageState extends State<HomePage> {
                         PageRouteBuilder(
                           pageBuilder:
                               (context, animation, secondaryAnimation) =>
-                                  PenjualanPage(),
+                                  TransaksiPenjualanPage(),
                           transitionsBuilder:
                               (context, animation, secondaryAnimation, child) {
                             var begin = Offset(1.0, 0.0);
@@ -235,7 +248,11 @@ class _HomePageState extends State<HomePage> {
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                        primary: Color.fromARGB(255, 244, 143, 177)),
+                      primary: Color.fromARGB(255, 237, 211, 210),
+                      elevation: 5, // Menambahkan elevasi untuk efek bayangan
+                      shadowColor: Colors.grey
+                          .withOpacity(1), // Warna bayangan (shadow color)
+                    ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -279,7 +296,12 @@ class _HomePageState extends State<HomePage> {
                         ),
                       );
                     },
-                    style: ElevatedButton.styleFrom(primary: Colors.pink[200]),
+                    style: ElevatedButton.styleFrom(
+                      primary: Color.fromARGB(255, 237, 211, 210),
+                      elevation: 5, // Menambahkan elevasi untuk efek bayangan
+                      shadowColor: Colors.grey
+                          .withOpacity(1), // Warna bayangan (shadow color)
+                    ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -325,7 +347,10 @@ class _HomePageState extends State<HomePage> {
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      primary: Color.fromARGB(255, 244, 143, 177),
+                      primary: Color.fromARGB(255, 237, 211, 210),
+                      elevation: 5, // Menambahkan elevasi untuk efek bayangan
+                      shadowColor: Colors.grey
+                          .withOpacity(1), // Warna bayangan (shadow color)
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
