@@ -44,10 +44,17 @@ class _RegisterPageState extends State<RegisterPage> {
           ScaffoldMessenger.of(context).showSnackBar(snackBar);
 
           Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (_) => LoginPage(showRegisterPage: () {})),
-          );
+              context,
+              PageRouteBuilder(
+                  transitionDuration: Duration(milliseconds: 500),
+                  pageBuilder: (_, __, ___) =>
+                      LoginPage(showRegisterPage: () {}),
+                  transitionsBuilder: (_, animation, __, child) {
+                    return FadeTransition(
+                      opacity: animation,
+                      child: child,
+                    );
+                  }));
         }
       } else {
         showDialog(

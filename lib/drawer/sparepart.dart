@@ -159,13 +159,19 @@ class _SparepartPageState extends State<SparepartPage> {
 
   void searchList(String query) {
     if (query.isNotEmpty) {
+      List<Map> searchResult = filteredList
+          .where((sparepart) => sparepart['namaSparepart']
+              .toLowerCase()
+              .contains(query.toLowerCase()))
+          .toList();
+
       setState(() {
         isSearching = true;
-        filteredList = filteredList
-            .where((sparepart) => sparepart['namaSparepart']
-                .toLowerCase()
-                .contains(query.toLowerCase()))
-            .toList();
+        filteredList = searchResult;
+      });
+    } else {
+      setState(() {
+        isSearching = false;
       });
     }
   }

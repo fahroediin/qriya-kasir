@@ -4,6 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'forgot_pw_page.dart';
 import 'home_page.dart';
 import 'register_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:animated_text_kit/animated_text_kit.dart';
 
 class LoginPage extends StatefulWidget {
   final VoidCallback showRegisterPage;
@@ -14,19 +16,41 @@ class LoginPage extends StatefulWidget {
   State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends State<LoginPage>
+    with SingleTickerProviderStateMixin {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final GlobalKey<FormState> _key = GlobalKey<FormState>();
   late ScaffoldMessengerState _scaffoldMessengerState;
   bool _obscurePassword = true;
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scaffoldMessengerState = ScaffoldMessenger.of(context);
+      _loadEmailHistory();
     });
+
+    _animationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 600),
+    );
+
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.easeInOut,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
   }
 
   void _showSnackBar(String message) {
@@ -37,6 +61,21 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  Future<void> _loadEmailHistory() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? email = prefs.getString('email');
+    if (email != null) {
+      setState(() {
+        _emailController.text = email;
+      });
+    }
+  }
+
+  Future<void> _saveEmailHistory() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('email', _emailController.text);
+  }
+
   Future<void> signIn() async {
     if (_key.currentState!.validate()) {
       try {
@@ -44,9 +83,22 @@ class _LoginPageState extends State<LoginPage> {
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
         );
+        _saveEmailHistory(); // Simpan histori email
+
+        // Menggunakan Navigator.pushReplacement dengan PageRouteBuilder untuk animasi transisi
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => HomePage()),
+          PageRouteBuilder(
+            transitionDuration: Duration(milliseconds: 600),
+            pageBuilder: (_, __, ___) => HomePage(),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              return FadeTransition(
+                opacity: animation,
+                child: child,
+              );
+            },
+          ),
         );
       } on FirebaseAuthException catch (e) {
         if (e.code == 'user-not-found') {
@@ -81,6 +133,28 @@ class _LoginPageState extends State<LoginPage> {
     return null;
   }
 
+  Future<void> _showRegisterPage() async {
+    _animationController.forward();
+    await Future.delayed(Duration(milliseconds: 1000));
+
+    // Menggunakan Navigator.push dengan PageRouteBuilder untuk animasi transisi
+    Navigator.push(
+      context,
+      PageRouteBuilder(
+        transitionDuration: Duration(milliseconds: 1000),
+        pageBuilder: (_, __, ___) => RegisterPage(
+          showLoginPage: () {},
+        ),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(
+            opacity: animation,
+            child: child,
+          );
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -93,18 +167,42 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  SizedBox(height: 50),
+                  Container(
+                    margin: EdgeInsets.only(left: 20.0),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Selamat Datang,',
+                        style: GoogleFonts.roboto(
+                          fontSize: 45,
+                          color: Color.fromARGB(255, 20, 20, 19),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(left: 20.0),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Login untuk melanjutkan.',
+                        style: GoogleFonts.roboto(
+                          fontSize: 20,
+                          color: Color.fromARGB(255, 20, 20, 19),
+                          fontWeight: FontWeight.w200,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20),
                   Image.asset(
                     'assets/login.png',
                     width: 250,
                     height: 250,
                   ),
-                  Text(
-                    'LOGIN',
-                    style: GoogleFonts.gugi(
-                      fontSize: 100,
-                      color: Color.fromARGB(255, 219, 42, 15),
-                    ),
-                  ),
+                  SizedBox(height: 20),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 25.0),
                     child: TextFormField(
@@ -121,6 +219,7 @@ class _LoginPageState extends State<LoginPage> {
                         hintText: 'Email',
                         fillColor: Color.fromARGB(255, 247, 243, 244),
                         filled: true,
+                        prefixIcon: Icon(Icons.email),
                       ),
                       validator: _emailValidator,
                     ),
@@ -156,6 +255,7 @@ class _LoginPageState extends State<LoginPage> {
                                 : Icons.visibility,
                           ),
                         ),
+                        prefixIcon: Icon(Icons.lock),
                       ),
                       validator: _passwordValidator,
                     ),
@@ -203,7 +303,9 @@ class _LoginPageState extends State<LoginPage> {
                       width: double.infinity,
                       height: 50,
                       child: ElevatedButton(
-                        onPressed: signIn,
+                        onPressed: () async {
+                          await signIn();
+                        },
                         child: Text(
                           'LOGIN',
                           style: TextStyle(
@@ -219,7 +321,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 100),
+                  SizedBox(height: 80),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -237,9 +339,10 @@ class _LoginPageState extends State<LoginPage> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (_) => RegisterPage(
-                                        showLoginPage: () {},
-                                      )),
+                                builder: (_) => RegisterPage(
+                                  showLoginPage: () {},
+                                ),
+                              ),
                             );
                           },
                           child: Text(

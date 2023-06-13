@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:project_s/pages/home_page.dart';
 import 'mekanik.dart';
+import 'dart:math';
 
 class AddMekanikPage extends StatefulWidget {
   const AddMekanikPage({Key? key}) : super(key: key);
@@ -15,8 +16,35 @@ class _AddMekanikPageState extends State<AddMekanikPage> {
   final TextEditingController _namaMekanikController = TextEditingController();
   final TextEditingController _alamatController = TextEditingController();
   final TextEditingController _noHpController = TextEditingController();
+  bool _isNoHpValid = true; // Variabel untuk menunjukkan validitas nomor HP
 
   final databaseReference = FirebaseDatabase.instance.reference();
+
+  @override
+  void initState() {
+    super.initState();
+    _idMekanikController.text = _generateIdMekanik();
+  }
+
+  String _generateIdMekanik() {
+    const String chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    Random random = Random();
+
+    String id = 'MK'; // Menginisialisasi dengan 'MK' sebagai awalan
+
+    // Generate 2 angka acak
+    int angka1 = random.nextInt(10);
+    int angka2 = random.nextInt(10);
+
+    // Generate 2 huruf acak
+    String huruf1 = chars[random.nextInt(26)];
+    String huruf2 = chars[random.nextInt(26)];
+
+    id +=
+        '$angka1$huruf1$angka2$huruf2'; // Menambahkan angka dan huruf acak ke ID
+
+    return id;
+  }
 
   void saveData() {
     String idMekanik = _idMekanikController.text.trim();
@@ -33,8 +61,8 @@ class _AddMekanikPageState extends State<AddMekanikPage> {
         'alamat': alamat,
         'noHp': noHp,
       }).then((_) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Mekanik succesfully added')));
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Mekanik successfully added')));
         _clearFields();
 
         // Navigasi ke halaman MekanikPage setelah data berhasil disimpan
@@ -93,6 +121,11 @@ class _AddMekanikPageState extends State<AddMekanikPage> {
             TextField(
               controller: _idMekanikController,
               keyboardType: TextInputType.text,
+              enabled: false, // Membuat TextField menjadi read-only
+              style: TextStyle(
+                color:
+                    Colors.grey, // Mengatur warna teks menjadi abu-abu (grey)
+              ),
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: 'ID Mekanik',
@@ -128,6 +161,30 @@ class _AddMekanikPageState extends State<AddMekanikPage> {
                 labelText: 'Nomer HP',
                 hintText: '',
               ),
+              onChanged: (value) {
+                if (value.length > 13) {
+                  // Jika panjang digit lebih dari 13
+                  // Potong nilai input menjadi 13 karakter
+                  value = value.substring(0, 13);
+
+                  setState(() {
+                    _noHpController.text = value;
+                    _noHpController.selection = TextSelection.fromPosition(
+                      TextPosition(offset: value.length),
+                    );
+                  });
+                }
+
+                if (value.length < 10 || value.length > 13) {
+                  setState(() {
+                    _isNoHpValid = false;
+                  });
+                } else {
+                  setState(() {
+                    _isNoHpValid = true;
+                  });
+                }
+              },
             ),
             SizedBox(height: 20),
             ElevatedButton(

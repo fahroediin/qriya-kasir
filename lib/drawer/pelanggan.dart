@@ -84,7 +84,7 @@ class _PelangganState extends State<Pelanggan> {
     return Container(
       margin: const EdgeInsets.all(10),
       padding: const EdgeInsets.all(10),
-      height: 250,
+      height: 210,
       decoration: BoxDecoration(
         color: Color.fromARGB(255, 232, 192, 145),
         borderRadius: BorderRadius.circular(10),

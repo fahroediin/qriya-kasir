@@ -13,7 +13,9 @@ class ListSparepartPage extends StatefulWidget {
 class _ListSparepartPageState extends State<ListSparepartPage> {
   Query dbRef = FirebaseDatabase.instance.reference().child('daftarSparepart');
   TextEditingController searchController = TextEditingController();
-  late List<Map> filteredList;
+  List<Map> searchResultList = [];
+  List<Map> sparepartList = [];
+  List<Map> filteredList = [];
   bool isSearching = false;
 
   @override
@@ -41,25 +43,46 @@ class _ListSparepartPageState extends State<ListSparepartPage> {
   }
 
   void searchList(String query) {
+    searchResultList.clear();
+
     if (query.isNotEmpty) {
-      setState(() {
-        isSearching = true;
-        filteredList = filteredList
-            .where((sparepart) =>
-                sparepart['namaSparepart']
-                    .toLowerCase()
-                    .contains(query.toLowerCase()) ||
-                sparepart['idSparepart']
-                    .toLowerCase()
-                    .contains(query.toLowerCase()))
-            .toList();
-      });
+      List<Map> searchResult = sparepartList
+          .where((sparepart) =>
+              sparepart['namaSparepart']
+                  .toLowerCase()
+                  .contains(query.toLowerCase()) ||
+              sparepart['specSparepart']
+                  .toLowerCase()
+                  .contains(query.toLowerCase()))
+          .toList();
+
+      if (searchResult.isNotEmpty) {
+        setState(() {
+          isSearching = true;
+          searchResultList.add(searchResult.first);
+        });
+      } else {
+        setState(() {
+          isSearching = false;
+        });
+      }
     } else {
       setState(() {
         isSearching = false;
-        filteredList = [];
       });
     }
+  }
+
+  Widget buildNoDataWidget() {
+    return Center(
+      child: Text(
+        'Data tidak ada',
+        style: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
   }
 
   @override
@@ -71,7 +94,24 @@ class _ListSparepartPageState extends State<ListSparepartPage> {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => HomePage()),
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    HomePage(),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  var begin = Offset(1.0, 0.0);
+                  var end = Offset.zero;
+                  var curve = Curves.ease;
+
+                  var tween = Tween(begin: begin, end: end)
+                      .chain(CurveTween(curve: curve));
+
+                  return SlideTransition(
+                    position: animation.drive(tween),
+                    child: child,
+                  );
+                },
+              ),
             );
           },
         ),
@@ -103,19 +143,21 @@ class _ListSparepartPageState extends State<ListSparepartPage> {
             ),
             Expanded(
               child: isSearching
-                  ? ListView.builder(
-                      itemCount: filteredList.length,
-                      itemBuilder: (context, index) {
-                        final sparepart = filteredList[index];
-                        return Column(
-                          children: [
-                            listItem(sparepart: sparepart),
-                            SizedBox(height: 8),
-                            Divider(color: Colors.grey[400]),
-                          ],
-                        );
-                      },
-                    )
+                  ? searchResultList.isNotEmpty
+                      ? ListView.builder(
+                          itemCount: searchResultList.length,
+                          itemBuilder: (context, index) {
+                            final sparepart = searchResultList[index];
+                            return Column(
+                              children: [
+                                listItem(sparepart: sparepart),
+                                SizedBox(height: 8),
+                                Divider(color: Colors.grey[400]),
+                              ],
+                            );
+                          },
+                        )
+                      : buildNoDataWidget()
                   : FirebaseAnimatedList(
                       shrinkWrap: true,
                       physics: ClampingScrollPhysics(),
@@ -124,6 +166,7 @@ class _ListSparepartPageState extends State<ListSparepartPage> {
                           Animation<double> animation, int index) {
                         Map sparepart = snapshot.value as Map;
                         sparepart['key'] = snapshot.key;
+                        sparepartList.add(sparepart); // Tambahkan ini
 
                         return Column(
                           children: [

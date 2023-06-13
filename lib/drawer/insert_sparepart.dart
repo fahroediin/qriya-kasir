@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:project_s/drawer/sparepart.dart';
 import 'package:project_s/pages/home_page.dart';
+import 'dart:math';
 
 class InputSparepartPage extends StatefulWidget {
   const InputSparepartPage({Key? key}) : super(key: key);
@@ -25,6 +26,22 @@ class _InputSparepartPageState extends State<InputSparepartPage>
       TextEditingController();
 
   final databaseReference = FirebaseDatabase.instance.reference();
+
+  @override
+  void initState() {
+    super.initState();
+    _idSparepartController.text = generateID();
+  }
+
+  String generateID() {
+    // Generate 4 random digits
+    String randomDigits = '';
+    for (int i = 0; i < 4; i++) {
+      randomDigits += '${Random().nextInt(10)}';
+    }
+
+    return 'SP$randomDigits';
+  }
 
   void saveData() {
     String idSparepart = _idSparepartController.text.trim();
@@ -110,6 +127,7 @@ class _InputSparepartPageState extends State<InputSparepartPage>
             SizedBox(height: 10),
             TextField(
               controller: _idSparepartController,
+              enabled: false, // Set TextField menjadi read-only
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: 'ID Sparepart',

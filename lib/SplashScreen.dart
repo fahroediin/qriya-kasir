@@ -43,8 +43,8 @@ class _SplashScreenState extends State<SplashScreen> {
               children: <Widget>[
                 Image.asset(
                   'assets/qriya-logo.png',
-                  width: 400.0,
-                  height: 400.0,
+                  width: 200.0,
+                  height: 200.0,
                 ),
                 CircularProgressIndicator(
                   backgroundColor: Colors.grey,

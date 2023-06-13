@@ -313,84 +313,103 @@ class _ServisPageState extends State<ServisPage> {
                 shrinkWrap: true,
                 itemCount: _sparepartItems.length,
                 itemBuilder: (context, index) {
-                  return Card(
-                    child: Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Item ${index + 1}'),
-                          SizedBox(height: 8.0),
-                          TextFormField(
-                            decoration:
-                                InputDecoration(labelText: 'ID Sparepart'),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'ID sparepart tidak boleh kosong';
-                              }
-                              return null;
-                            },
-                            onChanged: (value) {
-                              updateItem(index, 'idSparepart', value);
-                            },
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.only(right: 10.0),
+                            child: TextFormField(
+                              onChanged: (value) {
+                                updateItem(index, 'idSparepart', value);
+                              },
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'ID Sparepart tidak boleh kosong';
+                                }
+                                return null;
+                              },
+                              decoration: InputDecoration(
+                                labelText: 'ID Sparepart',
+                              ),
+                            ),
                           ),
-                          SizedBox(height: 8.0),
-                          TextFormField(
-                            decoration:
-                                InputDecoration(labelText: 'Nama Sparepart'),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Nama sparepart tidak boleh kosong';
-                              }
-                              return null;
-                            },
-                            onChanged: (value) {
-                              updateItem(index, 'namaSparepart', value);
-                            },
+                        ),
+                        Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.only(right: 10.0),
+                            child: TextFormField(
+                              onChanged: (value) {
+                                updateItem(index, 'namaSparepart', value);
+                              },
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Nama Sparepart tidak boleh kosong';
+                                }
+                                return null;
+                              },
+                              decoration: InputDecoration(
+                                labelText: 'Nama Sparepart',
+                              ),
+                            ),
                           ),
-                          SizedBox(height: 8.0),
-                          TextFormField(
-                            decoration:
-                                InputDecoration(labelText: 'Harga Sparepart'),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Harga tidak boleh kosong';
-                              }
-                              return null;
-                            },
-                            keyboardType: TextInputType.number,
-                            onChanged: (value) {
-                              double hargaSparepart =
-                                  double.tryParse(value) ?? 0;
-                              updateItem(
-                                  index, 'hargaSparepart', hargaSparepart);
-                            },
+                        ),
+                        Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.only(right: 10.0),
+                            child: TextFormField(
+                              onChanged: (value) {
+                                double hargaSparepart =
+                                    double.tryParse(value) ?? 0;
+                                updateItem(
+                                    index, 'hargaSparepart', hargaSparepart);
+                              },
+                              keyboardType: TextInputType.number,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Harga Sparepart tidak boleh kosong';
+                                }
+                                return null;
+                              },
+                              inputFormatters: <TextInputFormatter>[
+                                FilteringTextInputFormatter.allow(
+                                    RegExp(r'[0-9.]')),
+                              ],
+                              decoration: InputDecoration(
+                                labelText: 'Harga Sparepart',
+                              ),
+                            ),
                           ),
-                          SizedBox(height: 8.0),
-                          TextFormField(
-                            decoration:
-                                InputDecoration(labelText: 'Jumlah Item'),
-                            keyboardType: TextInputType.number,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'jumlah tidak boleh kosong';
-                              }
-                              return null;
-                            },
-                            onChanged: (value) {
-                              int jumlahItem = int.tryParse(value) ?? 0;
-                              updateItem(index, 'jumlahItem', jumlahItem);
-                            },
+                        ),
+                        Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.only(right: 10.0),
+                            child: TextFormField(
+                              onChanged: (value) {
+                                int jumlahItem = int.tryParse(value) ?? 0;
+                                updateItem(index, 'jumlahItem', jumlahItem);
+                              },
+                              keyboardType: TextInputType.number,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Jumlah Sparepart tidak boleh kosong';
+                                }
+                                return null;
+                              },
+                              decoration: InputDecoration(
+                                labelText: 'Jumlah Sparepart',
+                              ),
+                            ),
                           ),
-                          SizedBox(height: 8.0),
-                          IconButton(
-                            icon: Icon(Icons.delete),
-                            onPressed: () {
-                              removeItem(index);
-                            },
-                          ),
-                        ],
-                      ),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.remove),
+                          onPressed: () {
+                            removeItem(index);
+                          },
+                        ),
+                      ],
                     ),
                   );
                 },
