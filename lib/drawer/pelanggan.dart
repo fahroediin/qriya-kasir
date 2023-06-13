@@ -169,31 +169,30 @@ class _PelangganState extends State<Pelanggan> {
                 ),
               ),
               SizedBox(width: 16),
-              TextButton(
-                onPressed: () {
+              GestureDetector(
+                onTap: () {
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
                       return AlertDialog(
                         title: Text('Konfirmasi'),
-                        content: Text(
-                          'Apakah Anda yakin ingin menghapus pelanggan ini?',
-                        ),
+                        content: Text('Hapus data pelanggan?'),
                         actions: [
                           TextButton(
                             onPressed: () {
-                              Navigator.of(context).pop();
+                              Navigator.of(context).pop(); // Tutup dialog
                             },
                             child: Text('No'),
                           ),
                           TextButton(
                             onPressed: () {
+                              // Hapus data
                               FirebaseDatabase.instance
                                   .reference()
                                   .child('daftarPelanggan')
                                   .child(snapshot.key!)
                                   .remove();
-                              Navigator.of(context).pop();
+                              Navigator.of(context).pop(); // Tutup dialog
                             },
                             child: Text('Yes'),
                           ),
@@ -202,9 +201,9 @@ class _PelangganState extends State<Pelanggan> {
                     },
                   );
                 },
-                child: Text(
-                  'Hapus',
-                  style: TextStyle(color: Colors.red),
+                child: Icon(
+                  Icons.delete,
+                  color: Colors.red[700],
                 ),
               ),
             ],

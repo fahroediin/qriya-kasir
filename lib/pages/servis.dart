@@ -1,8 +1,10 @@
-import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/services.dart';
 import 'package:project_s/pages/home_page.dart';
+import 'package:uuid/uuid.dart';
+import 'package:intl/intl.dart';
 
 class ServisPage extends StatefulWidget {
   @override
@@ -11,91 +13,81 @@ class ServisPage extends StatefulWidget {
 
 class _ServisPageState extends State<ServisPage> {
   final _formKey = GlobalKey<FormState>();
-  DateTime _selectedDate = DateTime.now();
-  String _idServis = '';
-  String? _hariTanggal;
+  DateTime _selectedDateTime = DateTime.now();
+  String? _idServis;
+  String _formattedDateTime = '';
   String? _idMekanik;
   String? _namaMekanik;
   String? _nopol;
   String? _namaPemilik;
-  String? _merkSpm;
-  String? _tipeSpm;
+  String? _merkKendaraan;
+  String? _tipeKendaraan;
   String? _kerusakan;
-  String? _idSparepart;
-  String? _namaSparepart;
-  int? _hargaSparepart;
-  int? _jumlahSparepart;
-  int? _biayaServis;
-  int? _totalBayar;
-  int? _jumlahBayar;
-  int? _kembalian;
+  List<Map<String, dynamic>> _sparepartItems = [];
+  double _totalBayar = 0;
+  double _bayar = 0;
+  double _biayaServis = 0;
+  double _kembalian = 0;
 
   @override
   void initState() {
     super.initState();
     initializeFirebase();
+    generateIdServis();
+    updateDateTime();
+  }
+
+  void updateDateTime() {
+    setState(() {
+      _formattedDateTime =
+          DateFormat('dd/MM/yyyy HH:mm:ss').format(DateTime.now());
+    });
   }
 
   void initializeFirebase() async {
     await Firebase.initializeApp();
   }
 
-  String _generateIdServis() {
-    DateTime now = DateTime.now();
-    String formattedDate =
-        '${now.year}${_addLeadingZero(now.month)}${_addLeadingZero(now.day)}';
-    return formattedDate + _addLeadingZero(now.microsecondsSinceEpoch % 10000);
+  void generateIdServis() {
+    setState(() {
+      _idServis = Uuid().v4();
+    });
   }
 
-  String _addLeadingZero(int number) {
-    if (number.toString().length < 2) {
-      return '0$number';
-    }
-    return number.toString();
-  }
-
-  void _submitForm() {
+  void submitForm() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      setState(() {
-        _idServis = _generateIdServis();
-        _totalBayar = _hargaSparepart! * _jumlahSparepart! + _biayaServis!;
-        _kembalian = _jumlahBayar! - _totalBayar!;
-      });
-
-      saveTransaksiServis();
+      saveServisData();
     }
   }
 
-  void saveTransaksiServis() {
+  void saveServisData() {
     DatabaseReference reference =
         FirebaseDatabase.instance.reference().child('transaksiServis');
-
-    reference.push().set({
+    Map<String, dynamic> data = {
       'idServis': _idServis,
-      'hariTanggal': _hariTanggal,
+      'dateTime': _formattedDateTime,
       'idMekanik': _idMekanik,
       'namaMekanik': _namaMekanik,
       'nopol': _nopol,
       'namaPemilik': _namaPemilik,
-      'merkSpm': _merkSpm,
-      'tipeSpm': _tipeSpm,
+      'merkKendaraan': _merkKendaraan,
+      'tipeKendaraan': _tipeKendaraan,
       'kerusakan': _kerusakan,
-      'idSparepart': _idSparepart,
-      'namaSparepart': _namaSparepart,
-      'hargaSparepart': _hargaSparepart,
-      'jumlahSparepart': _jumlahSparepart,
-      'biayaServis': _biayaServis,
+      'sparepartItems': _sparepartItems,
       'totalBayar': _totalBayar,
-      'jumlahBayar': _jumlahBayar,
+      'biayaServis': _biayaServis,
+      'bayar': _bayar,
       'kembalian': _kembalian,
-    }).then((_) {
+    };
+
+    reference.push().set(data).then((_) {
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Data Servis Berhasil Disimpan'),
-            content: Text('Data servis berhasil disimpan.'),
+            title: Text('Proses sukses'),
+            content: Text('Servis berhasil diproses'),
             actions: <Widget>[
               TextButton(
                 child: Text('OK'),
@@ -131,236 +123,346 @@ class _ServisPageState extends State<ServisPage> {
     });
   }
 
+  void addItem() {
+    setState(() {
+      _sparepartItems.add({
+        'idSparepart': '',
+        'namaSparepart': '',
+        'hargaSparepart': 0,
+        'jumlahItem': 0,
+        'biayaServis': 0,
+      });
+    });
+  }
+
+  void updateItem(int index, String field, dynamic value) {
+    setState(() {
+      _sparepartItems[index][field] = value;
+      if (field == 'hargaSparepart' || field == 'jumlahItem') {
+        double hargaSparepart = _sparepartItems[index]['hargaSparepart'];
+        int jumlahItem = _sparepartItems[index]['jumlahItem'];
+        _sparepartItems[index]['biayaServis'] = hargaSparepart * jumlahItem;
+      }
+      calculateTotalBayar();
+    });
+  }
+
+  void removeItem(int index) {
+    setState(() {
+      _sparepartItems.removeAt(index);
+      calculateTotalBayar();
+    });
+  }
+
+  void calculateTotalBayar() {
+    double total = 0;
+    for (var item in _sparepartItems) {
+      total += item['biayaServis'];
+    }
+    setState(() {
+      _totalBayar = total;
+      calculateKembalian();
+    });
+  }
+
+  void calculateKembalian() {
+    double kembalian = _bayar - (_totalBayar + _biayaServis);
+    setState(() {
+      _kembalian = kembalian;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    var textStyle = TextStyle(fontWeight: FontWeight.bold);
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              PageRouteBuilder(
-                pageBuilder: (context, animation, secondaryAnimation) =>
-                    HomePage(),
-                transitionsBuilder:
-                    (context, animation, secondaryAnimation, child) {
-                  var begin = Offset(1.0, 0.0);
-                  var end = Offset.zero;
-                  var curve = Curves.ease;
-
-                  var tween = Tween(begin: begin, end: end)
-                      .chain(CurveTween(curve: curve));
-
-                  return SlideTransition(
-                    position: animation.drive(tween),
-                    child: child,
-                  );
-                },
-                transitionDuration: Duration(milliseconds: 300),
-              ),
-            );
-          },
-        ),
         title: Text('Halaman Servis'),
         backgroundColor: Color.fromARGB(255, 219, 42, 15),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  'ID Servis',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+          child: ListView(
+            children: [
+              Text(
+                'ID Transaksi',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              TextFormField(
+                initialValue: _idServis,
+                readOnly: true,
+                style: TextStyle(color: Colors.grey),
+                decoration: InputDecoration(),
+              ),
+              Container(
+                margin: EdgeInsets.symmetric(vertical: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Tanggal dan Waktu',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      _formattedDateTime,
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ],
                 ),
-                TextFormField(
-                  initialValue: _idServis,
-                  enabled: false,
-                  decoration: InputDecoration(
-                    hintText: 'ID Servis akan dihasilkan otomatis',
+              ),
+              SizedBox(height: 8.0),
+              TextFormField(
+                decoration: InputDecoration(labelText: 'ID Mekanik'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'ID Mekanik tidak boleh kosong';
+                  }
+                  return null;
+                },
+                onSaved: (value) {
+                  _idMekanik = value;
+                },
+              ),
+              SizedBox(height: 8.0),
+              TextFormField(
+                decoration: InputDecoration(labelText: 'Nama Mekanik'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Nama Mekanik tidak boleh kosong';
+                  }
+                  return null;
+                },
+                onSaved: (value) {
+                  _namaMekanik = value;
+                },
+              ),
+              SizedBox(height: 8.0),
+              TextFormField(
+                decoration: InputDecoration(labelText: 'Nomor Polisi'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Nomor Polisi tidak boleh kosong';
+                  }
+                  return null;
+                },
+                onSaved: (value) {
+                  _nopol = value;
+                },
+              ),
+              SizedBox(height: 8.0),
+              TextFormField(
+                decoration: InputDecoration(labelText: 'Nama Pemilik'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Nama Pemilik tidak boleh kosong';
+                  }
+                  return null;
+                },
+                onSaved: (value) {
+                  _namaPemilik = value;
+                },
+              ),
+              SizedBox(height: 8.0),
+              TextFormField(
+                decoration: InputDecoration(labelText: 'Merk Kendaraan'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Merk Kendaraan tidak boleh kosong';
+                  }
+                  return null;
+                },
+                onSaved: (value) {
+                  _merkKendaraan = value;
+                },
+              ),
+              SizedBox(height: 8.0),
+              TextFormField(
+                decoration: InputDecoration(labelText: 'Tipe Kendaraan'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Tipe Kendaraan tidak boleh kosong';
+                  }
+                  return null;
+                },
+                onSaved: (value) {
+                  _tipeKendaraan = value;
+                },
+              ),
+              SizedBox(height: 8.0),
+              TextFormField(
+                decoration: InputDecoration(labelText: 'Kerusakan'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Kerusakan tidak boleh kosong';
+                  }
+                  return null;
+                },
+                onSaved: (value) {
+                  _kerusakan = value;
+                },
+              ),
+              SizedBox(height: 16.0),
+              Text(
+                'Data Sparepart',
+                style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8.0),
+              ListView.builder(
+                shrinkWrap: true,
+                itemCount: _sparepartItems.length,
+                itemBuilder: (context, index) {
+                  return Card(
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Item ${index + 1}'),
+                          SizedBox(height: 8.0),
+                          TextFormField(
+                            decoration:
+                                InputDecoration(labelText: 'ID Sparepart'),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'ID sparepart tidak boleh kosong';
+                              }
+                              return null;
+                            },
+                            onChanged: (value) {
+                              updateItem(index, 'idSparepart', value);
+                            },
+                          ),
+                          SizedBox(height: 8.0),
+                          TextFormField(
+                            decoration:
+                                InputDecoration(labelText: 'Nama Sparepart'),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Nama sparepart tidak boleh kosong';
+                              }
+                              return null;
+                            },
+                            onChanged: (value) {
+                              updateItem(index, 'namaSparepart', value);
+                            },
+                          ),
+                          SizedBox(height: 8.0),
+                          TextFormField(
+                            decoration:
+                                InputDecoration(labelText: 'Harga Sparepart'),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Harga tidak boleh kosong';
+                              }
+                              return null;
+                            },
+                            keyboardType: TextInputType.number,
+                            onChanged: (value) {
+                              double hargaSparepart =
+                                  double.tryParse(value) ?? 0;
+                              updateItem(
+                                  index, 'hargaSparepart', hargaSparepart);
+                            },
+                          ),
+                          SizedBox(height: 8.0),
+                          TextFormField(
+                            decoration:
+                                InputDecoration(labelText: 'Jumlah Item'),
+                            keyboardType: TextInputType.number,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'jumlah tidak boleh kosong';
+                              }
+                              return null;
+                            },
+                            onChanged: (value) {
+                              int jumlahItem = int.tryParse(value) ?? 0;
+                              updateItem(index, 'jumlahItem', jumlahItem);
+                            },
+                          ),
+                          SizedBox(height: 8.0),
+                          IconButton(
+                            icon: Icon(Icons.delete),
+                            onPressed: () {
+                              removeItem(index);
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+              SizedBox(height: 8.0),
+              Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Color.fromARGB(255, 219, 42, 15),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 2,
+                      blurRadius: 4,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: InkWell(
+                  onTap: addItem,
+                  borderRadius: BorderRadius.circular(25),
+                  child: Icon(
+                    Icons.add,
+                    color: Colors.white,
                   ),
                 ),
-                SizedBox(height: 10),
-                Text(
-                  'Hari/Tanggal',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 16.0),
+              Text('Total Bayar: $_totalBayar'),
+              SizedBox(height: 8.0),
+              TextFormField(
+                decoration: InputDecoration(labelText: 'Biaya Servis'),
+                keyboardType: TextInputType.number,
+                onChanged: (value) {
+                  double biayaServis = double.tryParse(value) ?? 0;
+                  setState(() {
+                    _biayaServis = biayaServis;
+                    calculateKembalian();
+                  });
+                },
+              ),
+              SizedBox(height: 8.0),
+              TextFormField(
+                decoration: InputDecoration(labelText: 'Bayar'),
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Kolom bayar tidak boleh kosong';
+                  }
+                  return null;
+                },
+                onChanged: (value) {
+                  double bayar = double.tryParse(value) ?? 0;
+                  setState(() {
+                    _bayar = bayar;
+                    calculateKembalian();
+                  });
+                },
+              ),
+              SizedBox(height: 8.0),
+              Text('Kembalian: $_kembalian'),
+              SizedBox(height: 16.0),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  primary: Color.fromARGB(255, 219, 42, 15),
                 ),
-                TextFormField(
-                  onSaved: (value) => _hariTanggal = value,
-                  decoration: InputDecoration(
-                    hintText: 'Masukkan Hari/Tanggal',
-                  ),
-                ),
-                SizedBox(height: 10),
-                Text(
-                  'ID Mekanik',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                TextFormField(
-                  onSaved: (value) => _idMekanik = value,
-                  decoration: InputDecoration(
-                    hintText: 'Masukkan ID Mekanik',
-                  ),
-                ),
-                SizedBox(height: 10),
-                Text(
-                  'Nama Mekanik',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                TextFormField(
-                  onSaved: (value) => _namaMekanik = value,
-                  decoration: InputDecoration(
-                    hintText: 'Masukkan Nama Mekanik',
-                  ),
-                ),
-                SizedBox(height: 10),
-                Text(
-                  'Nomor Polisi',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                TextFormField(
-                  onSaved: (value) => _nopol = value,
-                  decoration: InputDecoration(
-                    hintText: 'Masukkan Nomor Polisi',
-                  ),
-                ),
-                SizedBox(height: 10),
-                Text(
-                  'Nama Pemilik',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                TextFormField(
-                  onSaved: (value) => _namaPemilik = value,
-                  decoration: InputDecoration(
-                    hintText: 'Masukkan Nama Pemilik',
-                  ),
-                ),
-                SizedBox(height: 10),
-                Text(
-                  'Merk Kendaraan',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                TextFormField(
-                  onSaved: (value) => _merkSpm = value,
-                  decoration: InputDecoration(
-                    hintText: 'Masukkan Merk Kendaraan',
-                  ),
-                ),
-                SizedBox(height: 10),
-                Text(
-                  'Tipe Kendaraan',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                TextFormField(
-                  onSaved: (value) => _tipeSpm = value,
-                  decoration: InputDecoration(
-                    hintText: 'Masukkan Tipe Kendaraan',
-                  ),
-                ),
-                SizedBox(height: 10),
-                Text(
-                  'Kerusakan',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                TextFormField(
-                  onSaved: (value) => _kerusakan = value,
-                  decoration: InputDecoration(
-                    hintText: 'Masukkan Kerusakan',
-                  ),
-                ),
-                SizedBox(height: 10),
-                Text(
-                  'ID Sparepart',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                TextFormField(
-                  onSaved: (value) => _idSparepart = value,
-                  decoration: InputDecoration(
-                    hintText: 'Masukkan ID Sparepart',
-                  ),
-                ),
-                SizedBox(height: 10),
-                Text(
-                  'Nama Sparepart',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                TextFormField(
-                  onSaved: (value) => _namaSparepart = value,
-                  decoration: InputDecoration(
-                    hintText: 'Masukkan Nama Sparepart',
-                  ),
-                ),
-                SizedBox(height: 10),
-                Text(
-                  'Harga Sparepart',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                TextFormField(
-                  onSaved: (value) => _hargaSparepart = int.tryParse(value!),
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    hintText: 'Masukkan Harga Sparepart',
-                  ),
-                ),
-                SizedBox(height: 10),
-                Text(
-                  'Jumlah Sparepart',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                TextFormField(
-                  onSaved: (value) => _jumlahSparepart = int.tryParse(value!),
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    hintText: 'Masukkan Jumlah Sparepart',
-                  ),
-                ),
-                SizedBox(height: 10),
-                Text(
-                  'Biaya Servis',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                TextFormField(
-                  onSaved: (value) => _biayaServis = int.tryParse(value!),
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    hintText: 'Masukkan Biaya Servis',
-                  ),
-                ),
-                SizedBox(height: 10),
-                Text(
-                  'Jumlah Bayar',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                TextFormField(
-                  onSaved: (value) => _jumlahBayar = int.tryParse(value!),
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    hintText: 'Masukkan Jumlah Bayar',
-                  ),
-                ),
-                SizedBox(height: 10),
-                ElevatedButton(
-                  onPressed: _submitForm,
-                  child: Text('Simpan'),
-                ),
-                SizedBox(height: 10),
-                if (_totalBayar != null)
-                  Text(
-                    'Total Bayar: Rp $_totalBayar',
-                    style: textStyle,
-                  ),
-                if (_kembalian != null)
-                  Text(
-                    'Kembalian: Rp $_kembalian',
-                    style: textStyle,
-                  ),
-              ],
-            ),
+                child: Text('Proses Servis'),
+                onPressed: submitForm,
+              ),
+            ],
           ),
         ),
       ),

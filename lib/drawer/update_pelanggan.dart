@@ -48,121 +48,126 @@ class _UpdatePelangganState extends State<UpdatePelanggan> {
         backgroundColor:
             Color.fromARGB(255, 219, 42, 15), // Change AppBar color
       ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              const SizedBox(
-                height: 20,
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              TextField(
-                controller: nopolController,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Nomor Polisi',
-                  hintText: 'Masukkan Nomor Polisi',
+      body: SingleChildScrollView(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                const SizedBox(
+                  height: 20,
                 ),
-              ),
-              const SizedBox(
-                height: 30,
-              ),
-              TextField(
-                controller: merkSpmController,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Merk SPM',
-                  hintText: 'Masukkan Merk SPM',
+                const SizedBox(
+                  height: 20,
                 ),
-              ),
-              const SizedBox(
-                height: 30,
-              ),
-              TextField(
-                controller: tipeSpmController,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Tipe SPM',
-                  hintText: 'Masukkan Tipe SPM',
+                TextField(
+                  controller: nopolController,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Nomor Polisi',
+                    hintText: 'Masukkan Nomor Polisi',
+                  ),
                 ),
-              ),
-              const SizedBox(
-                height: 30,
-              ),
-              TextField(
-                controller: namaPelangganController,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Nama Pelanggan',
-                  hintText: 'Masukkan Nama Pelanggan',
+                const SizedBox(
+                  height: 30,
                 ),
-              ),
-              const SizedBox(
-                height: 30,
-              ),
-              TextField(
-                controller: alamatController,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Alamat',
-                  hintText: 'Masukkan Alamat',
+                TextField(
+                  controller: merkSpmController,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Merk SPM',
+                    hintText: 'Masukkan Merk SPM',
+                  ),
                 ),
-              ),
-              const SizedBox(
-                height: 30,
-              ),
-              TextField(
-                controller: noHpController,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Nomor HP',
-                  hintText: 'Masukkan Nomor HP',
+                const SizedBox(
+                  height: 30,
                 ),
-              ),
-              SizedBox(height: 10),
-              MaterialButton(
-                onPressed: () {
-                  Map<String, dynamic> pelanggan = {
-                    'nopol': nopolController.text,
-                    'merkSpm': merkSpmController.text,
-                    'tipeSpm': tipeSpmController.text,
-                    'namaPelanggan': namaPelangganController.text,
-                    'alamat': alamatController.text,
-                    'noHp': noHpController.text,
-                  };
+                TextField(
+                  controller: tipeSpmController,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Tipe SPM',
+                    hintText: 'Masukkan Tipe SPM',
+                  ),
+                ),
+                const SizedBox(
+                  height: 30,
+                ),
+                TextField(
+                  controller: namaPelangganController,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Nama Pelanggan',
+                    hintText: 'Masukkan Nama Pelanggan',
+                  ),
+                ),
+                const SizedBox(
+                  height: 30,
+                ),
+                TextField(
+                  controller: alamatController,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Alamat',
+                    hintText: 'Masukkan Alamat',
+                  ),
+                ),
+                const SizedBox(
+                  height: 30,
+                ),
+                TextField(
+                  controller: noHpController,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Nomor HP',
+                    hintText: 'Masukkan Nomor HP',
+                  ),
+                ),
+                SizedBox(height: 10),
+                MaterialButton(
+                  onPressed: () {
+                    Map<String, dynamic> pelanggan = {
+                      'nopol': nopolController.text,
+                      'merkSpm': merkSpmController.text,
+                      'tipeSpm': tipeSpmController.text,
+                      'namaPelanggan': namaPelangganController.text,
+                      'alamat': alamatController.text,
+                      'noHp': noHpController.text,
+                    };
 
-                  dbRef.child(widget.pelangganKey).update(pelanggan).then((_) {
-                    Navigator.pop(context);
-                  }).catchError((error) {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: const Text('Error'),
-                          content: Text('Failed to update record: $error'),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: const Text('OK'),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  });
-                },
-                child: const Text('Update Data'),
-                color: Color.fromARGB(255, 219, 42, 15),
-                textColor: Colors.white,
-                minWidth: 500,
-                height: 40,
-              ),
-            ],
+                    dbRef
+                        .child(widget.pelangganKey)
+                        .update(pelanggan)
+                        .then((_) {
+                      Navigator.pop(context);
+                    }).catchError((error) {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text('Error'),
+                            content: Text('Failed to update record: $error'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: const Text('OK'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    });
+                  },
+                  child: const Text('Update Data'),
+                  color: Color.fromARGB(255, 219, 42, 15),
+                  textColor: Colors.white,
+                  minWidth: 500,
+                  height: 40,
+                ),
+              ],
+            ),
           ),
         ),
       ),

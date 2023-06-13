@@ -18,6 +18,7 @@ import 'package:project_s/drawer/about.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:project_s/pages/transaksi.dart';
+import 'dart:io';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -32,7 +33,6 @@ class _HomePageState extends State<HomePage> {
   DatabaseReference _databaseReference = FirebaseDatabase.instance.reference();
 
   int _dataCount = 0;
-  int _transaksiPenjualanCount = 0;
 
   @override
   void initState() {
@@ -139,7 +139,7 @@ class _HomePageState extends State<HomePage> {
                   Container(
                     margin: EdgeInsets.only(top: 5),
                     child: Text(
-                      'Penjualan : (${_transaksiPenjualanCount.toString()})',
+                      'Penjualan : 10',
                       style: TextStyle(
                           fontSize: 25,
                           fontWeight: FontWeight.normal,
@@ -421,7 +421,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 );
               },
-              leading: Icon(Icons.storage),
+              leading: Icon(Icons.group),
               title: Text('Data Pelanggan'),
             ),
             ListTile(
@@ -432,7 +432,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 );
               },
-              leading: Icon(Icons.storage),
+              leading: Icon(Icons.book),
               title: Text('Laporan'),
             ),
             ListTile(

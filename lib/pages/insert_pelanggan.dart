@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:project_s/pages/home_page.dart';
+import 'package:flutter/services.dart';
 
 class InputPelangganPage extends StatefulWidget {
   const InputPelangganPage({Key? key}) : super(key: key);
@@ -126,6 +127,16 @@ class _InputPelangganPageState extends State<InputPelangganPage>
     super.dispose();
   }
 
+  String? _validateInput(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Nomor harus diisi';
+    }
+    if (int.tryParse(value) == null) {
+      return 'Hanya angka yang diperbolehkan';
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -174,32 +185,72 @@ class _InputPelangganPageState extends State<InputPelangganPage>
               Row(
                 children: [
                   Expanded(
-                    child: TextField(
+                    child: TextFormField(
                       controller: _nopolAwalanController,
                       decoration: InputDecoration(
                         border: OutlineInputBorder(),
                         hintText: 'Awalan',
                       ),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z]')),
+                        LengthLimitingTextInputFormatter(2),
+                      ],
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Wajib diisi';
+                        }
+                        if (value.length != 2) {
+                          return 'Harus terdiri dari 2 huruf';
+                        }
+                        return null;
+                      },
                     ),
                   ),
                   SizedBox(width: 10),
                   Expanded(
-                    child: TextField(
+                    child: TextFormField(
                       controller: _nopolNomorController,
                       decoration: InputDecoration(
                         border: OutlineInputBorder(),
                         hintText: 'Nomor',
                       ),
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                        LengthLimitingTextInputFormatter(4),
+                      ],
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Wajib diisi';
+                        }
+                        if (value.length < 1 || value.length > 4) {
+                          return 'Harus terdiri dari 1 hingga 4 digit angka';
+                        }
+                        return null;
+                      },
                     ),
                   ),
                   SizedBox(width: 10),
                   Expanded(
-                    child: TextField(
+                    child: TextFormField(
                       controller: _nopolAkhiranController,
                       decoration: InputDecoration(
                         border: OutlineInputBorder(),
                         hintText: 'Akhiran',
                       ),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z]')),
+                        LengthLimitingTextInputFormatter(2),
+                      ],
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Wajib diisi';
+                        }
+                        if (value.length != 2) {
+                          return 'Harus terdiri dari 2 huruf';
+                        }
+                        return null;
+                      },
                     ),
                   ),
                 ],
@@ -234,12 +285,24 @@ class _InputPelangganPageState extends State<InputPelangganPage>
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 10),
-              TextField(
+              TextFormField(
                 controller: _tipeSpmController,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
-                  hintText: 'Tipe Sepeda Motor (contoh:"Beat 2021")',
+                  hintText: 'Tipe Sepeda Motor (Contoh: "Beat 2021")',
                 ),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9]')),
+                ],
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Wajib diisi';
+                  }
+                  if (value.length < 3) {
+                    return 'Minimal terdiri dari 3 karakter';
+                  }
+                  return null;
+                },
               ),
               SizedBox(height: 10),
               Text(
@@ -247,12 +310,25 @@ class _InputPelangganPageState extends State<InputPelangganPage>
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 10),
-              TextField(
+              TextFormField(
                 controller: _namaPelangganController,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
-                  hintText: 'Nama Pemilik kendaraan',
+                  hintText: 'Nama Pemilik',
                 ),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z]')),
+                  LengthLimitingTextInputFormatter(255),
+                ],
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Wajib diisi';
+                  }
+                  if (value.length < 3) {
+                    return 'Minimal 3 huruf';
+                  }
+                  return null;
+                },
               ),
               SizedBox(height: 20),
               Text(
@@ -273,12 +349,26 @@ class _InputPelangganPageState extends State<InputPelangganPage>
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 10),
-              TextField(
+              TextFormField(
                 controller: _noHpController,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
                   hintText: 'Nomor HP',
                 ),
+                keyboardType: TextInputType.phone,
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                  LengthLimitingTextInputFormatter(13),
+                ],
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Wajib diisi';
+                  }
+                  if (value.length < 11 || value.length > 13) {
+                    return 'Harus terdiri dari 11 hingga 13 digit angka';
+                  }
+                  return null;
+                },
               ),
               SizedBox(height: 20),
               ElevatedButton(

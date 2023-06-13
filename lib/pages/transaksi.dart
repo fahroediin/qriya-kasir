@@ -72,8 +72,8 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Transaksi Berhasil'),
-            content: Text('Transaksi penjualan berhasil disimpan.'),
+            title: Text('Proses sukses'),
+            content: Text('Transaksi berhasil disimpan'),
             actions: <Widget>[
               TextButton(
                 child: Text('OK'),
