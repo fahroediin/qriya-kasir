@@ -17,10 +17,27 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
   String? _idPenjualan;
   String _formattedDateTime = ''; // Add this variable
   String? _namaPembeli;
-  List<Map<String, dynamic>> _items = [];
   double _totalHarga = 0;
   double _bayar = 0;
   double _kembalian = 0;
+  final List<Map<String, dynamic>> _items = [];
+  final List<Map<String, dynamic>> daftarSparepart = [
+    {
+      'idSparepart': '1',
+      'namaSparepart': 'Ban',
+      'hargaSparepart': 100000,
+    },
+    {
+      'idSparepart': '2',
+      'namaSparepart': 'Kampas Rem',
+      'hargaSparepart': 50000,
+    },
+    {
+      'idSparepart': '3',
+      'namaSparepart': 'Filter Oli',
+      'hargaSparepart': 25000,
+    },
+  ];
 
   @override
   void initState() {

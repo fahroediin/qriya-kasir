@@ -13,6 +13,23 @@ class LaporanServisPage extends StatefulWidget {
 class _LaporanServisPageState extends State<LaporanServisPage> {
   Query dbRef = FirebaseDatabase.instance.reference().child('transaksiServis');
 
+  int itemCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  Future<void> fetchData() async {
+    DataSnapshot snapshot = await dbRef.get();
+    if (snapshot.exists) {
+      setState(() {
+        itemCount = snapshot.children.length;
+      });
+    }
+  }
+
   Widget buildListItem(DataSnapshot snapshot) {
     Map transaksi = snapshot.value as Map;
     String idServis = snapshot.key ?? '';
@@ -129,27 +146,44 @@ class _LaporanServisPageState extends State<LaporanServisPage> {
         ),
         backgroundColor: Color.fromARGB(255, 219, 42, 15),
       ),
-      body: Container(
-        padding: EdgeInsets.all(16),
-        child: FirebaseAnimatedList(
-          shrinkWrap: true,
-          physics: ClampingScrollPhysics(),
-          query: dbRef,
-          itemBuilder: (BuildContext context, DataSnapshot snapshot,
-              Animation<double> animation, int index) {
-            if (snapshot.value == null) {
-              return buildNoDataWidget();
-            } else {
-              return Column(
-                children: [
-                  buildListItem(snapshot),
-                  SizedBox(height: 8),
-                  Divider(color: Colors.grey[400]),
-                ],
-              );
-            }
-          },
-        ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: EdgeInsets.all(16),
+            child: Text(
+              'Jumlah Data: $itemCount',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.normal,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Container(
+              padding: EdgeInsets.all(16),
+              child: FirebaseAnimatedList(
+                shrinkWrap: true,
+                physics: ClampingScrollPhysics(),
+                query: dbRef,
+                itemBuilder: (BuildContext context, DataSnapshot snapshot,
+                    Animation<double> animation, int index) {
+                  if (snapshot.value == null) {
+                    return buildNoDataWidget();
+                  } else {
+                    return Column(
+                      children: [
+                        buildListItem(snapshot),
+                        SizedBox(height: 8),
+                        Divider(color: Colors.grey[400]),
+                      ],
+                    );
+                  }
+                },
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
