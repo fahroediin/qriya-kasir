@@ -14,6 +14,8 @@ class _LaporanPenjualanPageState extends State<LaporanPenjualanPage> {
   Query dbRef =
       FirebaseDatabase.instance.reference().child('transaksiPenjualan');
 
+  int itemCount = 0;
+
   Widget buildListItem(DataSnapshot snapshot) {
     Map transaksi = snapshot.value as Map;
     String idPenjualan = snapshot.key ?? '';
@@ -77,6 +79,21 @@ class _LaporanPenjualanPageState extends State<LaporanPenjualanPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  Future<void> fetchData() async {
+    DataSnapshot snapshot = await dbRef.get();
+    if (snapshot.exists) {
+      setState(() {
+        itemCount = snapshot.children.length;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -115,27 +132,44 @@ class _LaporanPenjualanPageState extends State<LaporanPenjualanPage> {
         ),
         backgroundColor: Color.fromARGB(255, 219, 42, 15),
       ),
-      body: Container(
-        padding: EdgeInsets.all(16),
-        child: FirebaseAnimatedList(
-          shrinkWrap: true,
-          physics: ClampingScrollPhysics(),
-          query: dbRef,
-          itemBuilder: (BuildContext context, DataSnapshot snapshot,
-              Animation<double> animation, int index) {
-            if (snapshot.value == null) {
-              return buildNoDataWidget();
-            } else {
-              return Column(
-                children: [
-                  buildListItem(snapshot),
-                  SizedBox(height: 8),
-                  Divider(color: Colors.grey[400]),
-                ],
-              );
-            }
-          },
-        ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: EdgeInsets.all(16),
+            child: Text(
+              'Jumlah Data: $itemCount',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.normal,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Container(
+              padding: EdgeInsets.all(16),
+              child: FirebaseAnimatedList(
+                shrinkWrap: true,
+                physics: ClampingScrollPhysics(),
+                query: dbRef,
+                itemBuilder: (BuildContext context, DataSnapshot snapshot,
+                    Animation<double> animation, int index) {
+                  if (snapshot.value == null) {
+                    return buildNoDataWidget();
+                  } else {
+                    return Column(
+                      children: [
+                        buildListItem(snapshot),
+                        SizedBox(height: 8),
+                        Divider(color: Colors.grey[400]),
+                      ],
+                    );
+                  }
+                },
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
