@@ -76,7 +76,6 @@ class _ServisPageState extends State<ServisPage> {
       'kerusakan': _kerusakan,
       'sparepartItems': _sparepartItems,
       'totalBayar': _totalBayar,
-      'biayaServis': _biayaServis,
       'bayar': _bayar,
       'kembalian': _kembalian,
     };
@@ -219,7 +218,6 @@ class _ServisPageState extends State<ServisPage> {
                   if (value == null || value.isEmpty) {
                     return 'ID Mekanik tidak boleh kosong';
                   }
-                  return null;
                 },
                 onSaved: (value) {
                   _idMekanik = value;
@@ -232,7 +230,6 @@ class _ServisPageState extends State<ServisPage> {
                   if (value == null || value.isEmpty) {
                     return 'Nama Mekanik tidak boleh kosong';
                   }
-                  return null;
                 },
                 onSaved: (value) {
                   _namaMekanik = value;
@@ -245,7 +242,6 @@ class _ServisPageState extends State<ServisPage> {
                   if (value == null || value.isEmpty) {
                     return 'Nomor Polisi tidak boleh kosong';
                   }
-                  return null;
                 },
                 onSaved: (value) {
                   _nopol = value;
@@ -258,7 +254,6 @@ class _ServisPageState extends State<ServisPage> {
                   if (value == null || value.isEmpty) {
                     return 'Nama Pemilik tidak boleh kosong';
                   }
-                  return null;
                 },
                 onSaved: (value) {
                   _namaPemilik = value;
@@ -271,7 +266,6 @@ class _ServisPageState extends State<ServisPage> {
                   if (value == null || value.isEmpty) {
                     return 'Merk Kendaraan tidak boleh kosong';
                   }
-                  return null;
                 },
                 onSaved: (value) {
                   _merkKendaraan = value;
@@ -284,7 +278,6 @@ class _ServisPageState extends State<ServisPage> {
                   if (value == null || value.isEmpty) {
                     return 'Tipe Kendaraan tidak boleh kosong';
                   }
-                  return null;
                 },
                 onSaved: (value) {
                   _tipeKendaraan = value;
@@ -297,7 +290,6 @@ class _ServisPageState extends State<ServisPage> {
                   if (value == null || value.isEmpty) {
                     return 'Kerusakan tidak boleh kosong';
                   }
-                  return null;
                 },
                 onSaved: (value) {
                   _kerusakan = value;
@@ -328,7 +320,6 @@ class _ServisPageState extends State<ServisPage> {
                                 if (value == null || value.isEmpty) {
                                   return 'ID Sparepart tidak boleh kosong';
                                 }
-                                return null;
                               },
                               decoration: InputDecoration(
                                 labelText: 'ID Sparepart',
@@ -347,7 +338,6 @@ class _ServisPageState extends State<ServisPage> {
                                 if (value == null || value.isEmpty) {
                                   return 'Nama Sparepart tidak boleh kosong';
                                 }
-                                return null;
                               },
                               decoration: InputDecoration(
                                 labelText: 'Nama Sparepart',
@@ -370,7 +360,6 @@ class _ServisPageState extends State<ServisPage> {
                                 if (value == null || value.isEmpty) {
                                   return 'Harga Sparepart tidak boleh kosong';
                                 }
-                                return null;
                               },
                               inputFormatters: <TextInputFormatter>[
                                 FilteringTextInputFormatter.allow(
@@ -395,7 +384,6 @@ class _ServisPageState extends State<ServisPage> {
                                 if (value == null || value.isEmpty) {
                                   return 'Jumlah Sparepart tidak boleh kosong';
                                 }
-                                return null;
                               },
                               decoration: InputDecoration(
                                 labelText: 'Jumlah Sparepart',
@@ -461,7 +449,6 @@ class _ServisPageState extends State<ServisPage> {
                   if (value == null || value.isEmpty) {
                     return 'Kolom bayar tidak boleh kosong';
                   }
-                  return null;
                 },
                 onChanged: (value) {
                   double bayar = double.tryParse(value) ?? 0;

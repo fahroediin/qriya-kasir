@@ -13,11 +13,12 @@ import 'package:project_s/pages/login_page.dart';
 import 'package:project_s/pages/servis.dart';
 import 'package:project_s/pages/listSparepart.dart';
 import 'package:project_s/drawer/mekanik.dart';
-import 'package:project_s/drawer/report.dart';
+import 'package:project_s/drawer/laporanPenjualan.dart';
 import 'package:project_s/drawer/about.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:project_s/pages/transaksi.dart';
+import 'package:project_s/drawer/laporanServis.dart';
 import 'dart:io';
 
 class HomePage extends StatefulWidget {
@@ -76,306 +77,309 @@ class _HomePageState extends State<HomePage> {
         ),
         centerTitle: true,
       ),
-      body: Column(
-        children: [
-          Image.asset(
-            'assets/airamotor.png',
-            height: 170,
-            width: 400,
-          ),
-          SizedBox(height: 0),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            child: Container(
-              height: 150,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Image.asset(
+              'assets/airamotor.png',
+              height: 170,
               width: 400,
-              decoration: BoxDecoration(
-                color: Color.fromRGBO(254, 143, 143, 1),
-                borderRadius: BorderRadius.circular(8),
-                boxShadow: [
-                  BoxShadow(
-                    color: Color.fromARGB(255, 71, 67, 67)
-                        .withOpacity(0.5), // Warna bayangan
-                    spreadRadius: 2, // Penyebaran bayangan
-                    blurRadius: 2, // Ukuran blur bayangan
-                    offset: Offset(0, 3), // Posisi bayangan
-                  ),
-                ],
-              ),
-              child: Column(
-                children: [
-                  Container(
-                    margin: EdgeInsets.only(top: 5),
-                    child: Text(
-                      DateFormat.yMMMMEEEEd('initializedDateFormatting').format(
-                          DateTime.now()), // Format date with Indonesian locale
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+            ),
+            SizedBox(height: 0),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: Container(
+                height: 150,
+                width: 400,
+                decoration: BoxDecoration(
+                  color: Color.fromRGBO(254, 143, 143, 1),
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color.fromARGB(255, 71, 67, 67)
+                          .withOpacity(0.5), // Warna bayangan
+                      spreadRadius: 2, // Penyebaran bayangan
+                      blurRadius: 2, // Ukuran blur bayangan
+                      offset: Offset(0, 3), // Posisi bayangan
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    Container(
+                      margin: EdgeInsets.only(top: 5),
+                      child: Text(
+                        DateFormat.yMMMMEEEEd('initializedDateFormatting')
+                            .format(DateTime
+                                .now()), // Format date with Indonesian locale
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.only(top: 5),
-                    child: Text(
-                      'Transaksi Hari ini : 10',
-                      style: TextStyle(
-                          fontSize: 25,
-                          fontWeight: FontWeight.normal,
-                          color: Color.fromARGB(255, 63, 63, 62)),
+                    Container(
+                      margin: EdgeInsets.only(top: 5),
+                      child: Text(
+                        'Transaksi Hari ini : 10',
+                        style: const TextStyle(
+                            fontSize: 25,
+                            fontWeight: FontWeight.normal,
+                            color: Color.fromARGB(255, 63, 63, 62)),
+                      ),
                     ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.only(top: 5),
-                    child: Text(
-                      'Servis : $_dataCount',
-                      style: TextStyle(
-                          fontSize: 25,
-                          fontWeight: FontWeight.normal,
-                          color: Color.fromARGB(255, 63, 63, 62)),
+                    Container(
+                      margin: EdgeInsets.only(top: 5),
+                      child: Text(
+                        'Servis : $_dataCount',
+                        style: TextStyle(
+                            fontSize: 25,
+                            fontWeight: FontWeight.normal,
+                            color: Color.fromARGB(255, 63, 63, 62)),
+                      ),
                     ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.only(top: 5),
-                    child: Text(
-                      'Penjualan : 10',
-                      style: TextStyle(
-                          fontSize: 25,
-                          fontWeight: FontWeight.normal,
-                          color: Color.fromARGB(255, 63, 63, 62)),
-                    ),
-                  )
-                ],
-              ),
-            ),
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          Column(
-            children: [
-              Container(
-                child: Text(
-                  '- - Action Menu - -',
-                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.w300),
+                    Container(
+                      margin: EdgeInsets.only(top: 5),
+                      child: Text(
+                        'Penjualan : 10',
+                        style: TextStyle(
+                            fontSize: 25,
+                            fontWeight: FontWeight.normal,
+                            color: Color.fromARGB(255, 63, 63, 62)),
+                      ),
+                    )
+                  ],
                 ),
               ),
-            ],
-          ),
-
-          // Grid button
-          SingleChildScrollView(
-            child: Container(
-              margin: EdgeInsets.all(10.0),
-              child: GridView.count(
-                crossAxisCount: 2,
-                crossAxisSpacing: 16.0,
-                mainAxisSpacing: 16.0,
-                shrinkWrap: true,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        PageRouteBuilder(
-                          pageBuilder:
-                              (context, animation, secondaryAnimation) =>
-                                  ServisPage(),
-                          transitionsBuilder:
-                              (context, animation, secondaryAnimation, child) {
-                            var begin = Offset(1.0, 0.0);
-                            var end = Offset.zero;
-                            var curve = Curves.ease;
-
-                            var tween = Tween(begin: begin, end: end)
-                                .chain(CurveTween(curve: curve));
-
-                            return SlideTransition(
-                              position: animation.drive(tween),
-                              child: child,
-                            );
-                          },
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      primary: Color.fromARGB(255, 237, 211, 210),
-                      elevation: 5, // Menambahkan elevasi untuk efek bayangan
-                      shadowColor: Colors.grey
-                          .withOpacity(1), // Warna bayangan (shadow color)
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          'assets/trans.png',
-                          height: 125,
-                          width: 350,
-                        ),
-                        SizedBox(height: 8.0),
-                        Text(
-                          'SERVIS',
-                          style: TextStyle(
-                              fontSize: 23,
-                              color: Color.fromARGB(239, 42, 41, 41)),
-                        ),
-                      ],
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        PageRouteBuilder(
-                          pageBuilder:
-                              (context, animation, secondaryAnimation) =>
-                                  TransaksiPenjualanPage(),
-                          transitionsBuilder:
-                              (context, animation, secondaryAnimation, child) {
-                            var begin = Offset(1.0, 0.0);
-                            var end = Offset.zero;
-                            var curve = Curves.ease;
-
-                            var tween = Tween(begin: begin, end: end)
-                                .chain(CurveTween(curve: curve));
-
-                            return SlideTransition(
-                              position: animation.drive(tween),
-                              child: child,
-                            );
-                          },
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      primary: Color.fromARGB(255, 237, 211, 210),
-                      elevation: 5, // Menambahkan elevasi untuk efek bayangan
-                      shadowColor: Colors.grey
-                          .withOpacity(1), // Warna bayangan (shadow color)
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          'assets/selling.png',
-                          height: 125,
-                          width: 350,
-                        ),
-                        SizedBox(height: 8.0),
-                        Text(
-                          'PENJUALAN',
-                          style: TextStyle(
-                              fontSize: 23,
-                              color: Color.fromARGB(239, 42, 41, 41)),
-                        ),
-                      ],
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        PageRouteBuilder(
-                          pageBuilder:
-                              (context, animation, secondaryAnimation) =>
-                                  ListSparepartPage(),
-                          transitionsBuilder:
-                              (context, animation, secondaryAnimation, child) {
-                            var begin = Offset(1.0, 0.0);
-                            var end = Offset.zero;
-                            var curve = Curves.ease;
-
-                            var tween = Tween(begin: begin, end: end)
-                                .chain(CurveTween(curve: curve));
-
-                            return SlideTransition(
-                              position: animation.drive(tween),
-                              child: child,
-                            );
-                          },
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      primary: Color.fromARGB(255, 237, 211, 210),
-                      elevation: 5, // Menambahkan elevasi untuk efek bayangan
-                      shadowColor: Colors.grey
-                          .withOpacity(1), // Warna bayangan (shadow color)
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          'assets/listSparepart.png',
-                          height: 125,
-                          width: 350,
-                        ),
-                        SizedBox(height: 8.0),
-                        Text(
-                          'SPAREPART',
-                          style: TextStyle(
-                            fontSize: 23,
-                            color: Color.fromARGB(239, 42, 41, 41),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        PageRouteBuilder(
-                          pageBuilder:
-                              (context, animation, secondaryAnimation) =>
-                                  InputPelangganPage(),
-                          transitionsBuilder:
-                              (context, animation, secondaryAnimation, child) {
-                            var begin = Offset(1.0, 0.0);
-                            var end = Offset.zero;
-                            var curve = Curves.ease;
-
-                            var tween = Tween(begin: begin, end: end)
-                                .chain(CurveTween(curve: curve));
-
-                            return SlideTransition(
-                              position: animation.drive(tween),
-                              child: child,
-                            );
-                          },
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      primary: Color.fromARGB(255, 237, 211, 210),
-                      elevation: 5, // Menambahkan elevasi untuk efek bayangan
-                      shadowColor: Colors.grey
-                          .withOpacity(1), // Warna bayangan (shadow color)
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          'assets/client.png',
-                          height: 125,
-                          width: 300,
-                        ),
-                        SizedBox(height: 8.0),
-                        Text(
-                          'INPUT',
-                          style: TextStyle(
-                              fontSize: 23,
-                              color: Color.fromARGB(239, 42, 41, 41)),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
             ),
-          )
-        ],
+            SizedBox(
+              height: 10,
+            ),
+            Column(
+              children: [
+                Container(
+                  child: Text(
+                    '- - Action Menu - -',
+                    style: TextStyle(fontSize: 30, fontWeight: FontWeight.w300),
+                  ),
+                ),
+              ],
+            ),
+
+            // Grid button
+            SingleChildScrollView(
+              child: Container(
+                margin: EdgeInsets.all(10.0),
+                child: GridView.count(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 16.0,
+                  mainAxisSpacing: 16.0,
+                  shrinkWrap: true,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) =>
+                                    ServisPage(),
+                            transitionsBuilder: (context, animation,
+                                secondaryAnimation, child) {
+                              var begin = Offset(1.0, 0.0);
+                              var end = Offset.zero;
+                              var curve = Curves.ease;
+
+                              var tween = Tween(begin: begin, end: end)
+                                  .chain(CurveTween(curve: curve));
+
+                              return SlideTransition(
+                                position: animation.drive(tween),
+                                child: child,
+                              );
+                            },
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        primary: Color.fromARGB(255, 237, 211, 210),
+                        elevation: 5, // Menambahkan elevasi untuk efek bayangan
+                        shadowColor: Colors.grey
+                            .withOpacity(1), // Warna bayangan (shadow color)
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            'assets/trans.png',
+                            height: 125,
+                            width: 350,
+                          ),
+                          SizedBox(height: 8.0),
+                          Text(
+                            'SERVIS',
+                            style: TextStyle(
+                                fontSize: 23,
+                                color: Color.fromARGB(239, 42, 41, 41)),
+                          ),
+                        ],
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) =>
+                                    TransaksiPenjualanPage(),
+                            transitionsBuilder: (context, animation,
+                                secondaryAnimation, child) {
+                              var begin = Offset(1.0, 0.0);
+                              var end = Offset.zero;
+                              var curve = Curves.ease;
+
+                              var tween = Tween(begin: begin, end: end)
+                                  .chain(CurveTween(curve: curve));
+
+                              return SlideTransition(
+                                position: animation.drive(tween),
+                                child: child,
+                              );
+                            },
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        primary: Color.fromARGB(255, 237, 211, 210),
+                        elevation: 5, // Menambahkan elevasi untuk efek bayangan
+                        shadowColor: Colors.grey
+                            .withOpacity(1), // Warna bayangan (shadow color)
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            'assets/selling.png',
+                            height: 125,
+                            width: 350,
+                          ),
+                          SizedBox(height: 8.0),
+                          Text(
+                            'PENJUALAN',
+                            style: TextStyle(
+                                fontSize: 23,
+                                color: Color.fromARGB(239, 42, 41, 41)),
+                          ),
+                        ],
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) =>
+                                    ListSparepartPage(),
+                            transitionsBuilder: (context, animation,
+                                secondaryAnimation, child) {
+                              var begin = Offset(1.0, 0.0);
+                              var end = Offset.zero;
+                              var curve = Curves.ease;
+
+                              var tween = Tween(begin: begin, end: end)
+                                  .chain(CurveTween(curve: curve));
+
+                              return SlideTransition(
+                                position: animation.drive(tween),
+                                child: child,
+                              );
+                            },
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color.fromARGB(255, 237, 211, 210),
+                        elevation: 5, // Menambahkan elevasi untuk efek bayangan
+                        shadowColor: Colors.grey
+                            .withOpacity(1), // Warna bayangan (shadow color)
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            'assets/listSparepart.png',
+                            height: 125,
+                            width: 350,
+                          ),
+                          SizedBox(height: 8.0),
+                          Text(
+                            'SPAREPART',
+                            style: TextStyle(
+                              fontSize: 23,
+                              color: Color.fromARGB(239, 42, 41, 41),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) =>
+                                    InputPelangganPage(),
+                            transitionsBuilder: (context, animation,
+                                secondaryAnimation, child) {
+                              var begin = Offset(1.0, 0.0);
+                              var end = Offset.zero;
+                              var curve = Curves.ease;
+
+                              var tween = Tween(begin: begin, end: end)
+                                  .chain(CurveTween(curve: curve));
+
+                              return SlideTransition(
+                                position: animation.drive(tween),
+                                child: child,
+                              );
+                            },
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        primary: Color.fromARGB(255, 237, 211, 210),
+                        elevation: 5, // Menambahkan elevasi untuk efek bayangan
+                        shadowColor: Colors.grey
+                            .withOpacity(1), // Warna bayangan (shadow color)
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            'assets/client.png',
+                            height: 125,
+                            width: 300,
+                          ),
+                          SizedBox(height: 8.0),
+                          Text(
+                            'INPUT',
+                            style: TextStyle(
+                                fontSize: 23,
+                                color: Color.fromARGB(239, 42, 41, 41)),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          ],
+        ),
       ),
       drawer: Drawer(
         child: ListView(
@@ -426,15 +430,48 @@ class _HomePageState extends State<HomePage> {
             ),
             ListTile(
               onTap: () {
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (context) => LaporanPage(),
-                  ),
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text('Pilih Jenis Laporan'),
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ListTile(
+                            leading: Icon(Icons.book),
+                            title: Text('Laporan Servis'),
+                            onTap: () {
+                              Navigator.of(context).pop();
+                              Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(
+                                  builder: (context) => LaporanServisPage(),
+                                ),
+                              );
+                            },
+                          ),
+                          ListTile(
+                            leading: Icon(Icons.shopping_cart),
+                            title: Text('Laporan Penjualan'),
+                            onTap: () {
+                              Navigator.of(context).pop();
+                              Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(
+                                  builder: (context) => LaporanPenjualanPage(),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    );
+                  },
                 );
               },
-              leading: Icon(Icons.book),
+              leading: Icon(Icons.description),
               title: Text('Laporan'),
             ),
+
             ListTile(
               onTap: () {
                 Navigator.of(context).pushReplacement(

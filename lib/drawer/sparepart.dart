@@ -18,7 +18,9 @@ class _SparepartPageState extends State<SparepartPage> {
       FirebaseDatabase.instance.reference().child('daftarSparepart');
 
   TextEditingController searchController = TextEditingController();
-  late List<Map> filteredList;
+  List<Map> searchResultList = [];
+  List<Map> sparepartList = [];
+  List<Map> filteredList = [];
   bool isSearching = false;
 
   @override
@@ -158,17 +160,29 @@ class _SparepartPageState extends State<SparepartPage> {
   }
 
   void searchList(String query) {
+    searchResultList.clear();
+
     if (query.isNotEmpty) {
-      List<Map> searchResult = filteredList
-          .where((sparepart) => sparepart['namaSparepart']
-              .toLowerCase()
-              .contains(query.toLowerCase()))
+      List<Map> searchResult = sparepartList
+          .where((sparepart) =>
+              sparepart['namaSparepart']
+                  .toLowerCase()
+                  .contains(query.toLowerCase()) ||
+              sparepart['specSparepart']
+                  .toLowerCase()
+                  .contains(query.toLowerCase()))
           .toList();
 
-      setState(() {
-        isSearching = true;
-        filteredList = searchResult;
-      });
+      if (searchResult.isNotEmpty) {
+        setState(() {
+          isSearching = true;
+          searchResultList.addAll(searchResult);
+        });
+      } else {
+        setState(() {
+          isSearching = false;
+        });
+      }
     } else {
       setState(() {
         isSearching = false;
@@ -239,9 +253,9 @@ class _SparepartPageState extends State<SparepartPage> {
               child: isSearching
                   ? ListView.builder(
                       shrinkWrap: true,
-                      itemCount: filteredList.length,
+                      itemCount: searchResultList.length,
                       itemBuilder: (BuildContext context, int index) {
-                        Map sparepart = filteredList[index];
+                        Map sparepart = searchResultList[index];
                         return Column(
                           children: [
                             listItem(sparepart: sparepart),

@@ -175,7 +175,7 @@ class _PelangganState extends State<Pelanggan> {
                     context: context,
                     builder: (BuildContext context) {
                       return AlertDialog(
-                        title: Text('Konfirmasi'),
+                        title: Text('Confirm'),
                         content: Text('Hapus data pelanggan?'),
                         actions: [
                           TextButton(
