@@ -126,16 +126,33 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
           printer.printNewLine();
           printer.printCustom('Nama Pembeli: $_namaPembeli', 1, 0);
           printer.printNewLine();
-          printer.printCustom('Barang:', 1, 0);
+          printer.printCustom('--------------------------------', 0, 0);
+          printer.printCustom('Items               Qty   Price', 0, 0);
+
           for (var item in _items) {
-            printer.printCustom(
-              '- ${item['namaSparepart']} x ${item['jumlahSparepart']} '
-              '${item['hargaSparepart'].toStringAsFixed(0)}',
-              1,
-              0,
-            );
+            String itemName = item['namaSparepart'];
+            int quantity = item['jumlahSparepart'];
+            double price = item['hargaSparepart'];
+
+            // Pad the strings to align the columns
+            String paddedItemName = itemName.padRight(18);
+            String paddedQuantity = quantity.toString().padLeft(5);
+            String paddedPrice = price.toStringAsFixed(0).padLeft(8);
+
+            // Calculate the indentation for quantity and price
+            int quantityIndentation = (5 - paddedQuantity.length) ~/ 2;
+            int priceIndentation = (8 - paddedPrice.length) ~/ 2;
+
+            // Create the final formatted line
+            String formattedLine = '$paddedItemName';
+            formattedLine += '${' ' * quantityIndentation}$paddedQuantity';
+            formattedLine += '${' ' * priceIndentation}$paddedPrice';
+
+            printer.printCustom(formattedLine, 1, 0);
           }
+
           printer.printNewLine();
+          printer.printCustom('--------------------------------', 0, 0);
           printer.printCustom('Total: ${_totalHarga.toStringAsFixed(0)}', 1, 0);
           printer.printCustom('Bayar: ${_bayar.toStringAsFixed(0)}', 1, 0);
           printer.printCustom(

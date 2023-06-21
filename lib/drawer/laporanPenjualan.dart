@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:project_s/pages/home_page.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:pdf/pdf.dart';
-import 'package:pdf/widgets.dart' as pw;
+import 'package:blue_thermal_printer/blue_thermal_printer.dart';
 
 class LaporanPenjualanPage extends StatefulWidget {
   const LaporanPenjualanPage({Key? key}) : super(key: key);
@@ -16,12 +14,14 @@ class LaporanPenjualanPage extends StatefulWidget {
 class _LaporanPenjualanPageState extends State<LaporanPenjualanPage> {
   Query dbRef =
       FirebaseDatabase.instance.reference().child('transaksiPenjualan');
-
+  List<BluetoothDevice> devices = [];
+  BluetoothDevice? selectedDevice;
+  BlueThermalPrinter printer = BlueThermalPrinter.instance;
   int itemCount = 0;
 
   Widget buildListItem(DataSnapshot snapshot) {
     Map transaksi = snapshot.value as Map;
-    String idPenjualan = snapshot.key ?? '';
+    String idPenjualan = transaksi['idPenjualan'] ?? '';
     String dateTime = transaksi['dateTime'] ?? '';
     String namaPembeli = transaksi['namaPembeli'] ?? '';
     List<Map>? items = (transaksi['items'] as List<dynamic>?)?.cast<Map>();
@@ -85,6 +85,12 @@ class _LaporanPenjualanPageState extends State<LaporanPenjualanPage> {
   void initState() {
     super.initState();
     fetchData();
+    getDevices();
+  }
+
+  void getDevices() async {
+    devices = await printer.getBondedDevices();
+    setState(() {});
   }
 
   Future<void> fetchData() async {
@@ -141,7 +147,7 @@ class _LaporanPenjualanPageState extends State<LaporanPenjualanPage> {
           Container(
             padding: EdgeInsets.all(16),
             child: Text(
-              'Jumlah Data: $itemCount',
+              'Jumlah Transaksi: $itemCount',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.normal,
