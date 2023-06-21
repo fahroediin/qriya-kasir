@@ -1,3 +1,6 @@
+import 'dart:math';
+import 'dart:ffi';
+import 'package:blue_thermal_printer/blue_thermal_printer.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -15,29 +18,15 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
   final _formKey = GlobalKey<FormState>();
   DateTime _selectedDate = DateTime.now();
   String? _idPenjualan;
-  String _formattedDateTime = ''; // Add this variable
+  String _formattedDateTime = '';
   String? _namaPembeli;
   double _totalHarga = 0;
   double _bayar = 0;
   double _kembalian = 0;
   final List<Map<String, dynamic>> _items = [];
-  final List<Map<String, dynamic>> daftarSparepart = [
-    {
-      'idSparepart': '1',
-      'namaSparepart': 'Ban',
-      'hargaSparepart': 100000,
-    },
-    {
-      'idSparepart': '2',
-      'namaSparepart': 'Kampas Rem',
-      'hargaSparepart': 50000,
-    },
-    {
-      'idSparepart': '3',
-      'namaSparepart': 'Filter Oli',
-      'hargaSparepart': 25000,
-    },
-  ];
+  List<BluetoothDevice> devices = [];
+  BluetoothDevice? selectedDevice;
+  BlueThermalPrinter printer = BlueThermalPrinter.instance;
 
   @override
   void initState() {
@@ -45,6 +34,12 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
     initializeFirebase();
     generateIdPenjualan();
     _updateDateTime();
+    getDevices();
+  }
+
+  void getDevices() async {
+    devices = await printer.getBondedDevices();
+    setState(() {});
   }
 
   void _updateDateTime() {
@@ -58,16 +53,142 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
     await Firebase.initializeApp();
   }
 
+  void _selectPrinter() async {
+    if (devices.isEmpty) {
+      return;
+    }
+
+    final selectedDevice = await showDialog<BluetoothDevice>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Pilih Printer'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: devices.map((device) {
+                return ListTile(
+                  onTap: () {
+                    Navigator.of(context).pop(device);
+                  },
+                  leading: Icon(Icons.print),
+                  title: Text(device.name.toString()),
+                );
+              }).toList(),
+            ),
+          ),
+        );
+      },
+    );
+
+    if (selectedDevice != null) {
+      setState(() {
+        this.selectedDevice = selectedDevice;
+      });
+
+      printReceipt();
+    }
+  }
+
+  void printReceipt() {
+    if (selectedDevice != null) {
+      try {
+        printer.connect(selectedDevice!).then((_) {
+          printer.paperCut();
+          printer.printNewLine();
+          printer.printCustom(
+            'Aira Motor Padangjaya',
+            3,
+            1,
+          );
+          printer.printCustom(
+            'Jl. Marta Atmaja RT 003/011',
+            0,
+            1,
+          );
+          printer.printCustom(
+            'Jatinegara, Padangjaya',
+            0,
+            1,
+          );
+          printer.printCustom(
+            'Majenang 53257 Cilacap',
+            0,
+            1,
+          );
+          printer.printCustom(
+            'HP 0818-0280-7674',
+            1,
+            1,
+          );
+          printer.printNewLine();
+          printer.printCustom('ID Penjualan: $_idPenjualan', 1, 0);
+          printer.printCustom('Date/Time: $_formattedDateTime', 1, 0);
+          printer.printNewLine();
+          printer.printCustom('Nama Pembeli: $_namaPembeli', 1, 0);
+          printer.printNewLine();
+          printer.printCustom('Barang:', 1, 0);
+          for (var item in _items) {
+            printer.printCustom(
+              '- ${item['namaSparepart']} x ${item['jumlahSparepart']} '
+              '${item['hargaSparepart'].toStringAsFixed(0)}',
+              1,
+              0,
+            );
+          }
+          printer.printNewLine();
+          printer.printCustom('Total: ${_totalHarga.toStringAsFixed(0)}', 1, 0);
+          printer.printCustom('Bayar: ${_bayar.toStringAsFixed(0)}', 1, 0);
+          printer.printCustom(
+              'Kembalian: ${_kembalian.toStringAsFixed(0)}', 1, 0);
+          printer.printNewLine();
+          printer.printCustom('Terima Kasih', 2, 1);
+          printer.printCustom('Semoga Hari Anda Menyenangkan!', 1, 1);
+          printer.paperCut();
+          printer.disconnect();
+          // Save the transaction
+          saveTransaksiPenjualan();
+          showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: Text('Transaksi Berhasil'),
+                content: Text('Transaksi berhasil dicetak.'),
+                actions: <Widget>[
+                  TextButton(
+                    child: Text('OK'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+        });
+      } on PlatformException catch (e) {
+        print(e.message);
+      }
+    }
+  }
+
   void generateIdPenjualan() {
+    final now = DateTime.now();
+    final formattedDateTime = DateFormat('ddMMyyyy').format(now);
+    final randomNumbers = List.generate(
+      6,
+      (_) => Random().nextInt(10),
+    );
+    final idPenjualan = '$formattedDateTime-${randomNumbers.join('')}';
+
     setState(() {
-      _idPenjualan = Uuid().v4(); // Menghasilkan UUID sebagai ID penjualan
+      _idPenjualan = idPenjualan;
     });
   }
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      saveTransaksiPenjualan();
+      _selectPrinter();
     }
   }
 
@@ -76,7 +197,7 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
         FirebaseDatabase.instance.reference().child('transaksiPenjualan');
     Map<String, dynamic> data = {
       'idPenjualan': _idPenjualan,
-      'dateTime': _formattedDateTime, // Use the formatted date and time
+      'dateTime': _formattedDateTime,
       'namaPembeli': _namaPembeli,
       'items': _items,
       'totalHarga': _totalHarga,
@@ -93,28 +214,30 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
             content: Text('Transaksi berhasil disimpan'),
             actions: <Widget>[
               TextButton(
-                child: Text('OK'),
+                child: Text('Tutup'),
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => HomePage()),
-                  );
+                  Navigator.of(context).pop();
                 },
               ),
             ],
           );
         },
-      );
-    }).catchError((error) {
+      ).then((_) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => HomePage()),
+        );
+      });
+    }).catchError((onError) {
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Terjadi Kesalahan'),
-            content: Text('Terjadi kesalahan saat menyimpan transaksi.'),
+            title: Text('Proses gagal'),
+            content: Text('Terjadi kesalahan saat menyimpan transaksi'),
             actions: <Widget>[
               TextButton(
-                child: Text('OK'),
+                child: Text('Tutup'),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -239,21 +362,14 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
                 ),
               ),
               SizedBox(height: 10),
-              Text(
-                'Nama Pembeli',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
               TextFormField(
-                onSaved: (value) => _namaPembeli = value,
-                validator: (value) {
-                  // Menghapus validasi untuk memeriksa apakah value kosong
-                  return null;
+                decoration: InputDecoration(labelText: 'Nama Pembeli'),
+                textCapitalization: TextCapitalization.words,
+                onSaved: (value) {
+                  _namaPembeli = value ?? 'Anonim';
                 },
-                decoration: InputDecoration(
-                  hintText: 'Masukkan Nama Pembeli',
-                ),
               ),
-              SizedBox(height: 10),
+              SizedBox(height: 16),
               ListView.builder(
                 shrinkWrap: true,
                 itemCount: _items.length,
@@ -380,37 +496,32 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
                 style: textStyle,
               ),
               SizedBox(height: 10),
-              Text(
-                'Bayar',
-                style: textStyle,
-              ),
               TextFormField(
-                onChanged: (value) {
-                  setState(() {
-                    _bayar = double.tryParse(value) ?? 0;
-                  });
-                  _calculateKembalian(_bayar);
-                },
+                decoration: InputDecoration(labelText: 'Bayar'),
                 keyboardType: TextInputType.number,
+                inputFormatters: <TextInputFormatter>[
+                  FilteringTextInputFormatter.digitsOnly
+                ],
+                onChanged: (value) {
+                  _bayar = double.parse(value);
+                  double kembalian = _bayar - _totalHarga;
+                  setState(() {
+                    _kembalian = max(0, kembalian);
+                  });
+                },
                 validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Jumlah Bayar tidak boleh kosong';
+                  if (value!.isEmpty) {
+                    return 'Jumlah bayar tidak boleh kosong';
                   }
                   return null;
                 },
-                inputFormatters: <TextInputFormatter>[
-                  FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
-                ],
-                decoration: InputDecoration(
-                  hintText: 'Masukkan Jumlah Bayar',
-                ),
               ),
               SizedBox(height: 10),
               Text(
                 'Kembalian: $_kembalian',
-                style: textStyle,
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: 10),
+              SizedBox(height: 16),
               ElevatedButton(
                 onPressed: _submitForm,
                 style: ElevatedButton.styleFrom(

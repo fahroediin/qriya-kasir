@@ -195,14 +195,11 @@ class _InputPelangganPageState extends State<InputPelangganPage>
                         FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z]')),
                         LengthLimitingTextInputFormatter(2),
                       ],
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Wajib diisi';
-                        }
-                        if (value.length != 2) {
-                          return 'Harus terdiri dari 2 huruf';
-                        }
-                        return null;
+                      textCapitalization: TextCapitalization.characters,
+                      onChanged: (value) {
+                        // This will force the value of the TextField to be in capslock.
+                        _nopolAwalanController.value =
+                            TextEditingValue(text: value.toUpperCase());
                       },
                     ),
                   ),
@@ -242,14 +239,11 @@ class _InputPelangganPageState extends State<InputPelangganPage>
                         FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z]')),
                         LengthLimitingTextInputFormatter(2),
                       ],
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Wajib diisi';
-                        }
-                        if (value.length != 2) {
-                          return 'Harus terdiri dari 2 huruf';
-                        }
-                        return null;
+                      textCapitalization: TextCapitalization.characters,
+                      onChanged: (value) {
+                        // This will force the value of the TextField to be in capslock.
+                        _nopolAkhiranController.value =
+                            TextEditingValue(text: value.toUpperCase());
                       },
                     ),
                   ),
@@ -294,6 +288,8 @@ class _InputPelangganPageState extends State<InputPelangganPage>
                 inputFormatters: [
                   FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9]')),
                 ],
+                textCapitalization: TextCapitalization
+                    .characters, // Menyebabkan Caps Lock otomatis
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Wajib diisi';
@@ -320,6 +316,8 @@ class _InputPelangganPageState extends State<InputPelangganPage>
                   FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z]')),
                   LengthLimitingTextInputFormatter(255),
                 ],
+                textCapitalization: TextCapitalization
+                    .characters, // Menyebabkan Caps Lock otomatis
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Wajib diisi';
