@@ -92,6 +92,10 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
   void printReceipt() {
     if (selectedDevice != null) {
       try {
+        // Size
+        // 0: Normal, 1: Normal - Bold, 2: Medium - Bold, 3: Large - Bold
+        // Align
+        // 0: left, 1: center, 2: right
         printer.connect(selectedDevice!).then((_) {
           printer.paperCut();
           printer.printNewLine();
@@ -153,10 +157,11 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
 
           printer.printNewLine();
           printer.printCustom('--------------------------------', 0, 0);
-          printer.printCustom('Total: ${_totalHarga.toStringAsFixed(0)}', 1, 0);
-          printer.printCustom('Bayar: ${_bayar.toStringAsFixed(0)}', 1, 0);
           printer.printCustom(
-              'Kembalian: ${_kembalian.toStringAsFixed(0)}', 1, 0);
+              'Total: Rp ${_totalHarga.toStringAsFixed(0)}', 1, 0);
+          printer.printCustom('Bayar: Rp ${_bayar.toStringAsFixed(0)}', 1, 0);
+          printer.printCustom(
+              'Kembalian: Rp ${_kembalian.toStringAsFixed(0)}', 1, 0);
           printer.printNewLine();
           printer.printCustom('Terima Kasih', 2, 1);
           printer.printCustom('Semoga Hari Anda Menyenangkan!', 1, 1);
@@ -385,6 +390,7 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
                 onSaved: (value) {
                   _namaPembeli = value ?? 'Anonim';
                 },
+                initialValue: 'Anonim',
               ),
               SizedBox(height: 16),
               ListView.builder(

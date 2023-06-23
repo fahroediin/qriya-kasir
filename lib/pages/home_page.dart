@@ -63,6 +63,7 @@ class _HomePageState extends State<HomePage> {
         Map<dynamic, dynamic> data = snapshot as Map<dynamic, dynamic>;
         setState(() {
           _dataCountServis = data.length;
+          _totalData = _dataCountServis + _dataCountPenjualan;
         });
       }
     }).catchError((error) {
@@ -76,6 +77,7 @@ class _HomePageState extends State<HomePage> {
         Map<dynamic, dynamic> data = snapshot as Map<dynamic, dynamic>;
         setState(() {
           _dataCountPenjualan = data.length;
+          _totalData = _dataCountServis + _dataCountPenjualan;
         });
       }
     }).catchError((error) {
@@ -404,11 +406,11 @@ class _HomePageState extends State<HomePage> {
         child: ListView(
           children: [
             UserAccountsDrawerHeader(
-              accountName: Text('Admin'),
+              accountName: Text('Kasir'),
               accountEmail: Text(_user?.email ?? ''),
               currentAccountPicture: CircleAvatar(
                 backgroundColor: Colors.white,
-                child: Icon(Icons.person),
+                child: Icon(Icons.admin_panel_settings_rounded),
               ),
               decoration: BoxDecoration(
                 color: Color.fromARGB(255, 219, 42, 15),

@@ -57,6 +57,7 @@ class _AddMekanikPageState extends State<AddMekanikPage> {
         alamat.isNotEmpty &&
         noHp.isNotEmpty) {
       databaseReference.child('mekanik').child(idMekanik).set({
+        'idMekanik': idMekanik,
         'namaMekanik': namaMekanik,
         'alamat': alamat,
         'noHp': noHp,

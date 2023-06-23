@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:project_s/pages/home_page.dart';
 import 'package:uuid/uuid.dart';
 import 'package:intl/intl.dart';
+import 'dart:math';
 
 class ServisPage extends StatefulWidget {
   @override
@@ -28,6 +29,10 @@ class _ServisPageState extends State<ServisPage> {
   double _bayar = 0;
   double _biayaServis = 0;
   double _kembalian = 0;
+  List<String> _mekanikList = [];
+  String? _selectedMekanik;
+  TextEditingController _namaMekanikController = TextEditingController();
+  List<Map<String, dynamic>> _daftarPelanggan = [];
 
   @override
   void initState() {
@@ -35,6 +40,8 @@ class _ServisPageState extends State<ServisPage> {
     initializeFirebase();
     generateIdServis();
     updateDateTime();
+    getMekanikList();
+    getDaftarPelanggan();
   }
 
   void updateDateTime() {
@@ -49,8 +56,16 @@ class _ServisPageState extends State<ServisPage> {
   }
 
   void generateIdServis() {
+    final now = DateTime.now();
+    final formattedDateTime = DateFormat('ddMMyyyy').format(now);
+    final randomNumbers = List.generate(
+      6,
+      (_) => Random().nextInt(10),
+    );
+    final idPenjualan = '$formattedDateTime-${randomNumbers.join('')}';
+
     setState(() {
-      _idServis = Uuid().v4();
+      _idServis = idPenjualan;
     });
   }
 
@@ -122,6 +137,34 @@ class _ServisPageState extends State<ServisPage> {
     });
   }
 
+  void getMekanikList() {
+    FirebaseDatabase.instance.ref('mekanik').onValue.listen((event) {
+      if (event.snapshot.exists) {
+        Map<dynamic, dynamic> values =
+            event.snapshot.value as Map<dynamic, dynamic>;
+        values.forEach((key, value) {
+          setState(() {
+            _mekanikList.add(value['idMekanik']);
+          });
+        });
+      }
+    });
+  }
+
+  void getDaftarPelanggan() {
+    FirebaseDatabase.instance.ref('daftarPelanggan').onValue.listen((event) {
+      if (event.snapshot.exists) {
+        Map<dynamic, dynamic> values =
+            event.snapshot.value as Map<dynamic, dynamic>;
+        values.forEach((key, value) {
+          setState(() {
+            _daftarPelanggan.add(value['nopol']);
+          });
+        });
+      }
+    });
+  }
+
   void addItem() {
     setState(() {
       _sparepartItems.add({
@@ -175,7 +218,7 @@ class _ServisPageState extends State<ServisPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Halaman Servis'),
+        title: Text('Transaksi Servis'),
         backgroundColor: Color.fromARGB(255, 219, 42, 15),
       ),
       body: Padding(
@@ -185,7 +228,7 @@ class _ServisPageState extends State<ServisPage> {
           child: ListView(
             children: [
               Text(
-                'ID Transaksi',
+                'ID Servis',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               TextFormField(
@@ -212,28 +255,36 @@ class _ServisPageState extends State<ServisPage> {
                 ),
               ),
               SizedBox(height: 8.0),
-              TextFormField(
+              DropdownButtonFormField<String>(
                 decoration: InputDecoration(labelText: 'ID Mekanik'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'ID Mekanik tidak boleh kosong';
                   }
+                  return null;
+                },
+                items: _mekanikList.map((mekanik) {
+                  return DropdownMenuItem<String>(
+                    value: mekanik,
+                    child: Text(mekanik),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedMekanik = value;
+                    _namaMekanikController.text = value.toString();
+                  });
                 },
                 onSaved: (value) {
-                  _idMekanik = value;
+                  _selectedMekanik = value;
                 },
+                value: _selectedMekanik,
               ),
               SizedBox(height: 8.0),
               TextFormField(
                 decoration: InputDecoration(labelText: 'Nama Mekanik'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Nama Mekanik tidak boleh kosong';
-                  }
-                },
-                onSaved: (value) {
-                  _namaMekanik = value;
-                },
+                controller: _namaMekanikController,
+                readOnly: true,
               ),
               SizedBox(height: 8.0),
               TextFormField(
@@ -295,12 +346,12 @@ class _ServisPageState extends State<ServisPage> {
                   _kerusakan = value;
                 },
               ),
-              SizedBox(height: 16.0),
+              SizedBox(height: 10),
               Text(
                 'Data Sparepart',
-                style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+                style: TextStyle(fontWeight: FontWeight.normal),
               ),
-              SizedBox(height: 8.0),
+              SizedBox(height: 16.0),
               ListView.builder(
                 shrinkWrap: true,
                 itemCount: _sparepartItems.length,
@@ -428,7 +479,9 @@ class _ServisPageState extends State<ServisPage> {
                 ),
               ),
               SizedBox(height: 16.0),
-              Text('Total Bayar: $_totalBayar'),
+              Text(
+                'Total Harga: $_totalBayar',
+              ),
               SizedBox(height: 8.0),
               TextFormField(
                 decoration: InputDecoration(labelText: 'Biaya Servis'),
