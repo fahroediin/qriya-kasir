@@ -6,8 +6,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/services.dart';
 import 'package:project_s/pages/home_page.dart';
+import 'package:project_s/pages/transaksiSuccess.dart';
 import 'package:uuid/uuid.dart';
 import 'package:intl/intl.dart';
+import 'transaksiSuccess.dart';
 
 class TransaksiPenjualanPage extends StatefulWidget {
   @override
@@ -24,9 +26,6 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
   double _bayar = 0;
   double _kembalian = 0;
   final List<Map<String, dynamic>> _items = [];
-  List<BluetoothDevice> devices = [];
-  BluetoothDevice? selectedDevice;
-  BlueThermalPrinter printer = BlueThermalPrinter.instance;
 
   @override
   void initState() {
@@ -34,12 +33,6 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
     initializeFirebase();
     generateIdPenjualan();
     _updateDateTime();
-    getDevices();
-  }
-
-  void getDevices() async {
-    devices = await printer.getBondedDevices();
-    setState(() {});
   }
 
   void _updateDateTime() {
@@ -51,146 +44,6 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
 
   void initializeFirebase() async {
     await Firebase.initializeApp();
-  }
-
-  void _selectPrinter() async {
-    if (devices.isEmpty) {
-      return;
-    }
-
-    final selectedDevice = await showDialog<BluetoothDevice>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Pilih Printer'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: devices.map((device) {
-                return ListTile(
-                  onTap: () {
-                    Navigator.of(context).pop(device);
-                  },
-                  leading: Icon(Icons.print),
-                  title: Text(device.name.toString()),
-                );
-              }).toList(),
-            ),
-          ),
-        );
-      },
-    );
-
-    if (selectedDevice != null) {
-      setState(() {
-        this.selectedDevice = selectedDevice;
-      });
-
-      printReceipt();
-    }
-  }
-
-  void printReceipt() {
-    if (selectedDevice != null) {
-      try {
-        // Size
-        // 0: Normal, 1: Normal - Bold, 2: Medium - Bold, 3: Large - Bold
-        // Align
-        // 0: left, 1: center, 2: right
-        printer.connect(selectedDevice!).then((_) {
-          printer.paperCut();
-          printer.printNewLine();
-          printer.printCustom(
-            'Aira Motor Padangjaya',
-            3,
-            1,
-          );
-          printer.printCustom(
-            'Jl. Marta Atmaja RT 003/011',
-            0,
-            1,
-          );
-          printer.printCustom(
-            'Jatinegara, Padangjaya',
-            0,
-            1,
-          );
-          printer.printCustom(
-            'Majenang 53257 Cilacap',
-            0,
-            1,
-          );
-          printer.printCustom(
-            'HP 0818-0280-7674',
-            1,
-            1,
-          );
-          printer.printNewLine();
-          printer.printCustom('ID Penjualan: $_idPenjualan', 1, 0);
-          printer.printCustom('Date/Time: $_formattedDateTime', 1, 0);
-          printer.printNewLine();
-          printer.printCustom('Nama Pembeli: $_namaPembeli', 1, 0);
-          printer.printNewLine();
-          printer.printCustom('--------------------------------', 0, 0);
-          printer.printCustom('Items               Qty   Price', 0, 0);
-
-          for (var item in _items) {
-            String itemName = item['namaSparepart'];
-            int quantity = item['jumlahSparepart'];
-            double price = item['hargaSparepart'];
-
-            // Pad the strings to align the columns
-            String paddedItemName = itemName.padRight(18);
-            String paddedQuantity = quantity.toString().padLeft(5);
-            String paddedPrice = price.toStringAsFixed(0).padLeft(8);
-
-            // Calculate the indentation for quantity and price
-            int quantityIndentation = (5 - paddedQuantity.length) ~/ 2;
-            int priceIndentation = (8 - paddedPrice.length) ~/ 2;
-
-            // Create the final formatted line
-            String formattedLine = '$paddedItemName';
-            formattedLine += '${' ' * quantityIndentation}$paddedQuantity';
-            formattedLine += '${' ' * priceIndentation}$paddedPrice';
-
-            printer.printCustom(formattedLine, 1, 0);
-          }
-
-          printer.printNewLine();
-          printer.printCustom('--------------------------------', 0, 0);
-          printer.printCustom(
-              'Total: Rp ${_totalHarga.toStringAsFixed(0)}', 1, 0);
-          printer.printCustom('Bayar: Rp ${_bayar.toStringAsFixed(0)}', 1, 0);
-          printer.printCustom(
-              'Kembalian: Rp ${_kembalian.toStringAsFixed(0)}', 1, 0);
-          printer.printNewLine();
-          printer.printCustom('Terima Kasih', 2, 1);
-          printer.printCustom('Semoga Hari Anda Menyenangkan!', 1, 1);
-          printer.paperCut();
-          printer.disconnect();
-          // Save the transaction
-          saveTransaksiPenjualan();
-          showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                title: Text('Transaksi Berhasil'),
-                content: Text('Transaksi berhasil dicetak.'),
-                actions: <Widget>[
-                  TextButton(
-                    child: Text('OK'),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ],
-              );
-            },
-          );
-        });
-      } on PlatformException catch (e) {
-        print(e.message);
-      }
-    }
   }
 
   void generateIdPenjualan() {
@@ -210,7 +63,7 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      _selectPrinter();
+      saveTransaksiPenjualan();
     }
   }
 
@@ -228,28 +81,20 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
     };
 
     reference.push().set(data).then((_) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Proses sukses'),
-            content: Text('Transaksi berhasil disimpan'),
-            actions: <Widget>[
-              TextButton(
-                child: Text('Tutup'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      ).then((_) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => HomePage()),
-        );
-      });
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => TransaksiSuccessPage(
+            idPenjualan: data['idPenjualan'],
+            formattedDateTime: data['formattedDateTime'] ?? '',
+            namaPembeli: data['namaPembeli'],
+            totalHarga: data['totalHarga'].toDouble(),
+            bayar: data['bayar'].toDouble(),
+            kembalian: _kembalian.toDouble(),
+            items: List<Map<String, dynamic>>.from(data['items']),
+          ),
+        ),
+      );
     }).catchError((onError) {
       showDialog(
         context: context,

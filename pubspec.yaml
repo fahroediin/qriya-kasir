@@ -105,6 +105,8 @@ flutter:
   - assets/selling.png
   - assets/trans.png
   - assets/client.png
+  #transaksi
+  - assets/success.png
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

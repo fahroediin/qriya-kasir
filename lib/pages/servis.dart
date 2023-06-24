@@ -16,6 +16,7 @@ class _ServisPageState extends State<ServisPage> {
   final _formKey = GlobalKey<FormState>();
   DateTime _selectedDateTime = DateTime.now();
   String? _idServis;
+  String _nofaktur = '0.0';
   String _formattedDateTime = '';
   String? _idMekanik;
   String? _namaMekanik;
@@ -32,6 +33,7 @@ class _ServisPageState extends State<ServisPage> {
   List<String> _mekanikList = [];
   String? _selectedMekanik;
   TextEditingController _namaMekanikController = TextEditingController();
+  String? _selectedPelanggan;
   List<Map<String, dynamic>> _daftarPelanggan = [];
 
   @override
@@ -41,7 +43,6 @@ class _ServisPageState extends State<ServisPage> {
     generateIdServis();
     updateDateTime();
     getMekanikList();
-    getDaftarPelanggan();
   }
 
   void updateDateTime() {
@@ -145,20 +146,6 @@ class _ServisPageState extends State<ServisPage> {
         values.forEach((key, value) {
           setState(() {
             _mekanikList.add(value['idMekanik']);
-          });
-        });
-      }
-    });
-  }
-
-  void getDaftarPelanggan() {
-    FirebaseDatabase.instance.ref('daftarPelanggan').onValue.listen((event) {
-      if (event.snapshot.exists) {
-        Map<dynamic, dynamic> values =
-            event.snapshot.value as Map<dynamic, dynamic>;
-        values.forEach((key, value) {
-          setState(() {
-            _daftarPelanggan.add(value['nopol']);
           });
         });
       }
@@ -288,10 +275,10 @@ class _ServisPageState extends State<ServisPage> {
               ),
               SizedBox(height: 8.0),
               TextFormField(
-                decoration: InputDecoration(labelText: 'Nomor Polisi'),
+                decoration: InputDecoration(labelText: 'NOPOL'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Nomor Polisi tidak boleh kosong';
+                    return 'NOPOL tidak boleh kosong';
                   }
                 },
                 onSaved: (value) {

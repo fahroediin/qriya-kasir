@@ -152,7 +152,7 @@ class _LaporanServisPageState extends State<LaporanServisPage> {
           Container(
             padding: EdgeInsets.all(16),
             child: Text(
-              'Jumlah Data: $itemCount',
+              'Jumlah Servis: $itemCount',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.normal,

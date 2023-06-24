@@ -100,6 +100,11 @@ class _LoginPageState extends State<LoginPage>
             },
           ),
         );
+
+        // Menyimpan data user yang sudah login agar tidak otomatis logout
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString('email', _emailController.text.trim());
+        prefs.setString('password', _passwordController.text.trim());
       } on FirebaseAuthException catch (e) {
         if (e.code == 'user-not-found') {
           _showSnackBar('Email tidak terdaftar');
