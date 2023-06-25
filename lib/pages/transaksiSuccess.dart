@@ -116,11 +116,15 @@ class _TransaksiSuccessPageState extends State<TransaksiSuccessPage> {
             1,
           );
           printer.printCustom(
-            'Padangjaya, Majenang 53257',
+            'Padangjaya, Majenang ',
             0,
             1,
           );
-
+          printer.printCustom(
+            '53257 Cilacap',
+            0,
+            1,
+          );
           printer.printCustom(
             'HP 0818-0280-7674',
             1,

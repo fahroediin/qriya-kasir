@@ -1,35 +1,27 @@
 import 'dart:io';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:pdf/widgets.dart' as pdfWidgets;
 import 'package:pdf/pdf.dart';
-import 'package:path_provider/path_provider.dart';
 
 class ReceiptTransactionPage extends StatelessWidget {
   final DatabaseReference _databaseReference =
       FirebaseDatabase.instance.reference();
 
-  Future<Map<String, dynamic>> _fetchLastTransactionData() async {
+  Future<Map<String, dynamic>> _fetchLastTransaction() async {
     final DatabaseEvent event = await _databaseReference
         .child('transaksiPenjualan')
-        .orderByKey()
+        .orderByChild('idPenjualan')
+        .equalTo('sukses')
         .limitToLast(1)
         .once();
-
-    if (event.snapshot.exists) {
-      final snapshots = event.snapshot;
-      final data = snapshots.value as Map<String, dynamic>;
-      return data;
-    } else {
-      return {};
-    }
+    return {};
   }
 
   Future<void> _saveAsPdf(BuildContext context) async {
     // Fetch last transaction data
-    Map<String, dynamic> lastTransactionData =
-        await _fetchLastTransactionData();
+    Map<String, dynamic> lastTransactionData = await _fetchLastTransaction();
 
     final pdfWidgets.Document pdf = pdfWidgets.Document();
 
@@ -136,7 +128,7 @@ class ReceiptTransactionPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               FutureBuilder<Map<String, dynamic>>(
-                future: _fetchLastTransactionData(),
+                future: _fetchLastTransaction(),
                 builder: (BuildContext context,
                     AsyncSnapshot<Map<String, dynamic>> snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -216,7 +208,9 @@ class ReceiptTransactionPage extends StatelessWidget {
                                 ),
                               ],
                             ),
-                            ...(lastTransactionData['items'] as List<dynamic>)
+                            ...(lastTransactionData['items']
+                                        as List<dynamic>? ??
+                                    [])
                                 .map((item) {
                               return TableRow(
                                 children: [
