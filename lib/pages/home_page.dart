@@ -19,6 +19,7 @@ import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:project_s/pages/transaksi.dart';
 import 'package:project_s/drawer/laporanServis.dart';
+import 'user.dart';
 import 'dart:io';
 
 class HomePage extends StatefulWidget {
@@ -405,17 +406,28 @@ class _HomePageState extends State<HomePage> {
       drawer: Drawer(
         child: ListView(
           children: [
-            UserAccountsDrawerHeader(
-              accountName: Text('Kasir'),
-              accountEmail: Text(_user?.email ?? ''),
-              currentAccountPicture: CircleAvatar(
-                backgroundColor: Colors.white,
-                child: Icon(Icons.admin_panel_settings_rounded),
-              ),
-              decoration: BoxDecoration(
-                color: Color.fromARGB(255, 219, 42, 15),
+            InkWell(
+              onTap: () {
+                // Navigasi ke halaman pengguna di sini
+                // Misalnya, menggunakan Navigator.push()
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => UserPage()),
+                );
+              },
+              child: UserAccountsDrawerHeader(
+                accountName: Text('Kasir'),
+                accountEmail: Text(_user?.email ?? ''),
+                currentAccountPicture: CircleAvatar(
+                  backgroundColor: Colors.white,
+                  child: Icon(Icons.admin_panel_settings_rounded),
+                ),
+                decoration: BoxDecoration(
+                  color: Color.fromARGB(255, 219, 42, 15),
+                ),
               ),
             ),
+
             ListTile(
               onTap: () {
                 Navigator.of(context).pushReplacement(

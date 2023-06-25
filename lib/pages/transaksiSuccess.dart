@@ -6,7 +6,7 @@ import 'transaksi.dart';
 
 class TransaksiSuccessPage extends StatefulWidget {
   final String idPenjualan;
-  final String formattedDateTime;
+  final String tanggalTransaksi;
   final String namaPembeli;
   final double totalHarga;
   final double bayar;
@@ -15,7 +15,7 @@ class TransaksiSuccessPage extends StatefulWidget {
 
   TransaksiSuccessPage({
     required this.idPenjualan,
-    required this.formattedDateTime,
+    required this.tanggalTransaksi,
     required this.namaPembeli,
     required this.totalHarga,
     required this.bayar,
@@ -31,7 +31,7 @@ class _TransaksiSuccessPageState extends State<TransaksiSuccessPage> {
   final _formKey = GlobalKey<FormState>();
   DateTime _selectedDate = DateTime.now();
   String? _idPenjualan;
-  String _formattedDateTime = '';
+  String? _tanggalTransaksi;
   String? _namaPembeli;
   double _totalHarga = 0;
   double _bayar = 0;
@@ -46,7 +46,7 @@ class _TransaksiSuccessPageState extends State<TransaksiSuccessPage> {
     super.initState();
     getDevices();
     _idPenjualan = widget.idPenjualan;
-    _formattedDateTime = widget.formattedDateTime;
+    _tanggalTransaksi = widget.tanggalTransaksi;
     _namaPembeli = widget.namaPembeli;
     _totalHarga = widget.totalHarga;
     _bayar = widget.bayar;
@@ -132,7 +132,7 @@ class _TransaksiSuccessPageState extends State<TransaksiSuccessPage> {
           );
           printer.printNewLine();
           printer.printCustom('ID Penjualan: $_idPenjualan', 1, 0);
-          printer.printCustom('Date/Time: $_formattedDateTime', 1, 0);
+          printer.printCustom('Date/Time: $_tanggalTransaksi', 1, 0);
           printer.printNewLine();
           printer.printCustom('Nama Pembeli: $_namaPembeli', 1, 0);
           printer.printNewLine();

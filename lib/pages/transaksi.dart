@@ -86,7 +86,7 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
         MaterialPageRoute(
           builder: (context) => TransaksiSuccessPage(
             idPenjualan: data['idPenjualan'],
-            formattedDateTime: data['formattedDateTime'] ?? '',
+            tanggalTransaksi: data['dateTime'] ?? '',
             namaPembeli: data['namaPembeli'],
             totalHarga: data['totalHarga'].toDouble(),
             bayar: data['bayar'].toDouble(),
