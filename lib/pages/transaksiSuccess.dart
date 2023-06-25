@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:blue_thermal_printer/blue_thermal_printer.dart';
 import 'package:flutter/services.dart';
+import 'package:project_s/pages/receiptTransaction.dart';
 import 'transaksi.dart';
 
 class TransaksiSuccessPage extends StatefulWidget {
@@ -44,6 +45,13 @@ class _TransaksiSuccessPageState extends State<TransaksiSuccessPage> {
   void initState() {
     super.initState();
     getDevices();
+    _idPenjualan = widget.idPenjualan;
+    _formattedDateTime = widget.formattedDateTime;
+    _namaPembeli = widget.namaPembeli;
+    _totalHarga = widget.totalHarga;
+    _bayar = widget.bayar;
+    _kembalian = widget.kembalian;
+    _items.addAll(widget.items);
   }
 
   void getDevices() async {
@@ -108,15 +116,11 @@ class _TransaksiSuccessPageState extends State<TransaksiSuccessPage> {
             1,
           );
           printer.printCustom(
-            'Jatinegara, Padangjaya',
+            'Padangjaya, Majenang 53257',
             0,
             1,
           );
-          printer.printCustom(
-            'Majenang 53257 Cilacap',
-            0,
-            1,
-          );
+
           printer.printCustom(
             'HP 0818-0280-7674',
             1,
@@ -166,13 +170,12 @@ class _TransaksiSuccessPageState extends State<TransaksiSuccessPage> {
           printer.printNewLine();
           printer.paperCut();
           printer.disconnect();
-
           showDialog(
             context: context,
             builder: (context) {
               return AlertDialog(
-                title: Text('Transaksi Berhasil'),
-                content: Text('Transaksi berhasil dicetak.'),
+                title: Text('Print Receipt'),
+                content: Text('Berhasil cetak kuitansi'),
                 actions: <Widget>[
                   TextButton(
                     child: Text('OK'),
@@ -194,11 +197,8 @@ class _TransaksiSuccessPageState extends State<TransaksiSuccessPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Transaksi Success'),
-        backgroundColor: Color.fromARGB(255, 219, 42, 15),
-      ),
-      body: Center(
+      body: Padding(
+        padding: const EdgeInsets.only(top: 1),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -206,7 +206,16 @@ class _TransaksiSuccessPageState extends State<TransaksiSuccessPage> {
               'assets/success.png',
               width: 200,
             ),
-            SizedBox(height: 30),
+            SizedBox(height: 20),
+            Text(
+              'Good Job!',
+              style: TextStyle(
+                fontSize: 30,
+                color: Color.fromARGB(255, 102, 103, 102),
+                fontFamily: 'Roboto',
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             Text(
               'Transaksi Berhasil!',
               style: TextStyle(
@@ -215,41 +224,121 @@ class _TransaksiSuccessPageState extends State<TransaksiSuccessPage> {
               ),
             ),
             SizedBox(height: 20),
-            Text(
-              'Kembalian: ${widget.kembalian.toStringAsFixed(2)}',
-              style: TextStyle(fontSize: 18),
-            ),
-            SizedBox(height: 30),
-            Card(
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      Icon(Icons.print),
-                      SizedBox(width: 5),
-                      Text('Cetak'),
-                    ],
+                  Text(
+                    'Kembalian',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.normal,
+                    ),
                   ),
-                  ElevatedButton.icon(
-                    onPressed: _selectPrinter,
-                    icon: Icon(Icons.settings),
-                    label: Text('Pilih Printer'),
+                  Expanded(
+                    child: Text(
+                      'Rp ${widget.kembalian.toStringAsFixed(0)}',
+                      style: TextStyle(fontSize: 22),
+                      textAlign: TextAlign.right,
+                    ),
                   ),
                 ],
               ),
             ),
+            SizedBox(height: 20),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => TransaksiPenjualanPage(),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  primary: Color.fromARGB(255, 219, 42, 15),
+                  padding: EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Transaksi Baru',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
             SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushReplacement(
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              child: ElevatedButton(
+                onPressed: _selectPrinter,
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.white,
+                  onPrimary: Colors.black,
+                  padding: EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  side: BorderSide(color: Colors.grey),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.print),
+                    SizedBox(width: 5),
+                    Text(
+                      'Print Receipt',
+                      style: TextStyle(
+                        fontSize: 20,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(height: 10),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => TransaksiPenjualanPage(),
+                    builder: (context) => ReceiptTransactionPage(),
                   ),
                 );
               },
-              child: Text('Transaksi Baru'),
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                child: Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                    child: Center(
+                      child: Text(
+                        'Lihat Kuitansi',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.normal,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ),
           ],
         ),
