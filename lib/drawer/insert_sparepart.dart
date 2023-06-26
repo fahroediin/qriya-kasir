@@ -49,14 +49,13 @@ class _InputSparepartPageState extends State<InputSparepartPage>
     String merkSparepart = _merkSparepartController.text.trim();
     String specSparepart = _specSparepartController.text.trim();
     String hargaSparepart = _hargaSparepartController.text.trim();
-    String stokSparepart = _stokSparepartController.text.trim();
+    int stokSparepart = int.tryParse(_stokSparepartController.text.trim()) ?? 0;
 
     if (idSparepart.isNotEmpty &&
         namaSparepart.isNotEmpty &&
         merkSparepart.isNotEmpty &&
         specSparepart.isNotEmpty &&
-        hargaSparepart.isNotEmpty &&
-        stokSparepart.isNotEmpty) {
+        hargaSparepart.isNotEmpty) {
       databaseReference.child('daftarSparepart').child(idSparepart).set({
         'idSparepart': idSparepart,
         'namaSparepart': namaSparepart,
@@ -168,6 +167,7 @@ class _InputSparepartPageState extends State<InputSparepartPage>
             SizedBox(height: 10),
             TextField(
               controller: _stokSparepartController,
+              keyboardType: TextInputType.number, // Set keyboard type to number
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: 'Stok Sparepart',

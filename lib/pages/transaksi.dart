@@ -26,6 +26,9 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
   double _bayar = 0;
   double _kembalian = 0;
   final List<Map<String, dynamic>> _items = [];
+  List<Map<dynamic, dynamic>> sparepartList = [];
+  List<Map<dynamic, dynamic>> filteredSparepartList = [];
+  List<Map<String, dynamic>> selectedSpareparts = [];
 
   @override
   void initState() {
@@ -63,6 +66,19 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
+
+      // Update the stock of spare parts
+      for (var sparepart in selectedSpareparts) {
+        DatabaseReference sparepartRef = FirebaseDatabase.instance
+            .reference()
+            .child('daftarSparepart')
+            .child(sparepart['idSparepart']);
+        int stokSparepart = sparepart['stokSparepart'];
+        int jumlahSparepart = sparepart['jumlahSparepart'];
+        sparepartRef.update({'stokSparepart': stokSparepart - jumlahSparepart});
+      }
+
+      // Save the transaction data
       saveTransaksiPenjualan();
     }
   }
@@ -74,12 +90,13 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
       'idPenjualan': _idPenjualan,
       'dateTime': _formattedDateTime,
       'namaPembeli': _namaPembeli,
-      'items': _items,
+      'items': selectedSpareparts, // Use selectedSpareparts instead of _items
       'totalHarga': _totalHarga,
       'bayar': _bayar,
       'kembalian': _kembalian,
     };
 
+    // Save the transaction data to the database
     reference.push().set(data).then((_) {
       Navigator.push(
         context,
@@ -95,24 +112,6 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
           ),
         ),
       );
-    }).catchError((onError) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Proses gagal'),
-            content: Text('Terjadi kesalahan saat menyimpan transaksi'),
-            actions: <Widget>[
-              TextButton(
-                child: Text('Tutup'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
     });
   }
 
@@ -120,6 +119,8 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        List<Map<String, dynamic>> selectedSpareparts = [];
+
         List<Map<dynamic, dynamic>> sparepartList = [];
         List<Map<dynamic, dynamic>> filteredSparepartList = [];
         TextEditingController jumlahItemController = TextEditingController();
@@ -207,6 +208,8 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
                                           'Spec Sparepart: ${sparepart['specSparepart']}'),
                                       Text(
                                           'Harga Sparepart: ${sparepart['hargaSparepart']}'),
+                                      Text(
+                                          'Stok Sparepart: ${sparepart['stokSparepart']}'),
                                     ],
                                   ),
                                   onTap: () {
@@ -230,11 +233,9 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
                                                         jumlahItemController
                                                             .text) ??
                                                     0;
-                                                int stokSparepart =
-                                                    int.tryParse(sparepart[
-                                                                'stokSparepart'] ??
-                                                            '0') ??
-                                                        0;
+                                                int stokSparepart = (sparepart[
+                                                        'stokSparepart'] ??
+                                                    '');
                                                 if (jumlahItem > 0 &&
                                                     jumlahItem <=
                                                         stokSparepart) {
@@ -302,7 +303,7 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
   }
 
   void _selectItem(Map<dynamic, dynamic> sparepart, int jumlahItem) {
-    int stokSparepart = int.tryParse(sparepart['stokSparepart'] ?? '0') ?? 0;
+    int stokSparepart = (sparepart['stokSparepart']) ?? 0;
 
     if (jumlahItem > 0 && jumlahItem <= stokSparepart) {
       setState(() {
@@ -311,6 +312,7 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
           'namaSparepart': sparepart['namaSparepart'],
           'hargaSparepart': sparepart['hargaSparepart'],
           'jumlahSparepart': jumlahItem,
+          'stokSparepart': stokSparepart,
         });
         sparepart['stokSparepart'] = (stokSparepart - jumlahItem).toString();
       });
@@ -321,7 +323,7 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
           .reference()
           .child('daftarSparepart')
           .child(sparepart['idSparepart']);
-      sparepartRef.update({'stokSparepart': sparepart['stokSparepart']});
+      sparepartRef.update({'stokSparepart': stokSparepart - jumlahItem});
     } else {
       showDialog(
         context: context,
@@ -344,6 +346,14 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
     }
   }
 
+  void _updateStokSparepart(String idSparepart, int stokSparepart) {
+    DatabaseReference sparepartRef = FirebaseDatabase.instance
+        .reference()
+        .child('daftarSparepart')
+        .child(idSparepart);
+    sparepartRef.update({'stokSparepart': stokSparepart});
+  }
+
   void _updateItem(int index, String field, dynamic value) {
     setState(() {
       _items[index][field] = value;
@@ -353,7 +363,11 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
 
   void _removeItem(int index) {
     setState(() {
-      _items.removeAt(index);
+      Map<String, dynamic> removedItem = _items.removeAt(index);
+      String idSparepart = removedItem['idSparepart'];
+      int jumlahSparepart = removedItem['jumlahSparepart'];
+      int stokSparepart = removedItem['stokSparepart'];
+      _updateStokSparepart(idSparepart, stokSparepart);
     });
     _calculateTotalHarga();
   }
