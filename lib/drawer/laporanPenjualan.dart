@@ -20,14 +20,14 @@ class _LaporanPenjualanPageState extends State<LaporanPenjualanPage> {
   int itemCount = 0;
 
   Widget buildListItem(DataSnapshot snapshot) {
-    Map transaksi = snapshot.value as Map;
-    String idPenjualan = transaksi['idPenjualan'] ?? '';
-    String dateTime = transaksi['dateTime'] ?? '';
-    String namaPembeli = transaksi['namaPembeli'] ?? '';
-    List<Map>? items = (transaksi['items'] as List<dynamic>?)?.cast<Map>();
-    double totalBayar = (transaksi['totalHarga'] ?? 0).toDouble();
-    double bayar = (transaksi['bayar'] ?? 0).toDouble();
-    double kembalian = (transaksi['kembalian'] ?? 0).toDouble();
+    Map? transaksi = snapshot.value as Map?;
+    String idPenjualan = transaksi?['idPenjualan'] ?? '';
+    String dateTime = transaksi?['dateTime'] ?? '';
+    String namaPembeli = transaksi?['namaPembeli'] ?? '';
+    List<Map>? items = (transaksi?['items'] as List<dynamic>?)?.cast<Map>();
+    double totalBayar = (transaksi?['totalHarga'] ?? 0).toDouble();
+    double bayar = (transaksi?['bayar'] ?? 0).toDouble();
+    double kembalian = (transaksi?['kembalian'] ?? 0).toDouble();
 
     return Card(
       child: ListTile(
@@ -42,8 +42,7 @@ class _LaporanPenjualanPageState extends State<LaporanPenjualanPage> {
               children: items?.map((item) {
                     String idSparepart = item['idSparepart'] ?? '';
                     String namaSparepart = item['namaSparepart'] ?? '';
-                    double hargaSparepart =
-                        (item['hargaSparepart'] ?? 0).toDouble();
+                    double hargaSparepart = (item['hargaSparepart'] ?? 0);
                     int jumlahItem = item['jumlahSparepart'] ?? 0;
                     return Padding(
                       padding: EdgeInsets.only(left: 16),
