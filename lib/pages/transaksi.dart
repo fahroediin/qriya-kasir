@@ -187,92 +187,125 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
                                 child: Text('Tidak ada data sparepart'),
                               );
                             }
-                            return ListView.builder(
+                            return ListView.separated(
                               shrinkWrap: true,
                               itemCount: filteredSparepartList.length,
+                              separatorBuilder:
+                                  (BuildContext context, int index) => Divider(
+                                color: Colors.grey,
+                                thickness: 1.0,
+                              ),
                               itemBuilder: (BuildContext context, int index) {
                                 Map<dynamic, dynamic> sparepart =
                                     filteredSparepartList[index];
-                                return ListTile(
-                                  title: Text(
-                                      'ID Sparepart: ${sparepart['idSparepart']}'),
-                                  subtitle: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                          'Nama Sparepart: ${sparepart['namaSparepart']}'),
-                                      Text(
-                                          'Merk Sparepart: ${sparepart['merkSparepart']}'),
-                                      Text(
-                                          'Spec Sparepart: ${sparepart['specSparepart']}'),
-                                      Text(
-                                          'Harga Sparepart: ${sparepart['hargaSparepart']}'),
-                                      Text(
-                                          'Stok Sparepart: ${sparepart['stokSparepart']}'),
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                    color: Colors.white,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Color.fromARGB(255, 237, 85, 85)
+                                            .withOpacity(0.2),
+                                        spreadRadius: 2,
+                                        blurRadius: 4,
+                                        offset: Offset(0, 2),
+                                      ),
                                     ],
                                   ),
-                                  onTap: () {
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return AlertDialog(
-                                          title: Text('Jumlah Item'),
-                                          content: TextField(
-                                            controller: jumlahItemController,
-                                            keyboardType: TextInputType.number,
-                                            decoration: InputDecoration(
-                                              labelText: 'Jumlah Item',
+                                  child: ListTile(
+                                    title: Text(
+                                      'ID Sparepart: ${sparepart['idSparepart']}',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    subtitle: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        SizedBox(height: 8.0),
+                                        Text(
+                                          'Nama Sparepart: ${sparepart['namaSparepart']}',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        SizedBox(height: 4.0),
+                                        Text(
+                                            'Merk Sparepart: ${sparepart['merkSparepart']}'),
+                                        SizedBox(height: 4.0),
+                                        Text(
+                                            'Spec Sparepart: ${sparepart['specSparepart']}'),
+                                        SizedBox(height: 4.0),
+                                        Text(
+                                            'Harga Sparepart: ${sparepart['hargaSparepart']}'),
+                                        SizedBox(height: 4.0),
+                                        Text(
+                                            'Stok Sparepart: ${sparepart['stokSparepart']}'),
+                                        SizedBox(height: 8.0),
+                                      ],
+                                    ),
+                                    onTap: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            title: Text('Jumlah Item'),
+                                            content: TextField(
+                                              controller: jumlahItemController,
+                                              keyboardType:
+                                                  TextInputType.number,
+                                              decoration: InputDecoration(
+                                                labelText: 'Jumlah Item',
+                                              ),
                                             ),
-                                          ),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () {
-                                                Navigator.of(context).pop();
-                                                int jumlahItem = int.tryParse(
-                                                        jumlahItemController
-                                                            .text) ??
-                                                    0;
-                                                int stokSparepart = (sparepart[
-                                                        'stokSparepart'] ??
-                                                    '');
-                                                if (jumlahItem > 0 &&
-                                                    jumlahItem <=
-                                                        stokSparepart) {
-                                                  _selectItem(
-                                                      sparepart, jumlahItem);
-                                                } else {
-                                                  showDialog(
-                                                    context: context,
-                                                    builder:
-                                                        (BuildContext context) {
-                                                      return AlertDialog(
-                                                        title:
-                                                            Text('Kesalahan'),
-                                                        content: Text(
-                                                            'Jumlah item tidak valid atau melebihi stok sparepart.'),
-                                                        actions: [
-                                                          TextButton(
-                                                            onPressed: () {
-                                                              Navigator.of(
-                                                                      context)
-                                                                  .pop();
-                                                            },
-                                                            child: Text('OK'),
-                                                          ),
-                                                        ],
-                                                      );
-                                                    },
-                                                  );
-                                                }
-                                              },
-                                              child: Text('OK'),
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    );
-                                  },
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                  int jumlahItem = int.tryParse(
+                                                          jumlahItemController
+                                                              .text) ??
+                                                      0;
+                                                  int stokSparepart = sparepart[
+                                                          'stokSparepart'] ??
+                                                      0;
+                                                  if (jumlahItem > 0 &&
+                                                      jumlahItem <=
+                                                          stokSparepart) {
+                                                    _selectItem(
+                                                        sparepart, jumlahItem);
+                                                  } else {
+                                                    showDialog(
+                                                      context: context,
+                                                      builder: (BuildContext
+                                                          context) {
+                                                        return AlertDialog(
+                                                          title:
+                                                              Text('Kesalahan'),
+                                                          content: Text(
+                                                              'Jumlah item tidak valid atau melebihi stok sparepart.'),
+                                                          actions: [
+                                                            TextButton(
+                                                              onPressed: () {
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop();
+                                                              },
+                                                              child: Text('OK'),
+                                                            ),
+                                                          ],
+                                                        );
+                                                      },
+                                                    );
+                                                  }
+                                                },
+                                                child: Text('OK'),
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    },
+                                  ),
                                 );
                               },
                             );
