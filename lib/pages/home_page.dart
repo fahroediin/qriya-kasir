@@ -13,12 +13,12 @@ import 'package:project_s/pages/login_page.dart';
 import 'package:project_s/pages/servis.dart';
 import 'package:project_s/pages/listSparepart.dart';
 import 'package:project_s/drawer/mekanik.dart';
-import 'package:project_s/drawer/laporanPenjualan.dart';
+import 'package:project_s/drawer/historiPenjualan.dart';
 import 'package:project_s/drawer/about.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:project_s/pages/transaksi.dart';
-import 'package:project_s/drawer/laporanServis.dart';
+import 'package:project_s/drawer/historiServis.dart';
 import 'user.dart';
 import 'dart:io';
 
@@ -493,30 +493,30 @@ class _HomePageState extends State<HomePage> {
                   context: context,
                   builder: (BuildContext context) {
                     return AlertDialog(
-                      title: Text('Pilih Jenis Laporan'),
+                      title: Text('Pilih Jenis Histori'),
                       content: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           ListTile(
                             leading: Icon(Icons.book),
-                            title: Text('Laporan Servis'),
+                            title: Text('Histori Servis'),
                             onTap: () {
                               Navigator.of(context).pop();
                               Navigator.of(context).pushReplacement(
                                 MaterialPageRoute(
-                                  builder: (context) => LaporanServisPage(),
+                                  builder: (context) => HistoriServisPage(),
                                 ),
                               );
                             },
                           ),
                           ListTile(
                             leading: Icon(Icons.shopping_cart),
-                            title: Text('Laporan Penjualan'),
+                            title: Text('Histori Penjualan'),
                             onTap: () {
                               Navigator.of(context).pop();
                               Navigator.of(context).pushReplacement(
                                 MaterialPageRoute(
-                                  builder: (context) => LaporanPenjualanPage(),
+                                  builder: (context) => HistoriPenjualanPage(),
                                 ),
                               );
                             },
@@ -528,7 +528,7 @@ class _HomePageState extends State<HomePage> {
                 );
               },
               leading: Icon(Icons.description),
-              title: Text('Laporan'),
+              title: Text('Histori'),
             ),
 
             ListTile(

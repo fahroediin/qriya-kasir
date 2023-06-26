@@ -2,48 +2,73 @@ import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:project_s/pages/home_page.dart';
-import 'package:blue_thermal_printer/blue_thermal_printer.dart';
 
-class LaporanPenjualanPage extends StatefulWidget {
-  const LaporanPenjualanPage({Key? key}) : super(key: key);
+class HistoriServisPage extends StatefulWidget {
+  const HistoriServisPage({Key? key}) : super(key: key);
 
   @override
-  State<LaporanPenjualanPage> createState() => _LaporanPenjualanPageState();
+  State<HistoriServisPage> createState() => _HistoriServisPageState();
 }
 
-class _LaporanPenjualanPageState extends State<LaporanPenjualanPage> {
-  Query dbRef =
-      FirebaseDatabase.instance.reference().child('transaksiPenjualan');
-  List<BluetoothDevice> devices = [];
-  BluetoothDevice? selectedDevice;
-  BlueThermalPrinter printer = BlueThermalPrinter.instance;
+class _HistoriServisPageState extends State<HistoriServisPage> {
+  Query dbRef = FirebaseDatabase.instance.reference().child('transaksiServis');
   int itemCount = 0;
 
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  Future<void> fetchData() async {
+    DataSnapshot snapshot = await dbRef.get();
+    if (snapshot.exists) {
+      setState(() {
+        itemCount = snapshot.children.length;
+      });
+    }
+  }
+
   Widget buildListItem(DataSnapshot snapshot) {
-    Map? transaksi = snapshot.value as Map?;
-    String idPenjualan = transaksi?['idPenjualan'] ?? '';
-    String dateTime = transaksi?['dateTime'] ?? '';
-    String namaPembeli = transaksi?['namaPembeli'] ?? '';
-    List<Map>? items = (transaksi?['items'] as List<dynamic>?)?.cast<Map>();
-    double totalBayar = (transaksi?['totalHarga'] ?? 0).toDouble();
-    double bayar = (transaksi?['bayar'] ?? 0).toDouble();
-    double kembalian = (transaksi?['kembalian'] ?? 0).toDouble();
+    Map transaksi = snapshot.value as Map;
+    String idServis = snapshot.key ?? '';
+    String dateTime = transaksi['dateTime'] ?? '';
+    String idMekanik = transaksi['idMekanik'] ?? '';
+    String namaMekanik = transaksi['namaMekanik'] ?? '';
+    String nopol = transaksi['nopol'] ?? '';
+    String merkSpm = transaksi['merkSpm'] ?? '';
+    String tipeSpm = transaksi['tipeSpm'] ?? '';
+    String namaPemilik = transaksi['namaPemilik'] ?? '';
+    String kerusakan = transaksi['kerusakan'] ?? '';
+    List<Map>? sparepartItems =
+        (transaksi['sparepartItems'] as List<dynamic>?)?.cast<Map>();
+    double biayaServis = (transaksi['biayaServis'] ?? 0).toDouble();
+    double totalBayar = (transaksi['totalBayar'] ?? 0).toDouble();
+    double bayar = (transaksi['bayar'] ?? 0).toDouble();
+    double kembalian = (transaksi['kembalian'] ?? 0).toDouble();
 
     return Card(
       child: ListTile(
-        title: Text('ID Penjualan: $idPenjualan'),
+        title: Text('ID Servis: $idServis'),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Tanggal dan Waktu: $dateTime'),
-            Text('Nama Pembeli: $namaPembeli'),
-            Text('Items:'),
+            Text('ID Mekanik: $idMekanik'),
+            Text('Nama Mekanik: $namaMekanik'),
+            Text('Nomor Polisi: $nopol'),
+            Text('Merk SPM: $merkSpm'),
+            Text('Tipe SPM: $tipeSpm'),
+            Text('Nama Pemilik: $namaPemilik'),
+            Text('Kerusakan: $kerusakan'),
+            Text('Sparepart Items:'),
             Column(
-              children: items?.map((item) {
+              children: sparepartItems?.map((item) {
                     String idSparepart = item['idSparepart'] ?? '';
                     String namaSparepart = item['namaSparepart'] ?? '';
-                    double hargaSparepart = (item['hargaSparepart'] ?? 0);
-                    int jumlahItem = item['jumlahSparepart'] ?? 0;
+                    double hargaSparepart =
+                        (item['hargaSparepart'] ?? 0).toDouble();
+                    int jumlahItem = item['jumlahItem'] ?? 0;
                     return Padding(
                       padding: EdgeInsets.only(left: 16),
                       child: Column(
@@ -59,39 +84,11 @@ class _LaporanPenjualanPageState extends State<LaporanPenjualanPage> {
                   }).toList() ??
                   [],
             ),
+            Text('Biaya Servis: $biayaServis'),
             Text('Total Bayar: $totalBayar'),
             Text('Bayar: $bayar'),
             Text('Kembalian: $kembalian'),
           ],
-        ),
-        trailing: IconButton(
-          icon: Icon(Icons.delete),
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  title: Text('Hapus Data'),
-                  content: Text('Anda yakin ingin menghapus data ini?'),
-                  actions: [
-                    TextButton(
-                      child: Text('Batal'),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                    TextButton(
-                      child: Text('Hapus'),
-                      onPressed: () {
-                        //deleteData(snapshot);
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                  ],
-                );
-              },
-            );
-          },
         ),
       ),
     );
@@ -107,27 +104,6 @@ class _LaporanPenjualanPageState extends State<LaporanPenjualanPage> {
         ),
       ),
     );
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    fetchData();
-    getDevices();
-  }
-
-  void getDevices() async {
-    devices = await printer.getBondedDevices();
-    setState(() {});
-  }
-
-  Future<void> fetchData() async {
-    DataSnapshot snapshot = await dbRef.get();
-    if (snapshot.exists) {
-      setState(() {
-        itemCount = snapshot.children.length;
-      });
-    }
   }
 
   @override
@@ -161,7 +137,7 @@ class _LaporanPenjualanPageState extends State<LaporanPenjualanPage> {
           },
         ),
         title: Text(
-          'Laporan Penjualan',
+          'Histori Servis',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -175,7 +151,7 @@ class _LaporanPenjualanPageState extends State<LaporanPenjualanPage> {
           Container(
             padding: EdgeInsets.all(16),
             child: Text(
-              'Jumlah Transaksi: $itemCount',
+              'Total Servis: $itemCount',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.normal,
