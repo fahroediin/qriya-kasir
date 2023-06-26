@@ -65,6 +65,35 @@ class _LaporanPenjualanPageState extends State<LaporanPenjualanPage> {
             Text('Kembalian: $kembalian'),
           ],
         ),
+        trailing: IconButton(
+          icon: Icon(Icons.delete),
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('Hapus Data'),
+                  content: Text('Anda yakin ingin menghapus data ini?'),
+                  actions: [
+                    TextButton(
+                      child: Text('Batal'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                    TextButton(
+                      child: Text('Hapus'),
+                      onPressed: () {
+                        //deleteData(snapshot);
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }

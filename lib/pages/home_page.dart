@@ -32,6 +32,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   User? _user;
+  Map<dynamic, dynamic>? userData;
   DatabaseReference _databaseReference = FirebaseDatabase.instance.reference();
   Query dbRefPenjualan =
       FirebaseDatabase.instance.reference().child('transaksiPenjualan');
@@ -40,6 +41,9 @@ class _HomePageState extends State<HomePage> {
   int _dataCountServis = 0;
   int _dataCountPenjualan = 0;
   int _totalData = 0;
+  String nameController = '';
+  String addressController = '';
+  String selectedRole = 'Owner';
 
   @override
   void initState() {
@@ -49,6 +53,29 @@ class _HomePageState extends State<HomePage> {
         'id_ID', null); // Initialize date formatting for Indonesian locale
     getDataCountServis();
     getDataCountPenjualan();
+    _databaseReference = FirebaseDatabase.instance.reference().child('user');
+    getUserData();
+    getUser();
+  }
+
+  void getUserData() {
+    _databaseReference.child('user').onValue.listen((event) {
+      if (event.snapshot.value != null) {
+        setState(() {
+          nameController = userData!['name'];
+          selectedRole = userData!['role'];
+          addressController = userData!['address'];
+        });
+      }
+    });
+  }
+
+  void getUser() {
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      setState(() {
+        _user = user;
+      });
+    });
   }
 
   void _checkCurrentUser() async {
@@ -407,26 +434,25 @@ class _HomePageState extends State<HomePage> {
         child: ListView(
           children: [
             InkWell(
-              onTap: () {
-                // Navigasi ke halaman pengguna di sini
-                // Misalnya, menggunakan Navigator.push()
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => UserPage()),
-                );
-              },
-              child: UserAccountsDrawerHeader(
-                accountName: Text('Kasir'),
-                accountEmail: Text(_user?.email ?? ''),
-                currentAccountPicture: CircleAvatar(
-                  backgroundColor: Colors.white,
-                  child: Icon(Icons.admin_panel_settings_rounded),
-                ),
-                decoration: BoxDecoration(
-                  color: Color.fromARGB(255, 219, 42, 15),
-                ),
-              ),
-            ),
+                onTap: () {
+                  // Navigasi ke halaman pengguna di sini
+                  // Misalnya, menggunakan Navigator.push()
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => UserPage()),
+                  );
+                },
+                child: UserAccountsDrawerHeader(
+                  accountName: Text(nameController),
+                  accountEmail: Text(_user?.email ?? ''),
+                  currentAccountPicture: CircleAvatar(
+                    backgroundColor: Colors.white,
+                    child: Icon(Icons.admin_panel_settings_rounded),
+                  ),
+                  decoration: BoxDecoration(
+                    color: Color.fromARGB(255, 219, 42, 15),
+                  ),
+                )),
 
             ListTile(
               onTap: () {

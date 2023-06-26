@@ -57,7 +57,8 @@ class _UserPageState extends State<UserPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('User Page'),
+          backgroundColor: Color.fromARGB(255, 219, 42, 15),
+          title: Text('Setting'),
         ),
         body: ListView(padding: EdgeInsets.all(16), children: [
           CircleAvatar(
@@ -96,7 +97,7 @@ class _UserPageState extends State<UserPage> {
               ),
             ),
             IconButton(
-              icon: Icon(Icons.settings),
+              icon: Icon(Icons.edit),
               onPressed: () {
                 setState(() {
                   isEditing = true;

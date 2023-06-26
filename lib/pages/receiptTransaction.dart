@@ -5,85 +5,103 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pdf/widgets.dart' as pdfWidgets;
 import 'package:pdf/pdf.dart';
 
-class ReceiptTransactionPage extends StatelessWidget {
+class ReceiptTransactionPage extends StatefulWidget {
+  @override
+  _ReceiptTransactionPageState createState() => _ReceiptTransactionPageState();
+}
+
+class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
   final DatabaseReference _databaseReference =
       FirebaseDatabase.instance.reference();
+
+  late Future<Map<String, dynamic>> _lastTransactionFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _lastTransactionFuture = _fetchLastTransaction();
+  }
 
   Future<Map<String, dynamic>> _fetchLastTransaction() async {
     final DatabaseEvent event = await _databaseReference
         .child('transaksiPenjualan')
         .orderByChild('idPenjualan')
-        .equalTo('sukses')
         .limitToLast(1)
         .once();
     return {};
   }
 
-  Future<void> _saveAsPdf(BuildContext context) async {
-    // Fetch last transaction data
-    Map<String, dynamic> lastTransactionData = await _fetchLastTransaction();
-
+  Future<void> _saveAsPdf(
+      BuildContext context, Map<String, dynamic> lastTransactionData) async {
     final pdfWidgets.Document pdf = pdfWidgets.Document();
 
     pdf.addPage(
       pdfWidgets.Page(
         build: (context) {
-          return pdfWidgets.Column(
-            crossAxisAlignment: pdfWidgets.CrossAxisAlignment.start,
-            children: [
-              pdfWidgets.Text(
-                'ID Transaksi: ${lastTransactionData['idPenjualan']}',
-                style: pdfWidgets.TextStyle(
-                    fontSize: 18, fontWeight: pdfWidgets.FontWeight.bold),
-              ),
-              pdfWidgets.SizedBox(height: 10),
-              pdfWidgets.Text(
-                'Tanggal dan Waktu: ${lastTransactionData['formattedDateTime']}',
-                style: pdfWidgets.TextStyle(fontSize: 14),
-              ),
-              pdfWidgets.SizedBox(height: 10),
-              pdfWidgets.Text(
-                'Nama Pembeli: ${lastTransactionData['namaPembeli']}',
-                style: pdfWidgets.TextStyle(fontSize: 14),
-              ),
-              pdfWidgets.SizedBox(height: 20),
-              pdfWidgets.Text(
-                'Daftar Barang:',
-                style: pdfWidgets.TextStyle(
-                    fontSize: 16, fontWeight: pdfWidgets.FontWeight.bold),
-              ),
-              pdfWidgets.SizedBox(height: 10),
-              pdfWidgets.Table.fromTextArray(
-                headers: ['ID Sparepart', 'Nama Sparepart', 'Harga', 'Jumlah'],
-                cellAlignment: pdfWidgets.Alignment.centerLeft,
-                headerStyle: pdfWidgets.TextStyle(
-                    fontWeight: pdfWidgets.FontWeight.bold),
-                data: (lastTransactionData['items'] ?? []).map((item) {
-                  return [
-                    item['idSparepart'],
-                    item['namaSparepart'],
-                    item['hargaSparepart'].toString(),
-                    item['jumlahSparepart'].toString(),
-                  ];
-                }).toList(),
-              ),
-              pdfWidgets.SizedBox(height: 20),
-              pdfWidgets.Text(
-                'Total Harga: ${lastTransactionData['totalHarga']}',
-                style: pdfWidgets.TextStyle(
-                    fontSize: 16, fontWeight: pdfWidgets.FontWeight.bold),
-              ),
-              pdfWidgets.Text(
-                'Bayar: ${lastTransactionData['bayar']}',
-                style: pdfWidgets.TextStyle(
-                    fontSize: 16, fontWeight: pdfWidgets.FontWeight.bold),
-              ),
-              pdfWidgets.Text(
-                'Kembalian: ${lastTransactionData['kembalian']}',
-                style: pdfWidgets.TextStyle(
-                    fontSize: 16, fontWeight: pdfWidgets.FontWeight.bold),
-              ),
-            ],
+          return pdfWidgets.Container(
+            padding: pdfWidgets.EdgeInsets.all(16.0),
+            child: pdfWidgets.Column(
+              crossAxisAlignment: pdfWidgets.CrossAxisAlignment.start,
+              children: [
+                pdfWidgets.Text(
+                  'ID Transaksi: ${lastTransactionData['idPenjualan']}',
+                  style: pdfWidgets.TextStyle(
+                      fontSize: 18, fontWeight: pdfWidgets.FontWeight.bold),
+                ),
+                pdfWidgets.SizedBox(height: 10),
+                pdfWidgets.Text(
+                  'Tanggal dan Waktu: ${lastTransactionData['formattedDateTime']}',
+                  style: pdfWidgets.TextStyle(fontSize: 14),
+                ),
+                pdfWidgets.SizedBox(height: 10),
+                pdfWidgets.Text(
+                  'Nama Pembeli: ${lastTransactionData['namaPembeli']}',
+                  style: pdfWidgets.TextStyle(fontSize: 14),
+                ),
+                pdfWidgets.SizedBox(height: 20),
+                pdfWidgets.Text(
+                  'Daftar Barang:',
+                  style: pdfWidgets.TextStyle(
+                      fontSize: 16, fontWeight: pdfWidgets.FontWeight.bold),
+                ),
+                pdfWidgets.SizedBox(height: 10),
+                pdfWidgets.Table.fromTextArray(
+                  headers: [
+                    'ID Sparepart',
+                    'Nama Sparepart',
+                    'Harga',
+                    'Jumlah'
+                  ],
+                  cellAlignment: pdfWidgets.Alignment.centerLeft,
+                  headerStyle: pdfWidgets.TextStyle(
+                      fontWeight: pdfWidgets.FontWeight.bold),
+                  data: (lastTransactionData['items'] ?? []).map((item) {
+                    return [
+                      item['idSparepart'],
+                      item['namaSparepart'],
+                      item['hargaSparepart'].toString(),
+                      item['jumlahSparepart'].toString(),
+                    ];
+                  }).toList(),
+                ),
+                pdfWidgets.SizedBox(height: 20),
+                pdfWidgets.Text(
+                  'Total Harga: ${lastTransactionData['totalHarga']}',
+                  style: pdfWidgets.TextStyle(
+                      fontSize: 16, fontWeight: pdfWidgets.FontWeight.bold),
+                ),
+                pdfWidgets.Text(
+                  'Bayar: ${lastTransactionData['bayar']}',
+                  style: pdfWidgets.TextStyle(
+                      fontSize: 16, fontWeight: pdfWidgets.FontWeight.bold),
+                ),
+                pdfWidgets.Text(
+                  'Kembalian: ${lastTransactionData['kembalian']}',
+                  style: pdfWidgets.TextStyle(
+                      fontSize: 16, fontWeight: pdfWidgets.FontWeight.bold),
+                ),
+              ],
+            ),
           );
         },
       ),
@@ -119,8 +137,8 @@ class ReceiptTransactionPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Receipt'),
-      ),
+          title: const Text('Receipt'),
+          backgroundColor: Color.fromARGB(255, 219, 42, 15)),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -128,7 +146,7 @@ class ReceiptTransactionPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               FutureBuilder<Map<String, dynamic>>(
-                future: _fetchLastTransaction(),
+                future: _lastTransactionFuture,
                 builder: (BuildContext context,
                     AsyncSnapshot<Map<String, dynamic>> snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -257,7 +275,7 @@ class ReceiptTransactionPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 20),
                         ElevatedButton(
-                          onPressed: () => _saveAsPdf(context),
+                          onPressed: () => _saveAsPdf,
                           child: Text('Save as PDF'),
                         ),
                       ],
