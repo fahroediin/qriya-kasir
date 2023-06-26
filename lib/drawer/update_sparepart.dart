@@ -34,14 +34,17 @@ class _UpdateRecordState extends State<UpdateRecord> {
 
   void getDaftarSparepart() async {
     DataSnapshot snapshot = await dbRef.child(widget.sparepartKey).get();
-    Map daftarSparepart = snapshot.value as Map;
+    Map<dynamic, dynamic> daftarSparepart =
+        snapshot.value as Map<dynamic, dynamic>;
 
     setState(() {
       namaSparepartController.text = daftarSparepart['namaSparepart'];
       merkSparepartController.text = daftarSparepart['merkSparepart'];
       specSparepartController.text = daftarSparepart['specSparepart'];
-      hargaSparepartController.text = daftarSparepart['hargaSparepart'];
-      stokSparepartController.text = daftarSparepart['stokSparepart'];
+      hargaSparepartController.text =
+          daftarSparepart['hargaSparepart'].toString();
+      stokSparepartController.text =
+          daftarSparepart['stokSparepart'].toString();
     });
   }
 
@@ -122,8 +125,9 @@ class _UpdateRecordState extends State<UpdateRecord> {
                       'namaSparepart': namaSparepartController.text,
                       'merkSparepart': merkSparepartController.text,
                       'specSparepart': specSparepartController.text,
-                      'hargaSparepart': hargaSparepartController.text,
-                      'stokSparepart': stokSparepartController.text,
+                      'hargaSparepart':
+                          int.parse(hargaSparepartController.text),
+                      'stokSparepart': int.parse(stokSparepartController.text),
                     };
 
                     dbRef

@@ -26,11 +26,27 @@ class _InputSparepartPageState extends State<InputSparepartPage>
       TextEditingController();
 
   final databaseReference = FirebaseDatabase.instance.reference();
+  List<Map<dynamic, dynamic>> sparepartList = [];
+  List<Map<dynamic, dynamic>> filteredSparepartList = [];
 
   @override
   void initState() {
     super.initState();
     _idSparepartController.text = generateID();
+    fetchData();
+  }
+
+  Future<void> fetchData() async {
+    DataSnapshot dataSnapshot =
+        await databaseReference.child('daftarSparepart').get() as DataSnapshot;
+    if (dataSnapshot != null && dataSnapshot.value != null) {
+      Map<dynamic, dynamic> data = dataSnapshot.value as Map<dynamic, dynamic>;
+      sparepartList = data.entries
+          .map((entry) => Map<dynamic, dynamic>.from(entry.value))
+          .toList();
+      filteredSparepartList = sparepartList;
+      setState(() {});
+    }
   }
 
   String generateID() {
