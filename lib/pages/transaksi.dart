@@ -1,15 +1,12 @@
-import 'dart:math';
 import 'dart:ffi';
-import 'package:blue_thermal_printer/blue_thermal_printer.dart';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/services.dart';
 import 'package:project_s/pages/home_page.dart';
 import 'package:project_s/pages/transaksiSuccess.dart';
-import 'package:uuid/uuid.dart';
 import 'package:intl/intl.dart';
-import 'transaksiSuccess.dart';
 
 class TransaksiPenjualanPage extends StatefulWidget {
   @override
@@ -86,11 +83,21 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
   void saveTransaksiPenjualan() {
     DatabaseReference reference =
         FirebaseDatabase.instance.reference().child('transaksiPenjualan');
+
+    List<Map<String, dynamic>> items = _items.map((item) {
+      return {
+        'idSparepart': item['idSparepart'],
+        'namaSparepart': item['namaSparepart'],
+        'hargaSparepart': item['hargaSparepart'].toInt(),
+        'jumlahSparepart': item['jumlahSparepart'],
+      };
+    }).toList();
+
     Map<String, dynamic> data = {
       'idPenjualan': _idPenjualan,
       'dateTime': _formattedDateTime,
       'namaPembeli': _namaPembeli,
-      'items': selectedSpareparts, // Use selectedSpareparts instead of _items
+      'items': items,
       'totalHarga': _totalHarga,
       'bayar': _bayar,
       'kembalian': _kembalian,
@@ -272,7 +279,10 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
                                                       jumlahItem <=
                                                           stokSparepart) {
                                                     _selectItem(
-                                                        sparepart, jumlahItem);
+                                                      Map<String, dynamic>.from(
+                                                          sparepart),
+                                                      jumlahItem,
+                                                    );
                                                   } else {
                                                     showDialog(
                                                       context: context,
@@ -343,7 +353,7 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
         _items.add({
           'idSparepart': sparepart['idSparepart'],
           'namaSparepart': sparepart['namaSparepart'],
-          'hargaSparepart': sparepart['hargaSparepart'],
+          'hargaSparepart': sparepart['hargaSparepart'].toInt(),
           'jumlahSparepart': jumlahItem,
           'stokSparepart': stokSparepart,
         });

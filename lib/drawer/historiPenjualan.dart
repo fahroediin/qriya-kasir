@@ -27,9 +27,9 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
     String dateTime = transaksi?['dateTime'] ?? '';
     String namaPembeli = transaksi?['namaPembeli'] ?? '';
     List<Map>? items = (transaksi?['items'] as List<dynamic>?)?.cast<Map>();
-    double totalBayar = (transaksi?['totalHarga'] ?? 0).toDouble();
-    double bayar = (transaksi?['bayar'] ?? 0).toDouble();
-    double kembalian = (transaksi?['kembalian'] ?? 0).toDouble();
+    int totalBayar = transaksi?['totalHarga'] ?? 0;
+    int bayar = transaksi?['bayar'] ?? 0;
+    int kembalian = transaksi?['kembalian'] ?? 0;
 
     return Card(
       child: ListTile(
@@ -44,7 +44,8 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
               children: items?.map((item) {
                     String idSparepart = item['idSparepart'] ?? '';
                     String namaSparepart = item['namaSparepart'] ?? '';
-                    String hargaSparepart = item['hargaSparepart'] ?? '';
+                    int hargaSparepart = item['hargaSparepart'] ?? 0;
+
                     int jumlahItem = item['jumlahSparepart'] ?? 0;
                     return Padding(
                       padding: EdgeInsets.only(left: 16),
@@ -53,7 +54,8 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
                         children: [
                           Text('ID Sparepart: $idSparepart'),
                           Text('Nama Sparepart: $namaSparepart'),
-                          Text('Harga Sparepart: $hargaSparepart'),
+                          Text(
+                              'Harga Sparepart: ${hargaSparepart.toStringAsFixed(2)}'),
                           Text('Jumlah Item: $jumlahItem'),
                         ],
                       ),
