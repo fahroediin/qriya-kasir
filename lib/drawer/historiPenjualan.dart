@@ -44,7 +44,7 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
               children: items?.map((item) {
                     String idSparepart = item['idSparepart'] ?? '';
                     String namaSparepart = item['namaSparepart'] ?? '';
-                    int hargaSparepart = item['hargaSparepart'] ?? 0;
+                    int hargaSparepart = item['hargaSparepart'] as int? ?? 0;
 
                     int jumlahItem = item['jumlahSparepart'] ?? 0;
                     return Padding(

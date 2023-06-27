@@ -3,7 +3,6 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/widgets.dart' as pdfWidgets;
-import 'package:pdf/pdf.dart';
 
 class ReceiptTransactionPage extends StatefulWidget {
   @override
@@ -19,16 +18,26 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
   @override
   void initState() {
     super.initState();
-    _lastTransactionFuture = _fetchLastTransaction();
+    _lastTransactionFuture = fetchLastTransaction();
   }
 
-  Future<Map<String, dynamic>> _fetchLastTransaction() async {
-    final DatabaseEvent event = await _databaseReference
-        .child('transaksiPenjualan')
-        .orderByChild('idPenjualan')
-        .limitToLast(1)
-        .once();
-    return {};
+  Future<Map<String, dynamic>> fetchLastTransaction() async {
+    final DatabaseReference databaseRef =
+        FirebaseDatabase.instance.reference().child('transaksiPenjualan');
+
+    final DataSnapshot snapshot =
+        await databaseRef.orderByChild('dateTime').limitToLast(1).get();
+
+    final dynamic data = snapshot.value;
+    if (data != null && data is Map) {
+      final String idPenjualan = data.keys.first;
+      final Map<String, dynamic> transactionData =
+          data[idPenjualan] as Map<String, dynamic>;
+
+      return transactionData;
+    } else {
+      return {};
+    }
   }
 
   Future<void> _saveAsPdf(
@@ -107,38 +116,60 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
       ),
     );
 
-    // Save the PDF file.
-    final String dir = (await getApplicationDocumentsDirectory()).path;
-    final String path =
-        '$dir/receipt_${lastTransactionData['idPenjualan']}.pdf';
-    final File file = File(path);
-    await file.writeAsBytes(await pdf.save());
+    // Simpan file PDF ke direktori lokal
+    final Directory? directory = await getExternalStorageDirectory();
+    if (directory != null) {
+      final String path =
+          '${directory.path}/receipt_${lastTransactionData['idPenjualan']}.pdf';
+      final File file = File(path);
+      await file.writeAsBytes(await pdf.save());
 
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('PDF Saved'),
-          content: const Text('The receipt has been saved as PDF.'),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('PDF Saved'),
+            content: const Text('The receipt has been saved as PDF.'),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Error'),
+            content:
+                const Text('Failed to get the external storage directory.'),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: const Text('Receipt'),
-          backgroundColor: Color.fromARGB(255, 219, 42, 15)),
+        title: const Text('Receipt'),
+        backgroundColor: Color.fromARGB(255, 219, 42, 15),
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -151,7 +182,7 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                     AsyncSnapshot<Map<String, dynamic>> snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return CircularProgressIndicator();
-                  } else if (snapshot.hasData) {
+                  } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                     Map<String, dynamic> lastTransactionData = snapshot.data!;
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -165,7 +196,7 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                         ),
                         const SizedBox(height: 10),
                         Text(
-                          'Tanggal dan Waktu: ${lastTransactionData['formattedDateTime']}',
+                          'Tanggal dan Waktu: ${lastTransactionData['dateTime']}',
                           style: TextStyle(
                             fontSize: 14,
                           ),
@@ -226,29 +257,26 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                                 ),
                               ],
                             ),
-                            ...(lastTransactionData['items']
-                                        as List<dynamic>? ??
-                                    [])
-                                .map((item) {
-                              return TableRow(
-                                children: [
-                                  TableCell(
-                                    child: Text(item['idSparepart']),
-                                  ),
-                                  TableCell(
-                                    child: Text(item['namaSparepart']),
-                                  ),
-                                  TableCell(
-                                    child:
-                                        Text(item['hargaSparepart'].toString()),
-                                  ),
-                                  TableCell(
-                                    child: Text(
-                                        item['jumlahSparepart'].toString()),
-                                  ),
-                                ],
-                              );
-                            }).toList(),
+                            ...lastTransactionData['items']
+                                .map<TableRow>((item) => TableRow(
+                                      children: [
+                                        TableCell(
+                                          child: Text(item['idSparepart']),
+                                        ),
+                                        TableCell(
+                                          child: Text(item['namaSparepart']),
+                                        ),
+                                        TableCell(
+                                          child: Text(item['hargaSparepart']
+                                              .toString()),
+                                        ),
+                                        TableCell(
+                                          child: Text(item['jumlahSparepart']
+                                              .toString()),
+                                        ),
+                                      ],
+                                    ))
+                                .toList(),
                           ],
                         ),
                         const SizedBox(height: 20),
@@ -273,19 +301,21 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(height: 20),
-                        ElevatedButton(
-                          onPressed: () => _saveAsPdf,
-                          child: Text('Save as PDF'),
-                        ),
                       ],
                     );
-                  } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
                   } else {
-                    return Text('No data available');
+                    return const Text('No transaction data found.');
                   }
                 },
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () async {
+                  Map<String, dynamic> lastTransactionData =
+                      await fetchLastTransaction();
+                  await _saveAsPdf(context, lastTransactionData);
+                },
+                child: const Text('Save as PDF'),
               ),
             ],
           ),
