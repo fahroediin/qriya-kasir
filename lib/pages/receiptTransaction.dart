@@ -25,19 +25,19 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
     final DatabaseReference databaseRef =
         FirebaseDatabase.instance.reference().child('transaksiPenjualan');
 
-    final DataSnapshot snapshot = await databaseRef
-        .orderByChild('dateTime')
-        .equalTo(DateTime.now().toString())
-        .limitToLast(1)
-        .get();
+    final DataSnapshot snapshot =
+        await databaseRef.orderByKey().limitToLast(1).get();
 
     final dynamic data = snapshot.value;
     if (data != null && data is Map<dynamic, dynamic>) {
-      final String idPenjualan = data.keys.first as String;
-      final Map<String, dynamic> transactionData =
-          data[idPenjualan] as Map<String, dynamic>;
+      final String idPenjualan = data.keys.first.toString();
+      final Map<dynamic, dynamic> transactionData =
+          data[idPenjualan] as Map<dynamic, dynamic>;
 
-      return transactionData;
+      final Map<String, dynamic> convertedTransactionData =
+          Map<String, dynamic>.from(transactionData);
+
+      return convertedTransactionData;
     } else {
       return {};
     }
@@ -93,7 +93,7 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                       item['namaSparepart'],
                       item['hargaSparepart'].toString(),
                       item['jumlahSparepart'].toString(),
-                    ];
+                    ].cast<dynamic>().toList();
                   }).toList(),
                 ),
                 pdfWidgets.SizedBox(height: 20),
@@ -119,8 +119,8 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
       ),
     );
 
-    // Simpan file PDF ke direktori lokal
-    final Directory? directory = await getExternalStorageDirectory();
+    // Get the document directory path
+    final Directory? directory = await getApplicationSupportDirectory();
     if (directory != null) {
       final String path =
           '${directory.path}/receipt_${lastTransactionData['idPenjualan']}.pdf';
@@ -132,7 +132,7 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text('PDF Saved'),
-            content: const Text('The receipt has been saved as PDF.'),
+            content: const Text('The PDF file has been saved successfully.'),
             actions: <Widget>[
               TextButton(
                 child: const Text('OK'),
@@ -150,8 +150,7 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text('Error'),
-            content:
-                const Text('Failed to get the external storage directory.'),
+            content: const Text('Failed to get the document directory.'),
             actions: <Widget>[
               TextButton(
                 child: const Text('OK'),
@@ -188,124 +187,181 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                   } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                     Map<String, dynamic> lastTransactionData = snapshot.data!
                         .cast<String, dynamic>(); // Use cast to enforce type
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'ID Transaksi: ${lastTransactionData['idPenjualan']}',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                    return Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8.0),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.5),
+                            spreadRadius: 2,
+                            blurRadius: 5,
+                            offset: Offset(0, 3),
                           ),
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          'Tanggal dan Waktu: ${lastTransactionData['dateTime']}',
-                          style: TextStyle(
-                            fontSize: 14,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          'Nama Pembeli: ${lastTransactionData['namaPembeli']}',
-                          style: TextStyle(
-                            fontSize: 14,
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        Text(
-                          'Daftar Barang:',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        Table(
-                          columnWidths: {
-                            0: FlexColumnWidth(2),
-                            1: FlexColumnWidth(3),
-                            2: FlexColumnWidth(1),
-                            3: FlexColumnWidth(1),
-                          },
+                        ],
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            TableRow(
+                            Text(
+                              'ID Transaksi: ${lastTransactionData['idPenjualan']}',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              'Tanggal dan Waktu: ${lastTransactionData['dateTime']}',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              'Nama Pembeli: ${lastTransactionData['namaPembeli']}',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            const Text(
+                              'List Item:',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                            const SizedBox(height: 5),
+                            Divider(
+                              color: Colors.grey,
+                              thickness: 1.5,
+                            ),
+                            const SizedBox(height: 5),
+                            Table(
+                              columnWidths: {
+                                0: FlexColumnWidth(2),
+                                1: FlexColumnWidth(3),
+                                2: FlexColumnWidth(1),
+                                3: FlexColumnWidth(1),
+                                4: FlexColumnWidth(1),
+                              },
                               children: [
-                                TableCell(
-                                  child: Text(
-                                    'ID Sparepart',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
-                                  ),
+                                TableRow(
+                                  children: [
+                                    TableCell(
+                                      child: Text(
+                                        'ID Sparepart',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                    TableCell(
+                                      child: Text(
+                                        'Nama Sparepart',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                    TableCell(
+                                      child: Text(
+                                        'Price',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                    TableCell(
+                                      child: Text(
+                                        'Qty',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                TableCell(
-                                  child: Text(
-                                    'Nama Sparepart',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                                TableCell(
-                                  child: Text(
-                                    'Harga',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                                TableCell(
-                                  child: Text(
-                                    'Jumlah',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                ),
+                                ...lastTransactionData['items']
+                                    .map<TableRow>(
+                                      (item) => TableRow(
+                                        children: [
+                                          TableCell(
+                                            child: Text(
+                                              item['idSparepart'],
+                                              style: TextStyle(
+                                                  color: Colors.black),
+                                            ),
+                                          ),
+                                          TableCell(
+                                            child: Text(
+                                              item['namaSparepart'],
+                                              style: TextStyle(
+                                                  color: Colors.black),
+                                            ),
+                                          ),
+                                          TableCell(
+                                            child: Text(
+                                              item['hargaSparepart'].toString(),
+                                              style: TextStyle(
+                                                  color: Colors.black),
+                                            ),
+                                          ),
+                                          TableCell(
+                                            child: Text(
+                                              item['jumlahSparepart']
+                                                  .toString(),
+                                              style: TextStyle(
+                                                  color: Colors.black),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                    .toList(),
                               ],
                             ),
-                            ...lastTransactionData['items']
-                                .map<TableRow>((item) => TableRow(
-                                      children: [
-                                        TableCell(
-                                          child: Text(item['idSparepart']),
-                                        ),
-                                        TableCell(
-                                          child: Text(item['namaSparepart']),
-                                        ),
-                                        TableCell(
-                                          child: Text(item['hargaSparepart']
-                                              .toString()),
-                                        ),
-                                        TableCell(
-                                          child: Text(item['jumlahSparepart']
-                                              .toString()),
-                                        ),
-                                      ],
-                                    ))
-                                .toList(),
+                            const SizedBox(height: 20),
+                            Text(
+                              'Total Harga: ${lastTransactionData['totalHarga']}',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                            SizedBox(height: 5),
+                            Text(
+                              'Bayar: ${lastTransactionData['bayar']}',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                            SizedBox(height: 5),
+                            Text(
+                              'Kembalian: ${lastTransactionData['kembalian']}',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
                           ],
                         ),
-                        const SizedBox(height: 20),
-                        Text(
-                          'Total Harga: ${lastTransactionData['totalHarga']}',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          'Bayar: ${lastTransactionData['bayar']}',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          'Kembalian: ${lastTransactionData['kembalian']}',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
+                      ),
                     );
                   } else {
                     return const Text('No transaction data found.');
@@ -319,7 +375,21 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                       await fetchLastTransaction();
                   await _saveAsPdf(context, lastTransactionData);
                 },
-                child: const Text('Save as PDF'),
+                child: const Text(
+                  'Save as PDF',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  primary: Color.fromARGB(255, 219, 42, 15),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 12,
+                    horizontal: 24,
+                  ),
+                ),
               ),
             ],
           ),
