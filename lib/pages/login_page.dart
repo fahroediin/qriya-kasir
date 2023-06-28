@@ -64,10 +64,25 @@ class _LoginPageState extends State<LoginPage>
   Future<void> _loadEmailHistory() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? email = prefs.getString('email');
-    if (email != null) {
-      setState(() {
-        _emailController.text = email;
-      });
+    String? token = prefs.getString('login_token');
+
+    if (email != null && token != null) {
+      // Email dan token ditemukan, cek validitas token di sini jika diperlukan
+
+      // Menggunakan Navigator.pushReplacement dengan PageRouteBuilder untuk animasi transisi
+      Navigator.pushReplacement(
+        context,
+        PageRouteBuilder(
+          transitionDuration: Duration(milliseconds: 600),
+          pageBuilder: (_, __, ___) => HomePage(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(
+              opacity: animation,
+              child: child,
+            );
+          },
+        ),
+      );
     }
   }
 
@@ -84,6 +99,10 @@ class _LoginPageState extends State<LoginPage>
           password: _passwordController.text.trim(),
         );
         _saveEmailHistory(); // Simpan histori email
+
+        // Menyimpan token setelah berhasil login
+        String token = 'token_login_anda'; // Ganti dengan token yang sesuai
+        await _saveToken(token);
 
         // Menggunakan Navigator.pushReplacement dengan PageRouteBuilder untuk animasi transisi
         Navigator.pushReplacement(
@@ -117,6 +136,11 @@ class _LoginPageState extends State<LoginPage>
         _showSnackBar('Terjadi kesalahan saat login');
       }
     }
+  }
+
+  Future<void> _saveToken(String token) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('login_token', token);
   }
 
   String? _emailValidator(String? formEmail) {

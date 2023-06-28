@@ -81,6 +81,31 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
     }
   }
 
+  void _calculateTotalHarga() {
+    double totalHarga = 0;
+    for (var item in _items) {
+      double harga = double.tryParse(item['hargaSparepart'].toString()) ?? 0;
+      int jumlah = int.tryParse(item['jumlahSparepart'].toString()) ?? 0;
+      totalHarga += harga * jumlah;
+    }
+
+    double diskon = double.tryParse(diskonController.text) ?? 0;
+    double diskonAmount =
+        totalHarga * (diskon / 100); // Mengubah diskon menjadi persen
+    totalHarga -= diskonAmount;
+
+    setState(() {
+      _totalHarga = totalHarga;
+    });
+  }
+
+  void _calculateKembalian(double jumlahBayar) {
+    double kembalian = jumlahBayar - _totalHarga;
+    setState(() {
+      _kembalian = kembalian;
+    });
+  }
+
   void saveTransaksiPenjualan() {
     DatabaseReference reference =
         FirebaseDatabase.instance.reference().child('transaksiPenjualan');
@@ -94,21 +119,29 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
       };
     }).toList();
 
-    double diskon = double.tryParse(diskonController.text) ??
-        0; // Ambil nilai diskon dari controller
+    double diskon = double.tryParse(diskonController.text) ?? 0;
+
+    double totalHarga = 0;
+    for (var item in _items) {
+      double harga = double.tryParse(item['hargaSparepart'].toString()) ?? 0;
+      int jumlah = int.tryParse(item['jumlahSparepart'].toString()) ?? 0;
+      totalHarga += harga * jumlah;
+    }
+
+    double hargaAkhir = totalHarga - (totalHarga * (diskon / 100));
 
     Map<String, dynamic> data = {
       'idPenjualan': _idPenjualan,
       'dateTime': _formattedDateTime,
       'namaPembeli': _namaPembeli,
       'items': items,
-      'totalHarga': _totalHarga,
+      'totalHarga': totalHarga,
+      'hargaAkhir': hargaAkhir,
       'bayar': _bayar,
       'kembalian': _kembalian,
-      'diskon': diskon.toInt(), // Menyimpan jumlah diskon ke dalam transaksi
+      'diskon': diskon.toInt(),
     };
 
-    // Save the transaction data to the database
     reference.push().set(data).then((_) {
       Navigator.push(
         context,
@@ -117,10 +150,12 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
             idPenjualan: data['idPenjualan'],
             tanggalTransaksi: data['dateTime'] ?? '',
             namaPembeli: data['namaPembeli'],
-            totalHarga: data['totalHarga'].toDouble(),
+            totalHarga: totalHarga,
             bayar: data['bayar'].toDouble(),
             kembalian: _kembalian.toDouble(),
             items: List<Map<String, dynamic>>.from(data['items']),
+            diskon: diskon.toDouble(),
+            hargaAkhir: hargaAkhir,
           ),
         ),
       );
@@ -420,30 +455,6 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
       _updateStokSparepart(idSparepart, stokSparepart);
     });
     _calculateTotalHarga();
-  }
-
-  void _calculateTotalHarga() {
-    double totalHarga = 0;
-    for (var item in _items) {
-      double harga = double.tryParse(item['hargaSparepart'].toString()) ?? 0;
-      int jumlah = int.tryParse(item['jumlahSparepart'].toString()) ?? 0;
-      totalHarga += harga * jumlah;
-    }
-
-    double diskon = double.tryParse(diskonController.text) ?? 0;
-    double diskonPersen = diskon / 100;
-    double hargaSetelahDiskon = totalHarga - (totalHarga * diskonPersen);
-
-    setState(() {
-      _totalHarga = max(0, hargaSetelahDiskon);
-    });
-  }
-
-  void _calculateKembalian(double jumlahBayar) {
-    double kembalian = jumlahBayar - _totalHarga;
-    setState(() {
-      _kembalian = kembalian;
-    });
   }
 
   @override

@@ -103,12 +103,12 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                       fontSize: 16, fontWeight: pdfWidgets.FontWeight.bold),
                 ),
                 pdfWidgets.Text(
-                  'Bayar: ${lastTransactionData['bayar']}',
+                  'Diskon: ${lastTransactionData['diskon']}',
                   style: pdfWidgets.TextStyle(
                       fontSize: 16, fontWeight: pdfWidgets.FontWeight.bold),
                 ),
                 pdfWidgets.Text(
-                  'Kembalian: ${lastTransactionData['kembalian']}',
+                  'Harga Akhir: ${lastTransactionData['hargaAkhir']}',
                   style: pdfWidgets.TextStyle(
                       fontSize: 16, fontWeight: pdfWidgets.FontWeight.bold),
                 ),
@@ -334,7 +334,16 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                             ),
                             const SizedBox(height: 20),
                             Text(
-                              'Total Harga: Rp ${lastTransactionData['totalHarga']}',
+                              'Harga: Rp ${lastTransactionData['totalHarga']} (*disc ${lastTransactionData['diskon']}%)',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                            SizedBox(height: 5),
+                            Text(
+                              'Total Bayar: Rp ${lastTransactionData['hargaAkhir']}',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -371,25 +380,11 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () async {
-                  Map<String, dynamic> lastTransactionData =
-                      await fetchLastTransaction();
+                  final Map<String, dynamic> lastTransactionData =
+                      await _lastTransactionFuture;
                   await _saveAsPdf(context, lastTransactionData);
                 },
-                child: const Text(
-                  'Save as PDF',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                style: ElevatedButton.styleFrom(
-                  primary: Color.fromARGB(255, 219, 42, 15),
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 12,
-                    horizontal: 24,
-                  ),
-                ),
+                child: const Text('Save as PDF'),
               ),
             ],
           ),

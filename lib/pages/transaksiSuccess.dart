@@ -12,6 +12,8 @@ class TransaksiSuccessPage extends StatefulWidget {
   final double bayar;
   final double kembalian;
   final List<Map<String, dynamic>> items;
+  final double diskon;
+  final double hargaAkhir;
 
   TransaksiSuccessPage({
     required this.idPenjualan,
@@ -21,6 +23,8 @@ class TransaksiSuccessPage extends StatefulWidget {
     required this.bayar,
     required this.kembalian,
     required this.items,
+    required this.diskon,
+    required this.hargaAkhir,
   });
 
   @override
@@ -164,7 +168,9 @@ class _TransaksiSuccessPageState extends State<TransaksiSuccessPage> {
           printer.printNewLine();
           printer.printCustom('--------------------------------', 0, 0);
           printer.printCustom(
-              'Total: Rp ${_totalHarga.toStringAsFixed(0)}', 1, 0);
+              'Total Harga: Rp ${widget.totalHarga.toStringAsFixed(0)}', 1, 0);
+          printer.printCustom(
+              'Diskon: Rp ${widget.diskon.toStringAsFixed(0)}', 1, 0);
           printer.printCustom('Bayar: Rp ${_bayar.toStringAsFixed(0)}', 1, 0);
           printer.printCustom(
               'Kembalian: Rp ${_kembalian.toStringAsFixed(0)}', 1, 0);
