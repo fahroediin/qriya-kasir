@@ -367,6 +367,8 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
           .child('daftarSparepart')
           .child(sparepart['idSparepart']);
       sparepartRef.update({'stokSparepart': stokSparepart - jumlahItem});
+
+      Navigator.of(context).pop(); // Menutup dialog
     } else {
       showDialog(
         context: context,

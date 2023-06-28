@@ -25,12 +25,15 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
     final DatabaseReference databaseRef =
         FirebaseDatabase.instance.reference().child('transaksiPenjualan');
 
-    final DataSnapshot snapshot =
-        await databaseRef.orderByChild('dateTime').limitToLast(1).get();
+    final DataSnapshot snapshot = await databaseRef
+        .orderByChild('dateTime')
+        .equalTo(DateTime.now().toString())
+        .limitToLast(1)
+        .get();
 
     final dynamic data = snapshot.value;
-    if (data != null && data is Map) {
-      final String idPenjualan = data.keys.first;
+    if (data != null && data is Map<dynamic, dynamic>) {
+      final String idPenjualan = data.keys.first as String;
       final Map<String, dynamic> transactionData =
           data[idPenjualan] as Map<String, dynamic>;
 
@@ -178,12 +181,13 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
             children: [
               FutureBuilder<Map<String, dynamic>>(
                 future: _lastTransactionFuture,
-                builder: (BuildContext context,
-                    AsyncSnapshot<Map<String, dynamic>> snapshot) {
+                builder:
+                    (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return CircularProgressIndicator();
                   } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                    Map<String, dynamic> lastTransactionData = snapshot.data!;
+                    Map<String, dynamic> lastTransactionData = snapshot.data!
+                        .cast<String, dynamic>(); // Use cast to enforce type
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [

@@ -142,12 +142,12 @@ class _TransaksiSuccessPageState extends State<TransaksiSuccessPage> {
           for (var item in _items) {
             String itemName = item['namaSparepart'];
             int quantity = item['jumlahSparepart'];
-            double price = item['hargaSparepart'];
+            int price = item['hargaSparepart'];
 
             // Pad the strings to align the columns
             String paddedItemName = itemName.padRight(18);
             String paddedQuantity = quantity.toString().padLeft(5);
-            String paddedPrice = price.toStringAsFixed(0).padLeft(8);
+            String paddedPrice = price.toString().padLeft(8);
 
             // Calculate the indentation for quantity and price
             int quantityIndentation = (5 - paddedQuantity.length) ~/ 2;
@@ -167,7 +167,7 @@ class _TransaksiSuccessPageState extends State<TransaksiSuccessPage> {
               'Total: Rp ${_totalHarga.toStringAsFixed(0)}', 1, 0);
           printer.printCustom('Bayar: Rp ${_bayar.toStringAsFixed(0)}', 1, 0);
           printer.printCustom(
-              'Kembalian: Rp ${widget.kembalian.toStringAsFixed(0)}', 1, 0);
+              'Kembalian: Rp ${_kembalian.toStringAsFixed(0)}', 1, 0);
           printer.printNewLine();
           printer.printCustom('Terima Kasih', 2, 1);
           printer.printCustom('Semoga Hari Anda Menyenangkan!', 1, 1);
@@ -178,8 +178,8 @@ class _TransaksiSuccessPageState extends State<TransaksiSuccessPage> {
             context: context,
             builder: (context) {
               return AlertDialog(
-                title: Text('Print Receipt'),
-                content: Text('Berhasil cetak kuitansi'),
+                title: Text('Cetak Kuitansi'),
+                content: Text('Berhasil mencetak kuitansi'),
                 actions: <Widget>[
                   TextButton(
                     child: Text('OK'),
@@ -212,7 +212,7 @@ class _TransaksiSuccessPageState extends State<TransaksiSuccessPage> {
             ),
             SizedBox(height: 20),
             Text(
-              'Good Job!',
+              'Selamat!',
               style: TextStyle(
                 fontSize: 30,
                 color: Color.fromARGB(255, 102, 103, 102),
@@ -242,7 +242,7 @@ class _TransaksiSuccessPageState extends State<TransaksiSuccessPage> {
                   ),
                   Expanded(
                     child: Text(
-                      'Rp ${widget.kembalian.toStringAsFixed(0)}',
+                      'Rp ${_kembalian.toStringAsFixed(0)}',
                       style: TextStyle(fontSize: 22),
                       textAlign: TextAlign.right,
                     ),

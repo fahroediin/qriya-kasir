@@ -32,9 +32,12 @@ class _ServisPageState extends State<ServisPage> {
   double _kembalian = 0;
   List<String> _mekanikList = [];
   String? _selectedMekanik;
-  TextEditingController _namaMekanikController = TextEditingController();
-  String? _selectedPelanggan;
-  List<Map<String, dynamic>> _daftarPelanggan = [];
+
+  final List<Map<String, dynamic>> _daftarPelanggan = [];
+  final List<Map<String, dynamic>> _items = [];
+  List<Map<dynamic, dynamic>> sparepartList = [];
+  List<Map<dynamic, dynamic>> filteredSparepartList = [];
+  List<Map<String, dynamic>> selectedSpareparts = [];
 
   @override
   void initState() {
@@ -152,45 +155,310 @@ class _ServisPageState extends State<ServisPage> {
     });
   }
 
-  void addItem() {
-    setState(() {
-      _sparepartItems.add({
-        'idSparepart': '',
-        'namaSparepart': '',
-        'hargaSparepart': 0,
-        'jumlahItem': 0,
-        'biayaServis': 0,
+  void _addItem() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        List<Map<String, dynamic>> selectedSpareparts = [];
+
+        List<Map<dynamic, dynamic>> sparepartList = [];
+        List<Map<dynamic, dynamic>> filteredSparepartList = [];
+        TextEditingController jumlahItemController = TextEditingController();
+
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              title: Text('Daftar Sparepart'),
+              content: Container(
+                width: double.maxFinite,
+                child: Column(
+                  children: [
+                    TextField(
+                      decoration: InputDecoration(
+                        labelText: 'Cari Sparepart',
+                      ),
+                      onChanged: (value) {
+                        filteredSparepartList =
+                            sparepartList.where((sparepart) {
+                          String namaSparepart = sparepart['namaSparepart']
+                              .toString()
+                              .toLowerCase();
+                          String specSparepart = sparepart['specSparepart']
+                              .toString()
+                              .toLowerCase();
+                          String searchKeyword = value.toLowerCase();
+                          return namaSparepart.contains(searchKeyword) ||
+                              specSparepart.contains(searchKeyword);
+                        }).toList();
+                        setState(() {});
+                      },
+                    ),
+                    SizedBox(height: 10),
+                    Expanded(
+                      child: FutureBuilder<DataSnapshot>(
+                        future: FirebaseDatabase.instance
+                            .reference()
+                            .child('daftarSparepart')
+                            .get(),
+                        builder: (BuildContext context,
+                            AsyncSnapshot<DataSnapshot> snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          } else if (snapshot.hasData &&
+                              snapshot.data != null) {
+                            DataSnapshot dataSnapshot = snapshot.data!;
+                            Map<dynamic, dynamic>? data =
+                                dataSnapshot.value as Map<dynamic, dynamic>?;
+
+                            if (data != null) {
+                              sparepartList = [];
+                              data.forEach((key, value) {
+                                sparepartList
+                                    .add(Map<dynamic, dynamic>.from(value));
+                              });
+                              filteredSparepartList = sparepartList;
+                            }
+
+                            if (filteredSparepartList.isEmpty) {
+                              return Center(
+                                child: Text('Tidak ada data sparepart'),
+                              );
+                            }
+                            return ListView.separated(
+                              shrinkWrap: true,
+                              itemCount: filteredSparepartList.length,
+                              separatorBuilder:
+                                  (BuildContext context, int index) => Divider(
+                                color: Colors.grey,
+                                thickness: 1.0,
+                              ),
+                              itemBuilder: (BuildContext context, int index) {
+                                Map<dynamic, dynamic> sparepart =
+                                    filteredSparepartList[index];
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                    color: Colors.white,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Color.fromARGB(255, 237, 85, 85)
+                                            .withOpacity(0.2),
+                                        spreadRadius: 2,
+                                        blurRadius: 4,
+                                        offset: Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: ListTile(
+                                    title: Text(
+                                      'ID Sparepart: ${sparepart['idSparepart']}',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    subtitle: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        SizedBox(height: 8.0),
+                                        Text(
+                                          'Nama Sparepart: ${sparepart['namaSparepart']}',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        SizedBox(height: 4.0),
+                                        Text(
+                                            'Merk Sparepart: ${sparepart['merkSparepart']}'),
+                                        SizedBox(height: 4.0),
+                                        Text(
+                                            'Spec Sparepart: ${sparepart['specSparepart']}'),
+                                        SizedBox(height: 4.0),
+                                        Text(
+                                            'Harga Sparepart: ${sparepart['hargaSparepart']}'),
+                                        SizedBox(height: 4.0),
+                                        Text(
+                                            'Stok Sparepart: ${sparepart['stokSparepart']}'),
+                                        SizedBox(height: 8.0),
+                                      ],
+                                    ),
+                                    onTap: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            title: Text('Jumlah Item'),
+                                            content: TextField(
+                                              controller: jumlahItemController,
+                                              keyboardType:
+                                                  TextInputType.number,
+                                              decoration: InputDecoration(
+                                                labelText: 'Jumlah Item',
+                                              ),
+                                            ),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                  int jumlahItem = int.tryParse(
+                                                          jumlahItemController
+                                                              .text) ??
+                                                      0;
+                                                  int stokSparepart = sparepart[
+                                                          'stokSparepart'] ??
+                                                      0;
+                                                  if (jumlahItem > 0 &&
+                                                      jumlahItem <=
+                                                          stokSparepart) {
+                                                    _selectItem(
+                                                      Map<String, dynamic>.from(
+                                                          sparepart),
+                                                      jumlahItem,
+                                                    );
+                                                  } else {
+                                                    showDialog(
+                                                      context: context,
+                                                      builder: (BuildContext
+                                                          context) {
+                                                        return AlertDialog(
+                                                          title:
+                                                              Text('Kesalahan'),
+                                                          content: Text(
+                                                              'Jumlah item tidak valid atau melebihi stok sparepart.'),
+                                                          actions: [
+                                                            TextButton(
+                                                              onPressed: () {
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop();
+                                                              },
+                                                              child: Text('OK'),
+                                                            ),
+                                                          ],
+                                                        );
+                                                      },
+                                                    );
+                                                  }
+                                                },
+                                                child: Text('OK'),
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    },
+                                  ),
+                                );
+                              },
+                            );
+                          } else {
+                            return Center(
+                              child: Text('Tidak ada data sparepart'),
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('Tutup'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _selectItem(Map<dynamic, dynamic> sparepart, int jumlahItem) {
+    int stokSparepart = (sparepart['stokSparepart']) ?? 0;
+
+    if (jumlahItem > 0 && jumlahItem <= stokSparepart) {
+      setState(() {
+        _items.add({
+          'idSparepart': sparepart['idSparepart'],
+          'namaSparepart': sparepart['namaSparepart'],
+          'hargaSparepart': sparepart['hargaSparepart'].toInt(),
+          'jumlahSparepart': jumlahItem,
+          'stokSparepart': stokSparepart,
+        });
+        sparepart['stokSparepart'] = (stokSparepart - jumlahItem).toString();
       });
-    });
+      _calculateTotalHarga();
+
+      // Update stokSparepart in the database
+      DatabaseReference sparepartRef = FirebaseDatabase.instance
+          .reference()
+          .child('daftarSparepart')
+          .child(sparepart['idSparepart']);
+      sparepartRef.update({'stokSparepart': stokSparepart - jumlahItem});
+
+      Navigator.of(context).pop(); // Menutup dialog
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Kesalahan'),
+            content:
+                Text('Jumlah item tidak valid atau melebihi stok sparepart.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
-  void updateItem(int index, String field, dynamic value) {
+  void _updateStokSparepart(String idSparepart, int stokSparepart) {
+    DatabaseReference sparepartRef = FirebaseDatabase.instance
+        .reference()
+        .child('daftarSparepart')
+        .child(idSparepart);
+    sparepartRef.update({'stokSparepart': stokSparepart});
+  }
+
+  void _updateItem(int index, String field, dynamic value) {
     setState(() {
-      _sparepartItems[index][field] = value;
-      if (field == 'hargaSparepart' || field == 'jumlahItem') {
-        double hargaSparepart = _sparepartItems[index]['hargaSparepart'];
-        int jumlahItem = _sparepartItems[index]['jumlahItem'];
-        _sparepartItems[index]['biayaServis'] = hargaSparepart * jumlahItem;
-      }
-      calculateTotalBayar();
+      _items[index][field] = value;
     });
+    _calculateTotalHarga();
   }
 
-  void removeItem(int index) {
+  void _removeItem(int index) {
     setState(() {
-      _sparepartItems.removeAt(index);
-      calculateTotalBayar();
+      Map<String, dynamic> removedItem = _items.removeAt(index);
+      String idSparepart = removedItem['idSparepart'];
+      int jumlahSparepart = removedItem['jumlahSparepart'];
+      int stokSparepart = removedItem['stokSparepart'];
+      _updateStokSparepart(idSparepart, stokSparepart);
     });
+    _calculateTotalHarga();
   }
 
-  void calculateTotalBayar() {
-    double total = 0;
-    for (var item in _sparepartItems) {
-      total += item['biayaServis'];
+  void _calculateTotalHarga() {
+    double totalHarga = 0;
+    for (var item in _items) {
+      double harga = double.tryParse(item['hargaSparepart'].toString()) ?? 0;
+      int jumlah = int.tryParse(item['jumlahSparepart'].toString()) ?? 0;
+      totalHarga += harga * jumlah;
     }
     setState(() {
-      _totalBayar = total;
-      calculateKembalian();
+      _totalBayar = totalHarga;
     });
   }
 
@@ -241,6 +509,15 @@ class _ServisPageState extends State<ServisPage> {
                   ],
                 ),
               ),
+              Text(
+                'Data Pelanggan',
+                style: TextStyle(fontWeight: FontWeight.normal),
+              ),
+              SizedBox(height: 10),
+              Text(
+                'Data Mekanik',
+                style: TextStyle(fontWeight: FontWeight.normal),
+              ),
               SizedBox(height: 10),
               Text(
                 'Data Sparepart',
@@ -249,106 +526,55 @@ class _ServisPageState extends State<ServisPage> {
               SizedBox(height: 16.0),
               ListView.builder(
                 shrinkWrap: true,
-                itemCount: _sparepartItems.length,
+                itemCount: _items.length,
                 itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4.0),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Padding(
-                            padding: EdgeInsets.only(right: 10.0),
-                            child: TextFormField(
-                              onChanged: (value) {
-                                updateItem(index, 'idSparepart', value);
-                              },
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'ID Sparepart tidak boleh kosong';
-                                }
-                              },
-                              decoration: InputDecoration(
-                                labelText: 'ID Sparepart',
-                              ),
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: Padding(
-                            padding: EdgeInsets.only(right: 10.0),
-                            child: TextFormField(
-                              onChanged: (value) {
-                                updateItem(index, 'namaSparepart', value);
-                              },
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Nama Sparepart tidak boleh kosong';
-                                }
-                              },
-                              decoration: InputDecoration(
-                                labelText: 'Nama Sparepart',
-                              ),
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: Padding(
-                            padding: EdgeInsets.only(right: 10.0),
-                            child: TextFormField(
-                              onChanged: (value) {
-                                double hargaSparepart =
-                                    double.tryParse(value) ?? 0;
-                                updateItem(
-                                    index, 'hargaSparepart', hargaSparepart);
-                              },
-                              keyboardType: TextInputType.number,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Harga Sparepart tidak boleh kosong';
-                                }
-                              },
-                              inputFormatters: <TextInputFormatter>[
-                                FilteringTextInputFormatter.allow(
-                                    RegExp(r'[0-9.]')),
-                              ],
-                              decoration: InputDecoration(
-                                labelText: 'Harga Sparepart',
-                              ),
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: Padding(
-                            padding: EdgeInsets.only(right: 10.0),
-                            child: TextFormField(
-                              onChanged: (value) {
-                                int jumlahItem = int.tryParse(value) ?? 0;
-                                updateItem(index, 'jumlahItem', jumlahItem);
-                              },
-                              keyboardType: TextInputType.number,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Jumlah Sparepart tidak boleh kosong';
-                                }
-                              },
-                              decoration: InputDecoration(
-                                labelText: 'Jumlah Sparepart',
-                              ),
-                            ),
-                          ),
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.remove),
-                          onPressed: () {
-                            removeItem(index);
-                          },
-                        ),
-                      ],
+                  Map<String, dynamic> item = _items[index];
+                  return Card(
+                    child: ListTile(
+                      title: Text(item['namaSparepart']),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('ID Sparepart: ${item['idSparepart']}'),
+                          Text('Harga Sparepart: ${item['hargaSparepart']}'),
+                          Text('Jumlah Sparepart: ${item['jumlahSparepart']}'),
+                        ],
+                      ),
+                      trailing: IconButton(
+                        icon: Icon(Icons.delete),
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text('Konfirmasi'),
+                                content: Text(
+                                    'Apakah Anda yakin ingin menghapus item ini?'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Text('Tidak'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                      _removeItem(index);
+                                    },
+                                    child: Text('Ya'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                      ),
                     ),
                   );
                 },
               ),
-              SizedBox(height: 8.0),
+              SizedBox(height: 10),
               Container(
                 width: 50,
                 height: 50,
@@ -365,7 +591,7 @@ class _ServisPageState extends State<ServisPage> {
                   ],
                 ),
                 child: InkWell(
-                  onTap: addItem,
+                  onTap: _addItem,
                   borderRadius: BorderRadius.circular(25),
                   child: Icon(
                     Icons.add,
@@ -375,7 +601,7 @@ class _ServisPageState extends State<ServisPage> {
               ),
               SizedBox(height: 16.0),
               Text(
-                'Total Harga: $_totalBayar',
+                'Total Bayar: $_totalBayar',
               ),
               SizedBox(height: 8.0),
               TextFormField(
