@@ -14,8 +14,11 @@ class HistoriPenjualanPage extends StatefulWidget {
 }
 
 class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
-  Query dbRef =
-      FirebaseDatabase.instance.reference().child('transaksiPenjualan');
+  Query dbRef = FirebaseDatabase.instance
+      .reference()
+      .child('transaksiPenjualan')
+      .orderByKey()
+      .limitToLast(100);
   List<BluetoothDevice> devices = [];
   BluetoothDevice? selectedDevice;
   BlueThermalPrinter printer = BlueThermalPrinter.instance;
@@ -30,6 +33,8 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
     int totalBayar = transaksi?['totalHarga'] ?? 0;
     int bayar = transaksi?['bayar'] ?? 0;
     int kembalian = transaksi?['kembalian'] ?? 0;
+    int diskon = transaksi?['diskon'] ?? 0;
+    int hargaAkhir = totalBayar - (totalBayar * diskon ~/ 100);
 
     return Card(
       child: ListTile(
@@ -45,7 +50,6 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
                     String idSparepart = item['idSparepart'] ?? '';
                     String namaSparepart = item['namaSparepart'] ?? '';
                     int hargaSparepart = item['hargaSparepart'] as int? ?? 0;
-
                     int jumlahItem = item['jumlahSparepart'] ?? 0;
                     return Padding(
                       padding: EdgeInsets.only(left: 16),
@@ -54,8 +58,7 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
                         children: [
                           Text('ID Sparepart: $idSparepart'),
                           Text('Nama Sparepart: $namaSparepart'),
-                          Text(
-                              'Harga Sparepart: ${hargaSparepart.toStringAsFixed(2)}'),
+                          Text('Harga Sparepart: Rp ${hargaSparepart}'),
                           Text('Jumlah Item: $jumlahItem'),
                         ],
                       ),
@@ -63,9 +66,11 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
                   }).toList() ??
                   [],
             ),
-            Text('Total Bayar: $totalBayar'),
-            Text('Bayar: $bayar'),
-            Text('Kembalian: $kembalian'),
+            Text('Harga: Rp $totalBayar'),
+            Text('Diskon: $diskon%'),
+            Text('Harga Akhir: Rp $hargaAkhir'),
+            Text('Bayar: Rp $bayar'),
+            Text('Kembalian: Rp $kembalian'),
           ],
         ),
       ),
@@ -122,10 +127,8 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
                   var begin = Offset(1.0, 0.0);
                   var end = Offset.zero;
                   var curve = Curves.ease;
-
                   var tween = Tween(begin: begin, end: end)
                       .chain(CurveTween(curve: curve));
-
                   return SlideTransition(
                     position: animation.drive(tween),
                     child: child,

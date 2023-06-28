@@ -380,11 +380,25 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () async {
-                  final Map<String, dynamic> lastTransactionData =
-                      await _lastTransactionFuture;
+                  Map<String, dynamic> lastTransactionData =
+                      await fetchLastTransaction();
                   await _saveAsPdf(context, lastTransactionData);
                 },
-                child: const Text('Save as PDF'),
+                child: const Text(
+                  'Save as PDF',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  primary: Color.fromARGB(255, 219, 42, 15),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 12,
+                    horizontal: 24,
+                  ),
+                ),
               ),
             ],
           ),
