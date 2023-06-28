@@ -53,7 +53,6 @@ dependencies:
   path_provider: ^2.0.2
   blue_thermal_printer: ^1.1.8
   flutter_blue_plus: ^1.5.2
-  flutter_ticket_view: ^1.0.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

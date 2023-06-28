@@ -589,9 +589,8 @@ class _HomePageState extends State<HomePage> {
                       ],
                     ),
                   );
-
                   if (confirmed == true) {
-                    _auth.signOut();
+                    await _auth.signOut();
                     Navigator.of(context).pushAndRemoveUntil(
                       MaterialPageRoute(
                         builder: (context) => LoginPage(
