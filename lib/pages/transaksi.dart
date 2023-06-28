@@ -617,23 +617,19 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
               ),
               SizedBox(height: 10),
               TextFormField(
-                controller:
-                    diskonController, // Gunakan controller untuk mendapatkan nilai input
-                decoration: InputDecoration(labelText: 'Diskon'),
+                controller: diskonController,
+                decoration: InputDecoration(
+                  labelText: 'Diskon',
+                  hintText: 'Masukkan diskon dalam 10/20/dst',
+                ),
                 keyboardType: TextInputType.number,
                 inputFormatters: <TextInputFormatter>[
                   FilteringTextInputFormatter.digitsOnly
                 ],
                 onChanged: (value) {
                   setState(() {
-                    _calculateTotalHarga(); // Hitung kembali total harga saat nilai diskon berubah
+                    _calculateTotalHarga();
                   });
-                },
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Jumlah diskon tidak boleh kosong';
-                  }
-                  return null;
                 },
               ),
               SizedBox(height: 10),

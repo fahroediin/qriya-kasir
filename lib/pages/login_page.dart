@@ -31,6 +31,7 @@ class _LoginPageState extends State<LoginPage>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scaffoldMessengerState = ScaffoldMessenger.of(context);
       _loadEmailHistory();
+      _checkUserToken(); // Cek token user UID saat aplikasi dimulai
     });
 
     _animationController = AnimationController(
@@ -60,6 +61,27 @@ class _LoginPageState extends State<LoginPage>
     );
   }
 
+  Future<void> _checkUserToken() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? uid = prefs.getString('uid');
+    if (uid != null) {
+      // Token user UID tersimpan, lanjutkan ke halaman beranda
+      Navigator.pushReplacement(
+        context,
+        PageRouteBuilder(
+          transitionDuration: Duration(milliseconds: 600),
+          pageBuilder: (_, __, ___) => HomePage(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(
+              opacity: animation,
+              child: child,
+            );
+          },
+        ),
+      );
+    }
+  }
+
   Future<void> _loadEmailHistory() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? email = prefs.getString('email');
@@ -78,11 +100,11 @@ class _LoginPageState extends State<LoginPage>
   Future<void> signIn() async {
     if (_key.currentState!.validate()) {
       try {
-        await FirebaseAuth.instance.signInWithEmailAndPassword(
+        UserCredential userCredential =
+            await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
         );
-        _saveEmailHistory(); // Simpan histori email
 
         // Menggunakan Navigator.pushReplacement dengan PageRouteBuilder untuk animasi transisi
         Navigator.pushReplacement(
@@ -104,6 +126,8 @@ class _LoginPageState extends State<LoginPage>
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString('email', _emailController.text);
         prefs.setString('password', _passwordController.text);
+        prefs.setString(
+            'uid', userCredential.user!.uid); // Simpan token user UID
       } on FirebaseAuthException catch (e) {
         if (e.code == 'user-not-found') {
           _showSnackBar('Email tidak terdaftar');
