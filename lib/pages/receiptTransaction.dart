@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/widgets.dart' as pdfWidgets;
 
@@ -41,6 +42,11 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
     } else {
       return {};
     }
+  }
+
+  String formatCurrency(int value) {
+    final format = NumberFormat("#,###");
+    return format.format(value);
   }
 
   Future<void> _saveAsPdf(
@@ -91,14 +97,14 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                     return [
                       item['idSparepart'],
                       item['namaSparepart'],
-                      item['hargaSparepart'].toString(),
+                      formatCurrency(item['hargaSparepart']),
                       item['jumlahSparepart'].toString(),
                     ].cast<dynamic>().toList();
                   }).toList(),
                 ),
                 pdfWidgets.SizedBox(height: 20),
                 pdfWidgets.Text(
-                  'Total Harga: ${lastTransactionData['totalHarga']}',
+                  'Total Harga: ${formatCurrency(lastTransactionData['totalHarga'])}',
                   style: pdfWidgets.TextStyle(
                       fontSize: 16, fontWeight: pdfWidgets.FontWeight.bold),
                 ),
@@ -108,7 +114,7 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                       fontSize: 16, fontWeight: pdfWidgets.FontWeight.bold),
                 ),
                 pdfWidgets.Text(
-                  'Harga Akhir: ${lastTransactionData['hargaAkhir']}',
+                  'Harga Akhir: ${formatCurrency(lastTransactionData['hargaAkhir'])}',
                   style: pdfWidgets.TextStyle(
                       fontSize: 16, fontWeight: pdfWidgets.FontWeight.bold),
                 ),
@@ -247,17 +253,17 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                             Table(
                               columnWidths: {
                                 0: FlexColumnWidth(2),
-                                1: FlexColumnWidth(3),
-                                2: FlexColumnWidth(1),
+                                1: FlexColumnWidth(2),
+                                2: FlexColumnWidth(2),
                                 3: FlexColumnWidth(1),
-                                4: FlexColumnWidth(1),
+                                4: FlexColumnWidth(2),
                               },
                               children: [
                                 TableRow(
                                   children: [
                                     TableCell(
                                       child: Text(
-                                        'ID Sparepart',
+                                        'Kode',
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color: Colors.black,
@@ -266,7 +272,7 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                                     ),
                                     TableCell(
                                       child: Text(
-                                        'Nama Sparepart',
+                                        'Nama',
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color: Colors.black,
@@ -275,7 +281,7 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                                     ),
                                     TableCell(
                                       child: Text(
-                                        'Price',
+                                        'Harga',
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color: Colors.black,
@@ -284,7 +290,7 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                                     ),
                                     TableCell(
                                       child: Text(
-                                        'Qty',
+                                        'Jumlah',
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color: Colors.black,
@@ -313,7 +319,8 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                                           ),
                                           TableCell(
                                             child: Text(
-                                              item['hargaSparepart'].toString(),
+                                              formatCurrency(
+                                                  item['hargaSparepart']),
                                               style: TextStyle(
                                                   color: Colors.black),
                                             ),
@@ -321,7 +328,8 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                                           TableCell(
                                             child: Text(
                                               item['jumlahSparepart']
-                                                  .toString(),
+                                                  .toString()
+                                                  .padLeft(7),
                                               style: TextStyle(
                                                   color: Colors.black),
                                             ),
@@ -334,7 +342,7 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                             ),
                             const SizedBox(height: 20),
                             Text(
-                              'Harga: Rp ${lastTransactionData['totalHarga']} (*disc ${lastTransactionData['diskon']}%)',
+                              'Harga: ${formatCurrency(lastTransactionData['totalHarga'])} (*disc ${lastTransactionData['diskon']}%)',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -343,7 +351,7 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                             ),
                             SizedBox(height: 5),
                             Text(
-                              'Total: Rp ${lastTransactionData['hargaAkhir']}',
+                              'Total: ${formatCurrency(lastTransactionData['hargaAkhir'])}',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -352,7 +360,7 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                             ),
                             SizedBox(height: 5),
                             Text(
-                              'Bayar: Rp ${lastTransactionData['bayar']}',
+                              'Bayar: ${formatCurrency(lastTransactionData['bayar'])}',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -361,7 +369,7 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                             ),
                             SizedBox(height: 5),
                             Text(
-                              'Kembalian: Rp ${lastTransactionData['kembalian']}',
+                              'Kembalian: ${formatCurrency(lastTransactionData['kembalian'])}',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -373,36 +381,33 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                       ),
                     );
                   } else {
-                    return const Text('No transaction data found.');
+                    return Text('No transaction found.');
                   }
                 },
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () async {
-                  Map<String, dynamic> lastTransactionData =
-                      await fetchLastTransaction();
-                  await _saveAsPdf(context, lastTransactionData);
-                },
-                child: const Text(
-                  'Save as PDF',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                style: ElevatedButton.styleFrom(
-                  primary: Color.fromARGB(255, 219, 42, 15),
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 12,
-                    horizontal: 24,
-                  ),
-                ),
               ),
             ],
           ),
         ),
+      ),
+      floatingActionButton: FutureBuilder<Map<String, dynamic>>(
+        future: _lastTransactionFuture,
+        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Container();
+          } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+            Map<String, dynamic> lastTransactionData = snapshot.data!
+                .cast<String, dynamic>(); // Use cast to enforce type
+            return FloatingActionButton(
+              onPressed: () {
+                _saveAsPdf(context, lastTransactionData);
+              },
+              child: Icon(Icons.save),
+              backgroundColor: Color.fromARGB(255, 219, 42, 15),
+            );
+          } else {
+            return Container();
+          }
+        },
       ),
     );
   }
