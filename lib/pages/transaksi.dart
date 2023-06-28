@@ -26,6 +26,7 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
   List<Map<dynamic, dynamic>> sparepartList = [];
   List<Map<dynamic, dynamic>> filteredSparepartList = [];
   List<Map<String, dynamic>> selectedSpareparts = [];
+  TextEditingController diskonController = TextEditingController();
 
   @override
   void initState() {
@@ -93,6 +94,9 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
       };
     }).toList();
 
+    double diskon = double.tryParse(diskonController.text) ??
+        0; // Ambil nilai diskon dari controller
+
     Map<String, dynamic> data = {
       'idPenjualan': _idPenjualan,
       'dateTime': _formattedDateTime,
@@ -101,6 +105,7 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
       'totalHarga': _totalHarga,
       'bayar': _bayar,
       'kembalian': _kembalian,
+      'diskon': diskon.toInt(), // Menyimpan jumlah diskon ke dalam transaksi
     };
 
     // Save the transaction data to the database
@@ -424,8 +429,13 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
       int jumlah = int.tryParse(item['jumlahSparepart'].toString()) ?? 0;
       totalHarga += harga * jumlah;
     }
+
+    double diskon = double.tryParse(diskonController.text) ?? 0;
+    double diskonPersen = diskon / 100;
+    double hargaSetelahDiskon = totalHarga - (totalHarga * diskonPersen);
+
     setState(() {
-      _totalHarga = totalHarga;
+      _totalHarga = max(0, hargaSetelahDiskon);
     });
   }
 
@@ -593,6 +603,27 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
               Text(
                 'Total Harga: $_totalHarga',
                 style: textStyle,
+              ),
+              SizedBox(height: 10),
+              TextFormField(
+                controller:
+                    diskonController, // Gunakan controller untuk mendapatkan nilai input
+                decoration: InputDecoration(labelText: 'Diskon'),
+                keyboardType: TextInputType.number,
+                inputFormatters: <TextInputFormatter>[
+                  FilteringTextInputFormatter.digitsOnly
+                ],
+                onChanged: (value) {
+                  setState(() {
+                    _calculateTotalHarga(); // Hitung kembali total harga saat nilai diskon berubah
+                  });
+                },
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Jumlah diskon tidak boleh kosong';
+                  }
+                  return null;
+                },
               ),
               SizedBox(height: 10),
               TextFormField(

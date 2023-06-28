@@ -334,7 +334,7 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                             ),
                             const SizedBox(height: 20),
                             Text(
-                              'Total Harga: ${lastTransactionData['totalHarga']}',
+                              'Total Harga: Rp ${lastTransactionData['totalHarga']}',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -343,7 +343,7 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                             ),
                             SizedBox(height: 5),
                             Text(
-                              'Bayar: ${lastTransactionData['bayar']}',
+                              'Bayar: Rp ${lastTransactionData['bayar']}',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -352,7 +352,7 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                             ),
                             SizedBox(height: 5),
                             Text(
-                              'Kembalian: ${lastTransactionData['kembalian']}',
+                              'Kembalian: Rp ${lastTransactionData['kembalian']}',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
