@@ -343,7 +343,7 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                             ),
                             SizedBox(height: 5),
                             Text(
-                              'Total Bayar: Rp ${lastTransactionData['hargaAkhir']}',
+                              'Total: Rp ${lastTransactionData['hargaAkhir']}',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,

@@ -5,7 +5,6 @@ import 'forgot_pw_page.dart';
 import 'home_page.dart';
 import 'register_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:animated_text_kit/animated_text_kit.dart';
 
 class LoginPage extends StatefulWidget {
   final VoidCallback showRegisterPage;
@@ -64,25 +63,10 @@ class _LoginPageState extends State<LoginPage>
   Future<void> _loadEmailHistory() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? email = prefs.getString('email');
-    String? token = prefs.getString('login_token');
-
-    if (email != null && token != null) {
-      // Email dan token ditemukan, cek validitas token di sini jika diperlukan
-
-      // Menggunakan Navigator.pushReplacement dengan PageRouteBuilder untuk animasi transisi
-      Navigator.pushReplacement(
-        context,
-        PageRouteBuilder(
-          transitionDuration: Duration(milliseconds: 600),
-          pageBuilder: (_, __, ___) => HomePage(),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(
-              opacity: animation,
-              child: child,
-            );
-          },
-        ),
-      );
+    if (email != null) {
+      setState(() {
+        _emailController.text = email;
+      });
     }
   }
 
@@ -99,10 +83,6 @@ class _LoginPageState extends State<LoginPage>
           password: _passwordController.text.trim(),
         );
         _saveEmailHistory(); // Simpan histori email
-
-        // Menyimpan token setelah berhasil login
-        String token = 'token_login_anda'; // Ganti dengan token yang sesuai
-        await _saveToken(token);
 
         // Menggunakan Navigator.pushReplacement dengan PageRouteBuilder untuk animasi transisi
         Navigator.pushReplacement(
@@ -122,8 +102,8 @@ class _LoginPageState extends State<LoginPage>
 
         // Menyimpan data user yang sudah login agar tidak otomatis logout
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setString('email', _emailController.text.trim());
-        prefs.setString('password', _passwordController.text.trim());
+        prefs.setString('email', _emailController.text);
+        prefs.setString('password', _passwordController.text);
       } on FirebaseAuthException catch (e) {
         if (e.code == 'user-not-found') {
           _showSnackBar('Email tidak terdaftar');
@@ -138,9 +118,12 @@ class _LoginPageState extends State<LoginPage>
     }
   }
 
-  Future<void> _saveToken(String token) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('login_token', token);
+  void _showLoginSuccessSnackBar() {
+    _scaffoldMessengerState.showSnackBar(
+      SnackBar(
+        content: Text('Berhasil Login'),
+      ),
+    );
   }
 
   String? _emailValidator(String? formEmail) {
@@ -355,7 +338,7 @@ class _LoginPageState extends State<LoginPage>
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'Don`t have an account?',
+                        'Don\'t have an account?',
                         style: TextStyle(
                           fontWeight: FontWeight.normal,
                           fontSize: 20,

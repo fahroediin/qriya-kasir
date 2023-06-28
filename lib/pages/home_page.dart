@@ -567,37 +567,43 @@ class _HomePageState extends State<HomePage> {
             ),
             ListTile(
               onTap: () async {
-                final confirmed = await showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: Text('Logout'),
-                    content: Text('Apakah kamu yakin ingin logout?'),
-                    actions: [
-                      TextButton(
-                        child: Text('Tidak'),
-                        onPressed: () {
-                          Navigator.of(context).pop(false);
-                        },
-                      ),
-                      TextButton(
-                        child: Text('Ya'),
-                        onPressed: () {
-                          Navigator.of(context).pop(true);
-                        },
-                      ),
-                    ],
-                  ),
-                );
-
-                if (confirmed == true) {
-                  _auth.signOut();
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(
-                        builder: (context) => LoginPage(
-                              showRegisterPage: () {},
-                            )),
-                    (route) => false,
+                try {
+                  final confirmed = await showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: Text('Logout'),
+                      content: Text('Apakah kamu yakin ingin logout?'),
+                      actions: [
+                        TextButton(
+                          child: Text('Tidak'),
+                          onPressed: () {
+                            Navigator.of(context).pop(false);
+                          },
+                        ),
+                        TextButton(
+                          child: Text('Ya'),
+                          onPressed: () {
+                            Navigator.of(context).pop(true);
+                          },
+                        ),
+                      ],
+                    ),
                   );
+
+                  if (confirmed == true) {
+                    _auth.signOut();
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(
+                        builder: (context) => LoginPage(
+                          showRegisterPage: () {},
+                        ),
+                      ),
+                      (route) => false,
+                    );
+                  }
+                } catch (e) {
+                  print('Error during logout: $e');
+                  // Handle the error appropriately (show error message, log, etc.)
                 }
               },
               leading: Icon(Icons.logout),

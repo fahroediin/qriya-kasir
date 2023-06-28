@@ -168,9 +168,11 @@ class _TransaksiSuccessPageState extends State<TransaksiSuccessPage> {
           printer.printNewLine();
           printer.printCustom('--------------------------------', 0, 0);
           printer.printCustom(
-              'Total Harga: Rp ${widget.totalHarga.toStringAsFixed(0)}', 1, 0);
+              'Harga: Rp ${widget.totalHarga.toStringAsFixed(0)} (*disc ${widget.diskon.toStringAsFixed(0)}%)',
+              1,
+              0);
           printer.printCustom(
-              'Diskon: Rp ${widget.diskon.toStringAsFixed(0)}', 1, 0);
+              'Total: Rp ${widget.hargaAkhir.toStringAsFixed(0)}', 1, 0);
           printer.printCustom('Bayar: Rp ${_bayar.toStringAsFixed(0)}', 1, 0);
           printer.printCustom(
               'Kembalian: Rp ${_kembalian.toStringAsFixed(0)}', 1, 0);
