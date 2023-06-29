@@ -5,6 +5,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:project_s/pages/home_page.dart';
 import 'package:blue_thermal_printer/blue_thermal_printer.dart';
+import 'editHistoriPenjualan.dart';
 
 class HistoriPenjualanPage extends StatefulWidget {
   const HistoriPenjualanPage({Key? key}) : super(key: key);
@@ -72,6 +73,19 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
             Text('Bayar: Rp $bayar'),
             Text('Kembalian: Rp $kembalian'),
           ],
+        ),
+        trailing: ElevatedButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => EditHistoriPenjualanPage(
+                  idPenjualan: '',
+                ),
+              ),
+            );
+          },
+          child: Text('Edit'),
         ),
       ),
     );

@@ -639,8 +639,8 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
               ),
               SizedBox(height: 10),
               Text(
-                'Total Harga: $_totalHarga',
-                style: textStyle,
+                'Total: Rp ${_totalHarga.toStringAsFixed(0)}',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 10),
               TextFormField(
@@ -682,7 +682,7 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
               ),
               SizedBox(height: 10),
               Text(
-                'Kembalian: $_kembalian',
+                'Kembalian: Rp ${_kembalian.toStringAsFixed(0)}',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 16),
