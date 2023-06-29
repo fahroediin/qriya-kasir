@@ -33,7 +33,11 @@ class _ServisPageState extends State<ServisPage> {
   List<String> _mekanikList = [];
   Map<String, String> _mekanikNameMap = {};
   TextEditingController _namaMekanikController = TextEditingController();
-  final List<Map<String, dynamic>> _daftarPelanggan = [];
+  List<String> _nopolList = []; // Daftar Nomor Polisi
+  Map<String, String> _pelangganNameMap =
+      {}; // Map untuk memetakan Nomor Polisi ke Nama Pelanggan
+  String? _namaPelanggan;
+  final _namaPelangganController = TextEditingController();
   final List<Map<String, dynamic>> _items = [];
   List<Map<dynamic, dynamic>> sparepartList = [];
   List<Map<dynamic, dynamic>> filteredSparepartList = [];
@@ -46,6 +50,7 @@ class _ServisPageState extends State<ServisPage> {
     generateIdServis();
     updateDateTime();
     getMekanikList();
+    getPelangganList();
   }
 
   void updateDateTime() {
@@ -161,6 +166,29 @@ class _ServisPageState extends State<ServisPage> {
       _idMekanik = value;
       _namaMekanik = _mekanikNameMap[value];
       _namaMekanikController.text = _namaMekanik ?? '';
+    });
+  }
+
+  void getPelangganList() {
+    FirebaseDatabase.instance.ref('pelanggan').onValue.listen((event) {
+      if (event.snapshot.exists) {
+        Map<dynamic, dynamic> values =
+            event.snapshot.value as Map<dynamic, dynamic>;
+        values.forEach((key, value) {
+          setState(() {
+            _nopolList.add(value['nopol']);
+            _pelangganNameMap[value['nopol']] = value['namaPelanggan'];
+          });
+        });
+      }
+    });
+  }
+
+  void _selectPelanggan(String? value) {
+    setState(() {
+      _nopol = value;
+      _namaPelanggan = _pelangganNameMap[value];
+      _namaPelangganController.text = _namaPelanggan ?? '';
     });
   }
 
@@ -518,15 +546,6 @@ class _ServisPageState extends State<ServisPage> {
                   ],
                 ),
               ),
-              Text(
-                'Data Pelanggan',
-                style: TextStyle(fontWeight: FontWeight.normal),
-              ),
-              SizedBox(height: 10),
-              Text(
-                'Data Mekanik',
-                style: TextStyle(fontWeight: FontWeight.normal),
-              ),
               SizedBox(height: 10),
               // Dropdown untuk memilih mekanik berdasarkan idMekanik
               Text(
@@ -543,7 +562,7 @@ class _ServisPageState extends State<ServisPage> {
                   );
                 }).toList(),
               ),
-
+              SizedBox(height: 10),
               // Textfield untuk menampilkan namaMekanik
               TextField(
                 controller: _namaMekanikController,
@@ -552,7 +571,68 @@ class _ServisPageState extends State<ServisPage> {
                 ),
                 readOnly: true,
               ),
-
+              SizedBox(height: 10),
+              DropdownButtonFormField<String>(
+                value: _nopol,
+                decoration: InputDecoration(labelText: 'Nomor Polisi'),
+                items: _nopolList
+                    .map((nopol) => DropdownMenuItem<String>(
+                          value: nopol,
+                          child: Text(nopol),
+                        ))
+                    .toList(),
+                onChanged: _selectPelanggan,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Pilih nomor polisi';
+                  }
+                  return null;
+                },
+              ),
+              SizedBox(height: 16.0),
+              TextFormField(
+                decoration: InputDecoration(
+                  labelText: 'Nama Pemilik',
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    _namaPemilik = value;
+                  });
+                },
+              ),
+              SizedBox(height: 16.0),
+              TextFormField(
+                decoration: InputDecoration(
+                  labelText: 'Merk Kendaraan',
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    _merkKendaraan = value;
+                  });
+                },
+              ),
+              SizedBox(height: 16.0),
+              TextFormField(
+                decoration: InputDecoration(
+                  labelText: 'Tipe Kendaraan',
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    _tipeKendaraan = value;
+                  });
+                },
+              ),
+              SizedBox(height: 16.0),
+              TextFormField(
+                decoration: InputDecoration(
+                  labelText: 'Kerusakan',
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    _kerusakan = value;
+                  });
+                },
+              ),
               SizedBox(height: 10),
               Text(
                 'Data Sparepart',
