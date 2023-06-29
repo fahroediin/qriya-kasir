@@ -31,8 +31,8 @@ class _ServisPageState extends State<ServisPage> {
   double _biayaServis = 0;
   double _kembalian = 0;
   List<String> _mekanikList = [];
-  String? _selectedMekanik;
-
+  Map<String, String> _mekanikNameMap = {};
+  TextEditingController _namaMekanikController = TextEditingController();
   final List<Map<String, dynamic>> _daftarPelanggan = [];
   final List<Map<String, dynamic>> _items = [];
   List<Map<dynamic, dynamic>> sparepartList = [];
@@ -149,9 +149,18 @@ class _ServisPageState extends State<ServisPage> {
         values.forEach((key, value) {
           setState(() {
             _mekanikList.add(value['idMekanik']);
+            _mekanikNameMap[value['idMekanik']] = value['namaMekanik'];
           });
         });
       }
+    });
+  }
+
+  void _selectMekanik(String? value) {
+    setState(() {
+      _idMekanik = value;
+      _namaMekanik = _mekanikNameMap[value];
+      _namaMekanikController.text = _namaMekanik ?? '';
     });
   }
 
@@ -518,6 +527,32 @@ class _ServisPageState extends State<ServisPage> {
                 'Data Mekanik',
                 style: TextStyle(fontWeight: FontWeight.normal),
               ),
+              SizedBox(height: 10),
+              // Dropdown untuk memilih mekanik berdasarkan idMekanik
+              Text(
+                'ID Mekanik',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              DropdownButton<String>(
+                value: _idMekanik,
+                onChanged: _selectMekanik,
+                items: _mekanikList.map((String idMekanik) {
+                  return DropdownMenuItem<String>(
+                    value: idMekanik,
+                    child: Text(idMekanik),
+                  );
+                }).toList(),
+              ),
+
+              // Textfield untuk menampilkan namaMekanik
+              TextField(
+                controller: _namaMekanikController,
+                decoration: InputDecoration(
+                  labelText: 'Nama Mekanik',
+                ),
+                readOnly: true,
+              ),
+
               SizedBox(height: 10),
               Text(
                 'Data Sparepart',

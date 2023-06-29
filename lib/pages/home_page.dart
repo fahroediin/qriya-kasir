@@ -34,8 +34,8 @@ class _HomePageState extends State<HomePage> {
   User? _user;
   Map<dynamic, dynamic>? userData;
   DatabaseReference _databaseReference = FirebaseDatabase.instance.reference();
-  Query dbRefPenjualan =
-      FirebaseDatabase.instance.reference().child('transaksiPenjualan');
+  DatabaseReference dbRefPenjualan = FirebaseDatabase.instance.reference();
+
   Query dbRefServis =
       FirebaseDatabase.instance.reference().child('transaksiServis');
   int _dataCountServis = 0;
@@ -52,7 +52,7 @@ class _HomePageState extends State<HomePage> {
     initializeDateFormatting(
         'id_ID', null); // Initialize date formatting for Indonesian locale
     getDataCountServis();
-    getDataCountPenjualan();
+
     _databaseReference = FirebaseDatabase.instance.reference().child('user');
     getUserData();
     getUser();
@@ -91,7 +91,6 @@ class _HomePageState extends State<HomePage> {
         Map<dynamic, dynamic> data = snapshot as Map<dynamic, dynamic>;
         setState(() {
           _dataCountServis = data.length;
-          _totalData = _dataCountServis + _dataCountPenjualan;
         });
       }
     }).catchError((error) {
@@ -99,14 +98,16 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void getDataCountPenjualan() {
-    dbRefPenjualan.once().then((snapshot) {
+  void getDataCountPenjualan(String idPenjualan) {
+    dbRefPenjualan
+        .child('transaksiPenjualan')
+        .orderByChild('idPenjualan')
+        .equalTo(idPenjualan)
+        .once()
+        .then((snapshot) {
       if (snapshot != null) {
         Map<dynamic, dynamic> data = snapshot as Map<dynamic, dynamic>;
-        setState(() {
-          _dataCountPenjualan = data.length;
-          _totalData = _dataCountServis + _dataCountPenjualan;
-        });
+        _dataCountPenjualan = data.length;
       }
     }).catchError((error) {
       print('Failed to get data count: $error');
