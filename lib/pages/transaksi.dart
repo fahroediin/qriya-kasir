@@ -106,6 +106,11 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
     });
   }
 
+  String formatCurrency(int value) {
+    final format = NumberFormat("#,###");
+    return format.format(value);
+  }
+
   void saveTransaksiPenjualan() {
     DatabaseReference reference =
         FirebaseDatabase.instance.reference().child('transaksiPenjualan');
@@ -171,6 +176,8 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
         List<Map<dynamic, dynamic>> sparepartList = [];
         List<Map<dynamic, dynamic>> filteredSparepartList = [];
         TextEditingController jumlahItemController = TextEditingController();
+        TextEditingController searchController =
+            TextEditingController(); // Tambahkan controller untuk TextField pencarian
 
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
@@ -181,6 +188,8 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
                 child: Column(
                   children: [
                     TextField(
+                      controller:
+                          searchController, // Tambahkan controller ke TextField pencarian
                       decoration: InputDecoration(
                         labelText: 'Cari Sparepart',
                       ),
@@ -261,9 +270,10 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
                                   ),
                                   child: ListTile(
                                     title: Text(
-                                      'ID Sparepart: ${sparepart['idSparepart']}',
+                                      '${sparepart['namaSparepart']}',
                                       style: TextStyle(
-                                          fontWeight: FontWeight.bold),
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 24),
                                     ),
                                     subtitle: Column(
                                       crossAxisAlignment:
@@ -271,22 +281,39 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
                                       children: [
                                         SizedBox(height: 8.0),
                                         Text(
-                                          'Nama Sparepart: ${sparepart['namaSparepart']}',
+                                          'ID: ${sparepart['idSparepart']}',
                                           style: TextStyle(
-                                              fontWeight: FontWeight.bold),
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 18),
                                         ),
                                         SizedBox(height: 4.0),
                                         Text(
-                                            'Merk Sparepart: ${sparepart['merkSparepart']}'),
+                                          'Merk: ${sparepart['merkSparepart']}',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.normal,
+                                              fontSize: 18),
+                                        ),
                                         SizedBox(height: 4.0),
                                         Text(
-                                            'Spec Sparepart: ${sparepart['specSparepart']}'),
+                                          'Spesifikasi: ${sparepart['specSparepart']}',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.normal,
+                                              fontSize: 18),
+                                        ),
                                         SizedBox(height: 4.0),
                                         Text(
-                                            'Harga Sparepart: ${sparepart['hargaSparepart']}'),
+                                          'Harga: Rp ${formatCurrency(sparepart['hargaSparepart'])}',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.normal,
+                                              fontSize: 18),
+                                        ),
                                         SizedBox(height: 4.0),
                                         Text(
-                                            'Stok Sparepart: ${sparepart['stokSparepart']}'),
+                                          'Stok: ${sparepart['stokSparepart']}',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 18),
+                                        ),
                                         SizedBox(height: 8.0),
                                       ],
                                     ),
@@ -295,7 +322,7 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
                                         context: context,
                                         builder: (BuildContext context) {
                                           return AlertDialog(
-                                            title: Text('Jumlah Item'),
+                                            title: Text('Jumlah'),
                                             content: TextField(
                                               controller: jumlahItemController,
                                               keyboardType:
@@ -371,11 +398,11 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
                 ),
               ),
               actions: [
-                TextButton(
+                IconButton(
+                  icon: Icon(Icons.close),
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: Text('Tutup'),
                 ),
               ],
             );

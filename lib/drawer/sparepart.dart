@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
+import 'package:intl/intl.dart';
 import 'package:project_s/pages/home_page.dart';
 import 'insert_sparepart.dart'; // Import halaman tambah data sparepart
 import 'update_sparepart.dart'; // Import halaman update data sparepart
@@ -27,6 +28,11 @@ class _SparepartPageState extends State<SparepartPage> {
   void initState() {
     super.initState();
     filteredList = [];
+  }
+
+  String formatCurrency(int value) {
+    final format = NumberFormat("#,###");
+    return format.format(value);
   }
 
   Widget listItem({required Map sparepart}) {
@@ -83,7 +89,7 @@ class _SparepartPageState extends State<SparepartPage> {
           ),
           SizedBox(height: 4),
           Text(
-            'Harga: ${sparepart['hargaSparepart']}',
+            'Harga: Rp ' + formatCurrency(sparepart['hargaSparepart']),
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w400,

@@ -319,8 +319,9 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                                           ),
                                           TableCell(
                                             child: Text(
-                                              formatCurrency(
-                                                  item['hargaSparepart']),
+                                              'Rp' +
+                                                  formatCurrency(
+                                                      item['hargaSparepart']),
                                               style: TextStyle(
                                                   color: Colors.black),
                                             ),
@@ -342,7 +343,7 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                             ),
                             const SizedBox(height: 20),
                             Text(
-                              'Harga: ${formatCurrency(lastTransactionData['totalHarga'])} (*disc ${lastTransactionData['diskon']}%)',
+                              'Harga: Rp ${formatCurrency(lastTransactionData['totalHarga'])} (*disc ${lastTransactionData['diskon']}%)',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -351,7 +352,7 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                             ),
                             SizedBox(height: 5),
                             Text(
-                              'Total: ${formatCurrency(lastTransactionData['hargaAkhir'])}',
+                              'Total: Rp ${formatCurrency(lastTransactionData['hargaAkhir'])}',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -360,7 +361,7 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                             ),
                             SizedBox(height: 5),
                             Text(
-                              'Bayar: ${formatCurrency(lastTransactionData['bayar'])}',
+                              'Bayar: Rp ${formatCurrency(lastTransactionData['bayar'])}',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -369,7 +370,7 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                             ),
                             SizedBox(height: 5),
                             Text(
-                              'Kembalian: ${formatCurrency(lastTransactionData['kembalian'])}',
+                              'Kembalian: Rp ${formatCurrency(lastTransactionData['kembalian'])}',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
