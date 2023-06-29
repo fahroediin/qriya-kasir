@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:blue_thermal_printer/blue_thermal_printer.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:project_s/pages/receiptTransaction.dart';
 import 'transaksi.dart';
 
@@ -66,6 +67,11 @@ class _TransaksiSuccessPageState extends State<TransaksiSuccessPage> {
   void _selectPrinter() async {
     if (devices.isEmpty) {
       return;
+    }
+
+    String formatCurrency(int value) {
+      final format = NumberFormat("#,###");
+      return format.format(value);
     }
 
     final selectedDevice = await showDialog<BluetoothDevice>(
@@ -150,8 +156,8 @@ class _TransaksiSuccessPageState extends State<TransaksiSuccessPage> {
 
             // Pad the strings to align the columns
             String paddedItemName = itemName.padRight(18);
-            String paddedQuantity = quantity.toString().padLeft(5);
-            String paddedPrice = price.toString().padLeft(8);
+            String paddedQuantity = quantity.toString().padLeft(4);
+            String paddedPrice = price.toString().padLeft(9);
 
             // Calculate the indentation for quantity and price
             int quantityIndentation = (5 - paddedQuantity.length) ~/ 2;

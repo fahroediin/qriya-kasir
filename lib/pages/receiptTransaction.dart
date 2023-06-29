@@ -263,7 +263,7 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                                   children: [
                                     TableCell(
                                       child: Text(
-                                        'Kode',
+                                        'ID',
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color: Colors.black,
@@ -272,7 +272,7 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                                     ),
                                     TableCell(
                                       child: Text(
-                                        'Nama',
+                                        'Name',
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color: Colors.black,
@@ -281,7 +281,7 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                                     ),
                                     TableCell(
                                       child: Text(
-                                        'Harga',
+                                        'Price',
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color: Colors.black,
@@ -290,7 +290,7 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                                     ),
                                     TableCell(
                                       child: Text(
-                                        'Jumlah',
+                                        'Qty',
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color: Colors.black,
@@ -330,7 +330,7 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                                             child: Text(
                                               item['jumlahSparepart']
                                                   .toString()
-                                                  .padLeft(7),
+                                                  .padLeft(3),
                                               style: TextStyle(
                                                   color: Colors.black),
                                             ),

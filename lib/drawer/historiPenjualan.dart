@@ -24,6 +24,33 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
   BluetoothDevice? selectedDevice;
   BlueThermalPrinter printer = BlueThermalPrinter.instance;
   int itemCount = 0;
+  TextEditingController searchController = TextEditingController();
+  late Query searchQuery;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+    getDevices();
+  }
+
+  void getDevices() async {
+    devices = await printer.getBondedDevices();
+    setState(() {});
+  }
+
+  Future<void> fetchData() async {
+    DataSnapshot snapshot = await dbRef.get();
+    if (snapshot.exists) {
+      setState(() {
+        itemCount = snapshot.children.length;
+      });
+    }
+  }
+
+  void startSearch(String searchKey) {
+    searchQuery = dbRef.orderByChild('idPenjualan').equalTo(searchKey);
+  }
 
   Widget buildListItem(DataSnapshot snapshot) {
     Map? transaksi = snapshot.value as Map?;
@@ -104,27 +131,6 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    fetchData();
-    getDevices();
-  }
-
-  void getDevices() async {
-    devices = await printer.getBondedDevices();
-    setState(() {});
-  }
-
-  Future<void> fetchData() async {
-    DataSnapshot snapshot = await dbRef.get();
-    if (snapshot.exists) {
-      setState(() {
-        itemCount = snapshot.children.length;
-      });
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -174,13 +180,30 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
               ),
             ),
           ),
+          Padding(
+            padding: EdgeInsets.all(16),
+            child: TextField(
+              controller: searchController,
+              decoration: InputDecoration(
+                labelText: 'Cari berdasarkan ID Penjualan',
+                suffixIcon: IconButton(
+                  onPressed: () {
+                    startSearch(searchController.text);
+                    searchController.clear();
+                    setState(() {});
+                  },
+                  icon: Icon(Icons.search),
+                ),
+              ),
+            ),
+          ),
           Expanded(
             child: Container(
               padding: EdgeInsets.all(16),
               child: FirebaseAnimatedList(
                 shrinkWrap: true,
                 physics: ClampingScrollPhysics(),
-                query: dbRef,
+                query: searchQuery,
                 itemBuilder: (BuildContext context, DataSnapshot snapshot,
                     Animation<double> animation, int index) {
                   if (snapshot.value == null) {
