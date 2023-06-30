@@ -34,7 +34,7 @@ class _ServisPageState extends State<ServisPage> {
   Map<String, String> _mekanikNameMap = {};
   TextEditingController _namaMekanikController = TextEditingController();
   List<String> _nopolList = []; // Daftar Nomor Polisi
-  Map<String, String> _pelangganNameMap =
+  Map<String, Map<String, dynamic>> _pelangganNameMap =
       {}; // Map untuk memetakan Nomor Polisi ke Nama Pelanggan
   String? _namaPelanggan;
   final _namaPelangganController = TextEditingController();
@@ -170,14 +170,22 @@ class _ServisPageState extends State<ServisPage> {
   }
 
   void getPelangganList() {
-    FirebaseDatabase.instance.ref('pelanggan').onValue.listen((event) {
+    FirebaseDatabase.instance
+        .reference()
+        .child('daftarPelanggan')
+        .onValue
+        .listen((event) {
       if (event.snapshot.exists) {
         Map<dynamic, dynamic> values =
             event.snapshot.value as Map<dynamic, dynamic>;
         values.forEach((key, value) {
           setState(() {
             _nopolList.add(value['nopol']);
-            _pelangganNameMap[value['nopol']] = value['namaPelanggan'];
+            _pelangganNameMap[value['nopol']] = {
+              'namaPemilik': value['namaPemilik'],
+              'merkSpm': value['merkSpm'],
+              'tipeSpm': value['tipeSpm'],
+            };
           });
         });
       }
@@ -187,7 +195,9 @@ class _ServisPageState extends State<ServisPage> {
   void _selectPelanggan(String? value) {
     setState(() {
       _nopol = value;
-      _namaPelanggan = _pelangganNameMap[value];
+      _namaPelanggan = _pelangganNameMap[value]!['namaPemilik'];
+      _merkKendaraan = _pelangganNameMap[value]!['merkSpm'];
+      _tipeKendaraan = _pelangganNameMap[value]!['tipeSpm'];
       _namaPelangganController.text = _namaPelanggan ?? '';
     });
   }
