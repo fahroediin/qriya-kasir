@@ -23,10 +23,14 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
   double _bayar = 0;
   double _kembalian = 0;
   final List<Map<String, dynamic>> _items = [];
-  List<Map<dynamic, dynamic>> sparepartList = [];
-  List<Map<dynamic, dynamic>> filteredSparepartList = [];
   List<Map<String, dynamic>> selectedSpareparts = [];
   TextEditingController diskonController = TextEditingController();
+  Query dbRef = FirebaseDatabase.instance.reference().child('daftarSparepart');
+  TextEditingController searchController = TextEditingController();
+  List<Map> searchResultList = [];
+  List<Map> sparepartList = [];
+  List<Map> filteredList = [];
+  bool isSearching = false;
 
   @override
   void initState() {
@@ -34,6 +38,38 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
     initializeFirebase();
     generateIdPenjualan();
     _updateDateTime();
+    filteredList = [];
+  }
+
+  void searchList(String query) {
+    searchResultList.clear();
+
+    if (query.isNotEmpty) {
+      List<Map> searchResult = sparepartList
+          .where((sparepart) =>
+              sparepart['namaSparepart']
+                  .toLowerCase()
+                  .contains(query.toLowerCase()) ||
+              sparepart['specSparepart']
+                  .toLowerCase()
+                  .contains(query.toLowerCase()))
+          .toList();
+
+      if (searchResult.isNotEmpty) {
+        setState(() {
+          isSearching = true;
+          searchResultList.add(searchResult.first);
+        });
+      } else {
+        setState(() {
+          isSearching = false;
+        });
+      }
+    } else {
+      setState(() {
+        isSearching = false;
+      });
+    }
   }
 
   void _updateDateTime() {

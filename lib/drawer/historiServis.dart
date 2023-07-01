@@ -87,7 +87,7 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
                   [],
             ),
             Text('Subtotal Sparepart: Rp $totalHargaSparepart'),
-            Text('Diskon: $diskon'),
+            Text('Diskon: $diskon%'),
             Text('Biaya Servis: Rp $biayaServis'),
             Text('Bayar: Rp $bayar'),
             Text('Kembalian: Rp $kembalian'),
