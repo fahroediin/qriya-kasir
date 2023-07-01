@@ -17,7 +17,6 @@ class _ServisPageState extends State<ServisPage> {
   final _formKey = GlobalKey<FormState>();
   DateTime _selectedDateTime = DateTime.now();
   String? _idServis;
-  String _nofaktur = '0.0';
   String _formattedDateTime = '';
   String? _idMekanik;
   String? _namaMekanik;
@@ -490,6 +489,7 @@ class _ServisPageState extends State<ServisPage> {
           'namaSparepart': sparepart['namaSparepart'],
           'hargaSparepart': sparepart['hargaSparepart'].toInt(),
           'jumlahSparepart': jumlahItem,
+          'stokSparepart': stokSparepart,
         });
         sparepart['stokSparepart'] = (stokSparepart - jumlahItem).toString();
       });
@@ -549,7 +549,6 @@ class _ServisPageState extends State<ServisPage> {
       _updateStokSparepart(idSparepart, stokSparepart);
     });
     _calculateTotalHarga();
-    calculateKembalian();
   }
 
   @override
