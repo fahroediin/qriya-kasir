@@ -197,9 +197,12 @@ class _InputPelangganPageState extends State<InputPelangganPage>
                       ],
                       textCapitalization: TextCapitalization.characters,
                       onChanged: (value) {
-                        // This will force the value of the TextField to be in capslock.
-                        _nopolAwalanController.value =
-                            TextEditingValue(text: value.toUpperCase());
+                        // Force the value of the TextField to be in capslock.
+                        _nopolAwalanController.value = TextEditingValue(
+                          text: value.toUpperCase(),
+                          selection:
+                              TextSelection.collapsed(offset: value.length),
+                        );
                       },
                     ),
                   ),
@@ -241,9 +244,12 @@ class _InputPelangganPageState extends State<InputPelangganPage>
                       ],
                       textCapitalization: TextCapitalization.characters,
                       onChanged: (value) {
-                        // This will force the value of the TextField to be in capslock.
-                        _nopolAkhiranController.value =
-                            TextEditingValue(text: value.toUpperCase());
+                        // Force the value of the TextField to be in capslock.
+                        _nopolAkhiranController.value = TextEditingValue(
+                          text: value.toUpperCase(),
+                          selection:
+                              TextSelection.collapsed(offset: value.length),
+                        );
                       },
                     ),
                   ),
@@ -286,10 +292,10 @@ class _InputPelangganPageState extends State<InputPelangganPage>
                   hintText: 'Tipe Sepeda Motor (Contoh: "Beat 2021")',
                 ),
                 inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9]')),
+                  FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9 ]')),
+                  LengthLimitingTextInputFormatter(255),
                 ],
-                textCapitalization: TextCapitalization
-                    .characters, // Menyebabkan Caps Lock otomatis
+                textCapitalization: TextCapitalization.characters,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Wajib diisi';
@@ -313,11 +319,10 @@ class _InputPelangganPageState extends State<InputPelangganPage>
                   hintText: 'Nama Pemilik',
                 ),
                 inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z]')),
+                  FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z ]')),
                   LengthLimitingTextInputFormatter(255),
                 ],
-                textCapitalization: TextCapitalization
-                    .characters, // Menyebabkan Caps Lock otomatis
+                textCapitalization: TextCapitalization.characters,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Wajib diisi';
@@ -334,12 +339,16 @@ class _InputPelangganPageState extends State<InputPelangganPage>
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 10),
-              TextField(
+              TextFormField(
                 controller: _alamatController,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
                   hintText: 'Alamat',
                 ),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'[A-Z 0-9/]')),
+                ],
+                textCapitalization: TextCapitalization.characters,
               ),
               SizedBox(height: 20),
               Text(

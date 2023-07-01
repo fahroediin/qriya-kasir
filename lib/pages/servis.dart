@@ -679,6 +679,7 @@ class _ServisPageState extends State<ServisPage> {
                     _kerusakan = value;
                   });
                 },
+                textCapitalization: TextCapitalization.characters,
               ),
               SizedBox(height: 10),
               Text(
