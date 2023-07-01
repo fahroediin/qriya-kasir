@@ -98,20 +98,24 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void getDataCountPenjualan(String idPenjualan) {
-    dbRefPenjualan
+  void getDataCountPenjualan(String idPenjualan) async {
+    final DatabaseReference dbRefPenjualan =
+        FirebaseDatabase.instance.reference();
+
+    DataSnapshot snapshot = (await dbRefPenjualan
         .child('transaksiPenjualan')
         .orderByChild('idPenjualan')
         .equalTo(idPenjualan)
-        .once()
-        .then((snapshot) {
-      if (snapshot != null) {
-        Map<dynamic, dynamic> data = snapshot as Map<dynamic, dynamic>;
-        _dataCountPenjualan = data.length;
-      }
-    }).catchError((error) {
-      print('Failed to get data count: $error');
-    });
+        .once()) as DataSnapshot;
+
+    int dataCountPenjualan = 0;
+
+    if (snapshot.value != null) {
+      Map<dynamic, dynamic> data = snapshot.value as Map<dynamic, dynamic>;
+      dataCountPenjualan = data.length;
+    } else {
+      print('No data found');
+    }
   }
 
   @override
