@@ -6,6 +6,7 @@ import 'package:project_s/pages/home_page.dart';
 import 'package:uuid/uuid.dart';
 import 'package:intl/intl.dart';
 import 'dart:math';
+import 'servisSuccess.dart';
 
 class ServisPage extends StatefulWidget {
   @override
@@ -116,46 +117,30 @@ class _ServisPageState extends State<ServisPage> {
       'kembalian': _kembalian,
     };
 
-    reference.push().set(data).then((_) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Proses sukses'),
-            content: Text('Servis berhasil diproses'),
-            actions: <Widget>[
-              TextButton(
-                child: Text('OK'),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => HomePage()),
-                  );
-                },
-              ),
-            ],
-          );
-        },
-      );
-    }).catchError((error) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Terjadi Kesalahan'),
-            content: Text('Terjadi kesalahan saat menyimpan data servis.'),
-            actions: <Widget>[
-              TextButton(
-                child: Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-    });
+    reference.push().set(data).then(
+      (_) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => ServisSuccessPage(
+                    idServis: data['idServis'],
+                    dateTime: data['dateTime'] ?? '',
+                    idMekanik: data['idMekanik'],
+                    namaMekanik: data['namaMekanik'],
+                    nopol: data['nopol'],
+                    namaPelanggan: data['namaPelanggan'],
+                    merkSpm: data['merkSpm'],
+                    tipeSpm: data['tipeSpm'],
+                    kerusakan: data['kerusakan'],
+                    items: data['items'],
+                    diskon: data['diskon'],
+                    totalBiaya: data['biayaServis'],
+                    bayar: data['bayar'],
+                    kembalian: data['kembalian'],
+                  )),
+        );
+      },
+    );
   }
 
 // Calculate total price before discount
