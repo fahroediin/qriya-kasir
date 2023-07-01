@@ -144,14 +144,15 @@ class _AddMekanikPageState extends State<AddMekanikPage> {
               ),
             ),
             SizedBox(height: 10),
-            TextField(
+            TextFormField(
               controller: _alamatController,
               keyboardType: TextInputType.text,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: 'Alamat',
                 hintText: '',
               ),
+              textCapitalization: TextCapitalization.characters,
             ),
             SizedBox(height: 10),
             TextField(

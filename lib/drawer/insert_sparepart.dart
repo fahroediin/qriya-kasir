@@ -151,28 +151,31 @@ class _InputSparepartPageState extends State<InputSparepartPage>
               ),
             ),
             SizedBox(height: 10),
-            TextField(
+            TextFormField(
               controller: _namaSparepartController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: 'Nama Sparepart',
               ),
+              textCapitalization: TextCapitalization.sentences,
             ),
             SizedBox(height: 10),
-            TextField(
+            TextFormField(
               controller: _merkSparepartController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: 'Merk Sparepart',
               ),
+              textCapitalization: TextCapitalization.sentences,
             ),
             SizedBox(height: 10),
-            TextField(
+            TextFormField(
               controller: _specSparepartController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: 'Spec Sparepart',
               ),
+              textCapitalization: TextCapitalization.sentences,
             ),
             SizedBox(height: 10),
             TextField(

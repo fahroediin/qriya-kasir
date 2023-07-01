@@ -225,6 +225,11 @@ class _ServisPageState extends State<ServisPage> {
     });
   }
 
+  String formatCurrency(int value) {
+    final format = NumberFormat("#,###");
+    return format.format(value);
+  }
+
   void _selectPelanggan(String? value) {
     setState(() {
       _nopol = value;
@@ -267,6 +272,8 @@ class _ServisPageState extends State<ServisPage> {
         List<Map<dynamic, dynamic>> sparepartList = [];
         List<Map<dynamic, dynamic>> filteredSparepartList = [];
         TextEditingController jumlahItemController = TextEditingController();
+        TextEditingController searchController =
+            TextEditingController(); // Tambahkan controller untuk TextField pencarian
 
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
@@ -277,6 +284,8 @@ class _ServisPageState extends State<ServisPage> {
                 child: Column(
                   children: [
                     TextField(
+                      controller:
+                          searchController, // Tambahkan controller ke TextField pencarian
                       decoration: InputDecoration(
                         labelText: 'Cari Sparepart',
                       ),
@@ -357,9 +366,10 @@ class _ServisPageState extends State<ServisPage> {
                                   ),
                                   child: ListTile(
                                     title: Text(
-                                      'ID Sparepart: ${sparepart['idSparepart']}',
+                                      '${sparepart['namaSparepart']}',
                                       style: TextStyle(
-                                          fontWeight: FontWeight.bold),
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 24),
                                     ),
                                     subtitle: Column(
                                       crossAxisAlignment:
@@ -367,22 +377,39 @@ class _ServisPageState extends State<ServisPage> {
                                       children: [
                                         SizedBox(height: 8.0),
                                         Text(
-                                          'Nama Sparepart: ${sparepart['namaSparepart']}',
+                                          'ID: ${sparepart['idSparepart']}',
                                           style: TextStyle(
-                                              fontWeight: FontWeight.bold),
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 18),
                                         ),
                                         SizedBox(height: 4.0),
                                         Text(
-                                            'Merk Sparepart: ${sparepart['merkSparepart']}'),
+                                          'Merk: ${sparepart['merkSparepart']}',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.normal,
+                                              fontSize: 18),
+                                        ),
                                         SizedBox(height: 4.0),
                                         Text(
-                                            'Spec Sparepart: ${sparepart['specSparepart']}'),
+                                          'Spesifikasi: ${sparepart['specSparepart']}',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.normal,
+                                              fontSize: 18),
+                                        ),
                                         SizedBox(height: 4.0),
                                         Text(
-                                            'Harga Sparepart: ${sparepart['hargaSparepart']}'),
+                                          'Harga: Rp ${formatCurrency(sparepart['hargaSparepart'])}',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.normal,
+                                              fontSize: 18),
+                                        ),
                                         SizedBox(height: 4.0),
                                         Text(
-                                            'Stok Sparepart: ${sparepart['stokSparepart']}'),
+                                          'Stok: ${sparepart['stokSparepart']}',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 18),
+                                        ),
                                         SizedBox(height: 8.0),
                                       ],
                                     ),
@@ -391,7 +418,7 @@ class _ServisPageState extends State<ServisPage> {
                                         context: context,
                                         builder: (BuildContext context) {
                                           return AlertDialog(
-                                            title: Text('Jumlah Item'),
+                                            title: Text('Jumlah'),
                                             content: TextField(
                                               controller: jumlahItemController,
                                               keyboardType:
@@ -467,11 +494,11 @@ class _ServisPageState extends State<ServisPage> {
                 ),
               ),
               actions: [
-                TextButton(
+                IconButton(
+                  icon: Icon(Icons.close),
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: Text('Tutup'),
                 ),
               ],
             );
@@ -601,7 +628,9 @@ class _ServisPageState extends State<ServisPage> {
               ),
               DropdownButtonFormField<String>(
                 value: _idMekanik,
-                decoration: InputDecoration(labelText: 'ID Mekanik'),
+                decoration: InputDecoration(
+                  labelText: 'ID Mekanik',
+                ),
                 items: _mekanikList.map((idMekanik) {
                   return DropdownMenuItem<String>(
                     value: idMekanik,
@@ -609,6 +638,12 @@ class _ServisPageState extends State<ServisPage> {
                   );
                 }).toList(),
                 onChanged: _selectMekanik,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Pilih Mekanik';
+                  }
+                  return null;
+                },
               ),
               SizedBox(height: 10),
               TextField(
@@ -625,7 +660,9 @@ class _ServisPageState extends State<ServisPage> {
               ),
               DropdownButtonFormField<String>(
                 value: _nopol,
-                decoration: InputDecoration(labelText: 'Nomor Polisi'),
+                decoration: InputDecoration(
+                  labelText: 'Nomor Polisi',
+                ),
                 items: _nopolList.map((nopol) {
                   return DropdownMenuItem<String>(
                     value: nopol,
@@ -633,6 +670,12 @@ class _ServisPageState extends State<ServisPage> {
                   );
                 }).toList(),
                 onChanged: _selectPelanggan,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Pilih Pelanggan';
+                  }
+                  return null;
+                },
               ),
               SizedBox(height: 16.0),
               Row(
@@ -680,6 +723,15 @@ class _ServisPageState extends State<ServisPage> {
                   });
                 },
                 textCapitalization: TextCapitalization.characters,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Tidak boleh kosong';
+                  }
+                  if (value.length < 6) {
+                    return 'Minimal 6 karakter';
+                  }
+                  return null;
+                },
               ),
               SizedBox(height: 10),
               Text(

@@ -176,7 +176,7 @@ class _ServisSuccessPageState extends State<ServisSuccessPage> {
           printer.printNewLine();
           printer.printCustom('--------------------------------', 0, 0);
           printer.printCustom(
-              'Subtotal Sparepart '.padRight(22) +
+              'Total Sparepart '.padRight(22) +
                   'Rp ${widget.totalHarga.toStringAsFixed(0)}',
               1,
               0);
