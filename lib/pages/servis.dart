@@ -30,6 +30,7 @@ class _ServisPageState extends State<ServisPage> {
   double _bayar = 0;
   double _biayaServis = 0;
   double _kembalian = 0;
+  double _diskon = 0;
   List<String> _mekanikList = [];
   Map<String, String> _mekanikNameMap = {};
   TextEditingController _namaMekanikController = TextEditingController();
@@ -45,6 +46,7 @@ class _ServisPageState extends State<ServisPage> {
   List<Map<dynamic, dynamic>> sparepartList = [];
   List<Map<dynamic, dynamic>> filteredSparepartList = [];
   List<Map<String, dynamic>> selectedSpareparts = [];
+  TextEditingController diskonController = TextEditingController();
 
   @override
   void initState() {
@@ -91,6 +93,10 @@ class _ServisPageState extends State<ServisPage> {
   void saveServisData() {
     DatabaseReference reference =
         FirebaseDatabase.instance.reference().child('transaksiServis');
+
+    double diskon = double.tryParse(diskonController.text) ?? 0;
+    double totalHarga = calculateTotalPriceBeforeDiscount();
+
     Map<String, dynamic> data = {
       'idServis': _idServis,
       'dateTime': _formattedDateTime,
@@ -101,8 +107,11 @@ class _ServisPageState extends State<ServisPage> {
       'merkSpm': _merkKendaraanController.text,
       'tipeSpm': _tipeKendaraanController.text,
       'kerusakan': _kerusakan,
-      'sparepartItems': _sparepartItems,
-      'totalBayar': _totalBayar,
+      'items': _items,
+      'diskon': diskon,
+      'totalHargaSparepart': totalHarga,
+      'hargaAkhir': _totalBayar,
+      'biayaServis': _biayaServis,
       'bayar': _bayar,
       'kembalian': _kembalian,
     };
@@ -146,6 +155,41 @@ class _ServisPageState extends State<ServisPage> {
           );
         },
       );
+    });
+  }
+
+// Calculate total price before discount
+  double calculateTotalPriceBeforeDiscount() {
+    double totalHarga = 0;
+    for (Map<String, dynamic> item in _items) {
+      int hargaSparepart = item['hargaSparepart'];
+      int jumlahSparepart = item['jumlahSparepart'];
+      totalHarga += hargaSparepart * jumlahSparepart;
+    }
+    return totalHarga;
+  }
+
+// Calculate total price after discount
+  double calculateTotalPriceAfterDiscount(double discount) {
+    double totalHarga = calculateTotalPriceBeforeDiscount();
+    double discountAmount = totalHarga * discount / 100;
+    return totalHarga - discountAmount;
+  }
+
+  void _calculateTotalHarga() {
+    double totalHarga = calculateTotalPriceBeforeDiscount();
+    double discountAmount = _diskon;
+    double totalHargaAfterDiscount = totalHarga - discountAmount;
+    setState(() {
+      _totalBayar = totalHargaAfterDiscount;
+      calculateKembalian(); // Menghitung kembalian saat totalBayar diperbarui
+    });
+  }
+
+  void calculateKembalian() {
+    double kembalian = _bayar - (_totalBayar + _biayaServis);
+    setState(() {
+      _kembalian = kembalian;
     });
   }
 
@@ -461,7 +505,6 @@ class _ServisPageState extends State<ServisPage> {
           'namaSparepart': sparepart['namaSparepart'],
           'hargaSparepart': sparepart['hargaSparepart'].toInt(),
           'jumlahSparepart': jumlahItem,
-          'stokSparepart': stokSparepart,
         });
         sparepart['stokSparepart'] = (stokSparepart - jumlahItem).toString();
       });
@@ -522,25 +565,6 @@ class _ServisPageState extends State<ServisPage> {
     });
     _calculateTotalHarga();
     calculateKembalian();
-  }
-
-  void _calculateTotalHarga() {
-    double totalHarga = 0;
-    for (var item in _items) {
-      double harga = double.tryParse(item['hargaSparepart'].toString()) ?? 0;
-      int jumlah = int.tryParse(item['jumlahSparepart'].toString()) ?? 0;
-      totalHarga += harga * jumlah + _biayaServis;
-    }
-    setState(() {
-      _totalBayar = totalHarga;
-    });
-  }
-
-  void calculateKembalian() {
-    double kembalian = _bayar - (_totalBayar + _biayaServis);
-    setState(() {
-      _kembalian = kembalian;
-    });
   }
 
   @override
@@ -753,8 +777,8 @@ class _ServisPageState extends State<ServisPage> {
               ),
               SizedBox(height: 16.0),
               Text(
-                'Total Bayar: $_totalBayar',
-              ),
+                  'Total Harga (Sparepart) : Rp ${_totalBayar.toStringAsFixed(0)}'),
+
               SizedBox(height: 8.0),
               TextFormField(
                 decoration: InputDecoration(labelText: 'Biaya Servis'),
@@ -763,6 +787,25 @@ class _ServisPageState extends State<ServisPage> {
                   double biayaServis = double.tryParse(value) ?? 0;
                   setState(() {
                     _biayaServis = biayaServis;
+                    calculateKembalian();
+                  });
+                },
+              ),
+              SizedBox(height: 8.0),
+              TextFormField(
+                controller: diskonController,
+                decoration: InputDecoration(
+                  labelText: 'Diskon',
+                  hintText: 'Masukkan diskon dalam 10/20/dst',
+                ),
+                keyboardType: TextInputType.number,
+                inputFormatters: <TextInputFormatter>[
+                  FilteringTextInputFormatter.digitsOnly
+                ],
+                onChanged: (value) {
+                  double discount = double.tryParse(value) ?? 0;
+                  setState(() {
+                    _totalBayar = calculateTotalPriceAfterDiscount(discount);
                     calculateKembalian();
                   });
                 },
@@ -784,8 +827,11 @@ class _ServisPageState extends State<ServisPage> {
                   });
                 },
               ),
-              SizedBox(height: 8.0),
-              Text('Kembalian: $_kembalian'),
+              SizedBox(height: 10),
+              Text(
+                  'Total Biaya : Rp ${(_totalBayar + _biayaServis).toStringAsFixed(0)}'),
+              SizedBox(height: 10),
+              Text('Kembalian : Rp ${_kembalian.toStringAsFixed(0)}'),
               SizedBox(height: 16.0),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
