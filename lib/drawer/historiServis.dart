@@ -30,22 +30,23 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
   }
 
   Widget buildListItem(DataSnapshot snapshot) {
-    Map transaksi = snapshot.value as Map;
+    Map<dynamic, dynamic> transaksi = snapshot.value as Map<dynamic, dynamic>;
     String idServis = snapshot.key ?? '';
     String dateTime = transaksi['dateTime'] ?? '';
     String idMekanik = transaksi['idMekanik'] ?? '';
     String namaMekanik = transaksi['namaMekanik'] ?? '';
     String nopol = transaksi['nopol'] ?? '';
+    String namaPelanggan = transaksi['namaPelanggan'] ?? '';
     String merkSpm = transaksi['merkSpm'] ?? '';
     String tipeSpm = transaksi['tipeSpm'] ?? '';
-    String namaPemilik = transaksi['namaPemilik'] ?? '';
     String kerusakan = transaksi['kerusakan'] ?? '';
-    List<Map>? sparepartItems =
-        (transaksi['sparepartItems'] as List<dynamic>?)?.cast<Map>();
-    double biayaServis = (transaksi['biayaServis'] ?? 0).toDouble();
-    double totalBayar = (transaksi['totalBayar'] ?? 0).toDouble();
-    double bayar = (transaksi['bayar'] ?? 0).toDouble();
-    double kembalian = (transaksi['kembalian'] ?? 0).toDouble();
+    List<Map>? items = (transaksi['items'] as List<dynamic>?)?.cast<Map>();
+    int biayaServis = transaksi['biayaServis'] ?? 0;
+    int totalHargaSparepart = transaksi['totalHargaSparepart'] ?? 0;
+    int diskon = transaksi['diskon'] ?? 0;
+    int hargaAkhir = transaksi['hargaAkhir'] ?? 0;
+    int bayar = transaksi['bayar'] ?? 0;
+    int kembalian = transaksi['kembalian'] ?? 0;
 
     return Card(
       child: ListTile(
@@ -57,18 +58,19 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
             Text('ID Mekanik: $idMekanik'),
             Text('Nama Mekanik: $namaMekanik'),
             Text('Nomor Polisi: $nopol'),
+            Text('Nama Pelanggan: $namaPelanggan'),
             Text('Merk SPM: $merkSpm'),
             Text('Tipe SPM: $tipeSpm'),
-            Text('Nama Pemilik: $namaPemilik'),
             Text('Kerusakan: $kerusakan'),
-            Text('Sparepart Items:'),
+            Text('Items:'),
             Column(
-              children: sparepartItems?.map((item) {
+              children: items?.map((item) {
                     String idSparepart = item['idSparepart'] ?? '';
                     String namaSparepart = item['namaSparepart'] ?? '';
-                    double hargaSparepart =
-                        (item['hargaSparepart'] ?? 0).toDouble();
-                    int jumlahItem = item['jumlahItem'] ?? 0;
+                    String merkSparepart = item['merkSparepart'] ?? '';
+                    String specSparepart = item['specSparepart'] ?? '';
+                    int hargaSparepart = item['hargaSparepart'] as int? ?? 0;
+                    int jumlahItem = item['jumlahSparepart'] ?? 0;
                     return Padding(
                       padding: EdgeInsets.only(left: 16),
                       child: Column(
@@ -76,7 +78,7 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
                         children: [
                           Text('ID Sparepart: $idSparepart'),
                           Text('Nama Sparepart: $namaSparepart'),
-                          Text('Harga Sparepart: $hargaSparepart'),
+                          Text('Harga Sparepart: Rp ${hargaSparepart}'),
                           Text('Jumlah Item: $jumlahItem'),
                         ],
                       ),
@@ -84,10 +86,11 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
                   }).toList() ??
                   [],
             ),
-            Text('Biaya Servis: $biayaServis'),
-            Text('Total Bayar: $totalBayar'),
-            Text('Bayar: $bayar'),
-            Text('Kembalian: $kembalian'),
+            Text('Subtotal Sparepart: Rp $totalHargaSparepart'),
+            Text('Diskon: $diskon'),
+            Text('Biaya Servis: Rp $biayaServis'),
+            Text('Bayar: Rp $bayar'),
+            Text('Kembalian: Rp $kembalian'),
           ],
         ),
       ),
@@ -167,7 +170,7 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
                 query: dbRef,
                 itemBuilder: (BuildContext context, DataSnapshot snapshot,
                     Animation<double> animation, int index) {
-                  if (snapshot.value == null) {
+                  if (!snapshot.exists) {
                     return buildNoDataWidget();
                   } else {
                     return Column(

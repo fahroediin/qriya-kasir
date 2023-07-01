@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
@@ -19,7 +17,7 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
       .reference()
       .child('transaksiPenjualan')
       .orderByKey()
-      .limitToLast(100);
+      .limitToLast(50);
   List<BluetoothDevice> devices = [];
   BluetoothDevice? selectedDevice;
   BlueThermalPrinter printer = BlueThermalPrinter.instance;
