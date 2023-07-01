@@ -132,8 +132,10 @@ class _ServisPageState extends State<ServisPage> {
                     tipeSpm: data['tipeSpm'],
                     kerusakan: data['kerusakan'],
                     items: data['items'],
+                    totalHarga: data['totalHargaSparepart'],
                     diskon: data['diskon'],
-                    totalBiaya: data['biayaServis'],
+                    biayaServis: data['biayaServis'],
+                    hargaAkhir: data['hargaAkhir'],
                     bayar: data['bayar'],
                     kembalian: data['kembalian'],
                   )),
@@ -681,7 +683,7 @@ class _ServisPageState extends State<ServisPage> {
               SizedBox(height: 10),
               Text(
                 'Data Sparepart',
-                style: TextStyle(fontWeight: FontWeight.normal),
+                style: TextStyle(fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 16.0),
               ListView.builder(
@@ -761,8 +763,9 @@ class _ServisPageState extends State<ServisPage> {
               ),
               SizedBox(height: 16.0),
               Text(
-                  'Total Harga (Sparepart) : Rp ${_totalBayar.toStringAsFixed(0)}'),
-
+                'Total Harga (Sparepart) : Rp ${_totalBayar.toStringAsFixed(0)}',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
               SizedBox(height: 8.0),
               TextFormField(
                 decoration: InputDecoration(labelText: 'Biaya Servis'),
@@ -813,9 +816,14 @@ class _ServisPageState extends State<ServisPage> {
               ),
               SizedBox(height: 10),
               Text(
-                  'Total Biaya : Rp ${(_totalBayar + _biayaServis).toStringAsFixed(0)}'),
+                'Total Biaya : Rp ${(_totalBayar + _biayaServis).toStringAsFixed(0)}',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
               SizedBox(height: 10),
-              Text('Kembalian : Rp ${_kembalian.toStringAsFixed(0)}'),
+              Text(
+                'Kembalian : Rp ${_kembalian.toStringAsFixed(0)}',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
               SizedBox(height: 16.0),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(

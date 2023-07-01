@@ -18,8 +18,10 @@ class ServisSuccessPage extends StatefulWidget {
   final List<Map<String, dynamic>> items;
   final double diskon;
   final double bayar;
-  final double totalBiaya;
+  final double biayaServis;
   final double kembalian;
+  final double hargaAkhir;
+  final double totalHarga;
 
   ServisSuccessPage({
     required this.idServis,
@@ -34,8 +36,10 @@ class ServisSuccessPage extends StatefulWidget {
     required this.items,
     required this.diskon,
     required this.bayar,
-    required this.totalBiaya,
     required this.kembalian,
+    required this.biayaServis,
+    required this.hargaAkhir,
+    required this.totalHarga,
   });
 
   @override
@@ -49,6 +53,7 @@ class _ServisSuccessPageState extends State<ServisSuccessPage> {
   String? _namaPembeli;
   double _bayar = 0;
   double _kembalian = 0;
+  final List<Map<String, dynamic>> _items = [];
   List<BluetoothDevice> devices = [];
   BluetoothDevice? selectedDevice;
   BlueThermalPrinter printer = BlueThermalPrinter.instance;
@@ -57,6 +62,7 @@ class _ServisSuccessPageState extends State<ServisSuccessPage> {
   void initState() {
     super.initState();
     getDevices();
+    _items.addAll(widget.items);
   }
 
   void getDevices() async {
@@ -134,8 +140,10 @@ class _ServisSuccessPageState extends State<ServisSuccessPage> {
           printer.printNewLine();
           printer.printCustom('ID Servis: ${widget.idServis}', 1, 0);
           printer.printCustom('Date/Time: ${widget.dateTime}', 1, 0);
+          printer.printCustom('--------------------------------', 0, 0);
           printer.printCustom('ID Mekanik: ${widget.idMekanik}', 1, 0);
           printer.printCustom('Nama Mekanik: ${widget.namaMekanik}', 1, 0);
+          printer.printCustom('--------------------------------', 0, 0);
           printer.printCustom('Nopol: ${widget.nopol}', 1, 0);
           printer.printCustom('Nama Pelanggan: ${widget.namaPelanggan}', 1, 0);
           printer.printCustom('Merk SPM: ${widget.merkSpm}', 1, 0);
@@ -143,10 +151,10 @@ class _ServisSuccessPageState extends State<ServisSuccessPage> {
           printer.printCustom('Kerusakan: ${widget.kerusakan}', 1, 0);
           printer.printNewLine();
           printer.printCustom('--------------------------------', 0, 0);
-          printer.printCustom('Items Qty Price', 0, 0);
-          for (var item in widget.items) {
+          printer.printCustom('Items               Qty   Price', 0, 0);
+          for (var item in _items) {
             String itemName = item['namaSparepart'];
-            int quantity = item['jumlahItem'];
+            int quantity = item['jumlahSparepart'];
             int price = item['hargaSparepart'];
 
             // Pad the strings to align the columns
@@ -165,41 +173,66 @@ class _ServisSuccessPageState extends State<ServisSuccessPage> {
 
             printer.printCustom(formattedLine, 1, 0);
           }
-
           printer.printNewLine();
           printer.printCustom('--------------------------------', 0, 0);
           printer.printCustom(
-              'Harga: Rp ${widget.totalBiaya.toStringAsFixed(0)} (*disc ${widget.diskon.toStringAsFixed(0)}%)',
+              'Subtotal Sparepart '.padRight(22) +
+                  'Rp ${widget.totalHarga.toStringAsFixed(0)}',
               1,
               0);
           printer.printCustom(
-              'Total: Rp ${widget.totalBiaya.toStringAsFixed(0)}', 1, 0);
-          printer.printCustom('Bayar: Rp ${_bayar.toStringAsFixed(0)}', 1, 0);
+              'Diskon '.padRight(22) + '${widget.diskon.toStringAsFixed(0)}% ',
+              1,
+              0);
           printer.printCustom(
-              'Kembalian: Rp ${_kembalian.toStringAsFixed(0)}', 1, 0);
+              'Subtotal '.padRight(22) +
+                  'Rp ${widget.hargaAkhir.toStringAsFixed(0)}',
+              1,
+              0);
+          printer.printCustom(
+              'Biaya Servis '.padRight(22) +
+                  'Rp ${widget.biayaServis.toStringAsFixed(0)}',
+              1,
+              0);
+          double total = widget.hargaAkhir + widget.biayaServis;
+          printer.printCustom(
+              'Jumlah '.padRight(22) + 'Rp ${total.toStringAsFixed(0)}', 1, 0);
+          printer.printCustom(
+              'Bayar '.padRight(22) + 'Rp ${widget.bayar.toStringAsFixed(0)}',
+              1,
+              0);
+          printer.printCustom(
+              'Kembalian '.padRight(22) +
+                  'Rp ${widget.kembalian.toStringAsFixed(0)}',
+              1,
+              0);
           printer.printNewLine();
           printer.printCustom('Terima Kasih', 2, 1);
           printer.printCustom('Semoga Hari Anda Menyenangkan!', 1, 1);
           printer.printNewLine();
           printer.paperCut();
-          printer.disconnect();
-          showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                title: Text('Cetak Kuitansi'),
-                content: Text('Berhasil mencetak kuitansi'),
-                actions: <Widget>[
-                  TextButton(
-                    child: Text('OK'),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ],
+          // Menambahkan jeda 5 detik sebelum memutuskan koneksi
+          Future.delayed(Duration(seconds: 5), () {
+            printer.disconnect().then((_) {
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: Text('Cetak Kuitansi'),
+                    content: Text('Berhasil mencetak kuitansi'),
+                    actions: <Widget>[
+                      TextButton(
+                        child: Text('OK'),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
+                  );
+                },
               );
-            },
-          );
+            });
+          });
         });
       } on PlatformException catch (e) {
         print(e.message);

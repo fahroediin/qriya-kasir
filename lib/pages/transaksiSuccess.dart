@@ -174,37 +174,51 @@ class _TransaksiSuccessPageState extends State<TransaksiSuccessPage> {
           printer.printNewLine();
           printer.printCustom('--------------------------------', 0, 0);
           printer.printCustom(
-              'Harga: Rp ${widget.totalHarga.toStringAsFixed(0)} (*disc ${widget.diskon.toStringAsFixed(0)}%)',
+              'Harga'.padRight(22) +
+                  'Rp ${widget.totalHarga.toStringAsFixed(0)}',
               1,
               0);
           printer.printCustom(
-              'Total: Rp ${widget.hargaAkhir.toStringAsFixed(0)}', 1, 0);
-          printer.printCustom('Bayar: Rp ${_bayar.toStringAsFixed(0)}', 1, 0);
+              'Diskon'.padRight(22) + '${widget.diskon.toStringAsFixed(0)}%',
+              1,
+              0);
           printer.printCustom(
-              'Kembalian: Rp ${_kembalian.toStringAsFixed(0)}', 1, 0);
+              'Total'.padRight(22) +
+                  'Rp ${widget.hargaAkhir.toStringAsFixed(0)}',
+              1,
+              0);
+          printer.printCustom(
+              'Bayar'.padRight(22) + 'Rp ${_bayar.toStringAsFixed(0)}', 1, 0);
+          printer.printCustom(
+              'Kembalian'.padRight(22) + 'Rp ${_kembalian.toStringAsFixed(0)}',
+              1,
+              0);
           printer.printNewLine();
           printer.printCustom('Terima Kasih', 2, 1);
           printer.printCustom('Semoga Hari Anda Menyenangkan!', 1, 1);
           printer.printNewLine();
           printer.paperCut();
-          printer.disconnect();
-          showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                title: Text('Cetak Kuitansi'),
-                content: Text('Berhasil mencetak kuitansi'),
-                actions: <Widget>[
-                  TextButton(
-                    child: Text('OK'),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ],
+          Future.delayed(Duration(seconds: 5), () {
+            printer.disconnect().then((_) {
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: Text('Cetak Kuitansi'),
+                    content: Text('Berhasil mencetak kuitansi'),
+                    actions: <Widget>[
+                      TextButton(
+                        child: Text('OK'),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
+                  );
+                },
               );
-            },
-          );
+            });
+          });
         });
       } on PlatformException catch (e) {
         print(e.message);
