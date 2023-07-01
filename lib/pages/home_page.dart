@@ -32,14 +32,15 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   User? _user;
+  String _formattedDateTime = '';
   Map<dynamic, dynamic>? userData;
   DatabaseReference _databaseReference = FirebaseDatabase.instance.reference();
-  DatabaseReference dbRefPenjualan = FirebaseDatabase.instance.reference();
-
   Query dbRefServis =
       FirebaseDatabase.instance.reference().child('transaksiServis');
-  int _dataCountServis = 0;
-  int _dataCountPenjualan = 0;
+  int countDataServis = 0;
+  Query dbRefPenjualan =
+      FirebaseDatabase.instance.reference().child('transaksiPenjualan');
+  int countdDataPenjualan = 0;
   int _totalData = 0;
   String nameController = '';
   String addressController = '';
@@ -49,13 +50,20 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _checkCurrentUser();
+    formattedDateTime();
     initializeDateFormatting(
         'id_ID', null); // Initialize date formatting for Indonesian locale
-    getDataCountServis();
-
+    fetchDataServis();
+    fetchDataPenjualan();
     _databaseReference = FirebaseDatabase.instance.reference().child('user');
     getUserData();
     getUser();
+  }
+
+  void formattedDateTime() {
+    setState(() {
+      _formattedDateTime = DateFormat('dd/MM/yyyy').format(DateTime.now());
+    });
   }
 
   void getUserData() {
@@ -85,36 +93,37 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void getDataCountServis() {
-    dbRefServis.once().then((snapshot) {
-      if (snapshot != null) {
-        Map<dynamic, dynamic> data = snapshot as Map<dynamic, dynamic>;
-        setState(() {
-          _dataCountServis = data.length;
-        });
-      }
-    }).catchError((error) {
-      print('Failed to get data count: $error');
-    });
+  Future<void> fetchDataServis() async {
+    DateTime currentDate = DateTime.now();
+    String formattedDate = DateFormat('dd/MM/yyyy').format(currentDate);
+
+    DataSnapshot snapshot = await dbRefServis
+        .orderByChild('dateTime')
+        .startAt(formattedDate)
+        .endAt(formattedDate + '\uf8ff')
+        .get();
+
+    if (snapshot.exists) {
+      setState(() {
+        countDataServis = snapshot.children.length;
+      });
+    }
   }
 
-  void getDataCountPenjualan(String idPenjualan) async {
-    final DatabaseReference dbRefPenjualan =
-        FirebaseDatabase.instance.reference();
+  Future<void> fetchDataPenjualan() async {
+    DateTime currentDate = DateTime.now();
+    String formattedDate = DateFormat('dd/MM/yyyy').format(currentDate);
 
-    DataSnapshot snapshot = (await dbRefPenjualan
-        .child('transaksiPenjualan')
-        .orderByChild('idPenjualan')
-        .equalTo(idPenjualan)
-        .once()) as DataSnapshot;
+    DataSnapshot snapshot = await dbRefServis
+        .orderByChild('dateTime')
+        .startAt(formattedDate)
+        .endAt(formattedDate + '\uf8ff')
+        .get();
 
-    int dataCountPenjualan = 0;
-
-    if (snapshot.value != null) {
-      Map<dynamic, dynamic> data = snapshot.value as Map<dynamic, dynamic>;
-      dataCountPenjualan = data.length;
-    } else {
-      print('No data found');
+    if (snapshot.exists) {
+      setState(() {
+        countdDataPenjualan = snapshot.children.length;
+      });
     }
   }
 
@@ -176,7 +185,7 @@ class _HomePageState extends State<HomePage> {
                     Container(
                       margin: EdgeInsets.only(top: 5),
                       child: Text(
-                        'Transaksi Hari ini : ${_dataCountServis + _dataCountPenjualan}',
+                        'Transaksi Hari ini : ${countDataServis + countdDataPenjualan}',
                         style: const TextStyle(
                             fontSize: 25,
                             fontWeight: FontWeight.normal,
@@ -186,7 +195,7 @@ class _HomePageState extends State<HomePage> {
                     Container(
                       margin: EdgeInsets.only(top: 5),
                       child: Text(
-                        'Servis : $_dataCountServis',
+                        'Servis : $countDataServis',
                         style: TextStyle(
                             fontSize: 25,
                             fontWeight: FontWeight.normal,
@@ -196,7 +205,7 @@ class _HomePageState extends State<HomePage> {
                     Container(
                       margin: EdgeInsets.only(top: 5),
                       child: Text(
-                        'Penjualan : $_dataCountPenjualan',
+                        'Penjualan : $countdDataPenjualan',
                         style: TextStyle(
                             fontSize: 25,
                             fontWeight: FontWeight.normal,
