@@ -68,6 +68,7 @@ class _ReceiptServisPageState extends State<ReceiptServisPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               FutureBuilder<Map<String, dynamic>>(
+                future: _lastServisFuture,
                 builder:
                     (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -94,7 +95,7 @@ class _ReceiptServisPageState extends State<ReceiptServisPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'ID Transaksi: ${lastTransactionData['idPenjualan']}',
+                              'ID Transaksi: ${lastTransactionData['idServis']}',
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
@@ -111,7 +112,47 @@ class _ReceiptServisPageState extends State<ReceiptServisPage> {
                             ),
                             const SizedBox(height: 10),
                             Text(
-                              'Nama Pembeli: ${lastTransactionData['namaPembeli']}',
+                              'ID Mekanik: ${lastTransactionData['idMekanik']}',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              'Nama Mekanik: ${lastTransactionData['namaMekanik']}',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              'Nomor Polisi: ${lastTransactionData['nopol']}',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              'Nama Pelanggan: ${lastTransactionData['namaPelanggan']}',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              'Merk: ${lastTransactionData['merkSpm']}',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              'Tipe: ${lastTransactionData['tipeSpm']}',
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Colors.grey,
@@ -225,7 +266,7 @@ class _ReceiptServisPageState extends State<ReceiptServisPage> {
                             ),
                             const SizedBox(height: 20),
                             Text(
-                              'Harga: Rp ${formatCurrency(lastTransactionData['totalHarga'])} (*disc ${lastTransactionData['diskon']}%)',
+                              'Subtotal Sparepart: Rp ${formatCurrency(lastTransactionData['totalHargaSparepart'])}',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -234,7 +275,16 @@ class _ReceiptServisPageState extends State<ReceiptServisPage> {
                             ),
                             SizedBox(height: 5),
                             Text(
-                              'Total: Rp ${formatCurrency(lastTransactionData['hargaAkhir'])}',
+                              'Diskon: ${lastTransactionData['diskon']}%',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                            SizedBox(height: 5),
+                            Text(
+                              'Biaya Servis: Rp ${formatCurrency(lastTransactionData['biayaServis'])}',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -244,6 +294,15 @@ class _ReceiptServisPageState extends State<ReceiptServisPage> {
                             SizedBox(height: 5),
                             Text(
                               'Bayar: Rp ${formatCurrency(lastTransactionData['bayar'])}',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                            SizedBox(height: 5),
+                            Text(
+                              'Harga Akhir: Rp ${formatCurrency(lastTransactionData['hargaAkhir'])}',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -273,6 +332,7 @@ class _ReceiptServisPageState extends State<ReceiptServisPage> {
         ),
       ),
       floatingActionButton: FutureBuilder<Map<String, dynamic>>(
+        future: _lastServisFuture,
         builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Container();
