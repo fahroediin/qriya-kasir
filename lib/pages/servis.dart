@@ -21,7 +21,7 @@ class _ServisPageState extends State<ServisPage> {
   String? _idMekanik;
   String? _namaMekanik;
   String? _nopol;
-  String? _namaPemilik;
+  String? _namaPelanggan;
   String? _merkKendaraan;
   String? _tipeKendaraan;
   String? _kerusakan;
@@ -34,10 +34,13 @@ class _ServisPageState extends State<ServisPage> {
   Map<String, String> _mekanikNameMap = {};
   TextEditingController _namaMekanikController = TextEditingController();
   List<String> _nopolList = []; // Daftar Nomor Polisi
-  Map<String, Map<String, dynamic>> _pelangganNameMap =
-      {}; // Map untuk memetakan Nomor Polisi ke Nama Pelanggan
-  String? _namaPelanggan;
-  final _namaPelangganController = TextEditingController();
+  Map<String, dynamic> _pelangganNameMap = {};
+  final TextEditingController _namaPelangganController =
+      TextEditingController();
+  final TextEditingController _merkKendaraanController =
+      TextEditingController();
+  final TextEditingController _tipeKendaraanController =
+      TextEditingController();
   final List<Map<String, dynamic>> _items = [];
   List<Map<dynamic, dynamic>> sparepartList = [];
   List<Map<dynamic, dynamic>> filteredSparepartList = [];
@@ -94,9 +97,9 @@ class _ServisPageState extends State<ServisPage> {
       'idMekanik': _idMekanik,
       'namaMekanik': _namaMekanik,
       'nopol': _nopol,
-      'namaPemilik': _namaPemilik,
-      'merkKendaraan': _merkKendaraan,
-      'tipeKendaraan': _tipeKendaraan,
+      'namaPelanggan': _namaPelangganController.text,
+      'merkSpm': _merkKendaraanController.text,
+      'tipeSpm': _tipeKendaraanController.text,
       'kerusakan': _kerusakan,
       'sparepartItems': _sparepartItems,
       'totalBayar': _totalBayar,
@@ -182,7 +185,7 @@ class _ServisPageState extends State<ServisPage> {
           setState(() {
             _nopolList.add(value['nopol']);
             _pelangganNameMap[value['nopol']] = {
-              'namaPemilik': value['namaPemilik'],
+              'namaPelanggan': value['namaPelanggan'],
               'merkSpm': value['merkSpm'],
               'tipeSpm': value['tipeSpm'],
             };
@@ -195,11 +198,34 @@ class _ServisPageState extends State<ServisPage> {
   void _selectPelanggan(String? value) {
     setState(() {
       _nopol = value;
-      _namaPelanggan = _pelangganNameMap[value]!['namaPemilik'];
-      _merkKendaraan = _pelangganNameMap[value]!['merkSpm'];
-      _tipeKendaraan = _pelangganNameMap[value]!['tipeSpm'];
+      _updateDataPelanggan(value);
       _namaPelangganController.text = _namaPelanggan ?? '';
+      _merkKendaraanController.text = _merkKendaraan ?? '';
+      _tipeKendaraanController.text = _tipeKendaraan ?? '';
     });
+  }
+
+  void _updateDataPelanggan(String? nopol) {
+    if (nopol != null) {
+      Map<String, dynamic>? pelangganData = _pelangganNameMap[nopol];
+      if (pelangganData != null) {
+        setState(() {
+          _namaPelanggan = pelangganData['namaPelanggan'];
+          _merkKendaraan = pelangganData['merkSpm'];
+          _tipeKendaraan = pelangganData['tipeSpm'];
+        });
+        _merkKendaraanController.text = _merkKendaraan ?? '';
+        _tipeKendaraanController.text = _tipeKendaraan ?? '';
+      } else {
+        setState(() {
+          _namaPelanggan = null;
+          _merkKendaraan = null;
+          _tipeKendaraan = null;
+        });
+        _merkKendaraanController.text = '';
+        _tipeKendaraanController.text = '';
+      }
+    }
   }
 
   void _addItem() {
@@ -495,6 +521,7 @@ class _ServisPageState extends State<ServisPage> {
       _updateStokSparepart(idSparepart, stokSparepart);
     });
     _calculateTotalHarga();
+    calculateKembalian();
   }
 
   void _calculateTotalHarga() {
@@ -502,7 +529,7 @@ class _ServisPageState extends State<ServisPage> {
     for (var item in _items) {
       double harga = double.tryParse(item['hargaSparepart'].toString()) ?? 0;
       int jumlah = int.tryParse(item['jumlahSparepart'].toString()) ?? 0;
-      totalHarga += harga * jumlah;
+      totalHarga += harga * jumlah + _biayaServis;
     }
     setState(() {
       _totalBayar = totalHarga;
@@ -559,21 +586,21 @@ class _ServisPageState extends State<ServisPage> {
               SizedBox(height: 10),
               // Dropdown untuk memilih mekanik berdasarkan idMekanik
               Text(
-                'ID Mekanik',
+                'Data Mekanik',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              DropdownButton<String>(
+              DropdownButtonFormField<String>(
                 value: _idMekanik,
-                onChanged: _selectMekanik,
-                items: _mekanikList.map((String idMekanik) {
+                decoration: InputDecoration(labelText: 'ID Mekanik'),
+                items: _mekanikList.map((idMekanik) {
                   return DropdownMenuItem<String>(
                     value: idMekanik,
                     child: Text(idMekanik),
                   );
                 }).toList(),
+                onChanged: _selectMekanik,
               ),
               SizedBox(height: 10),
-              // Textfield untuk menampilkan namaMekanik
               TextField(
                 controller: _namaMekanikController,
                 decoration: InputDecoration(
@@ -582,56 +609,56 @@ class _ServisPageState extends State<ServisPage> {
                 readOnly: true,
               ),
               SizedBox(height: 10),
+              Text(
+                'Data Pelanggan',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
               DropdownButtonFormField<String>(
                 value: _nopol,
                 decoration: InputDecoration(labelText: 'Nomor Polisi'),
-                items: _nopolList
-                    .map((nopol) => DropdownMenuItem<String>(
-                          value: nopol,
-                          child: Text(nopol),
-                        ))
-                    .toList(),
+                items: _nopolList.map((nopol) {
+                  return DropdownMenuItem<String>(
+                    value: nopol,
+                    child: Text(nopol),
+                  );
+                }).toList(),
                 onChanged: _selectPelanggan,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Pilih nomor polisi';
-                  }
-                  return null;
-                },
               ),
               SizedBox(height: 16.0),
-              TextFormField(
-                decoration: InputDecoration(
-                  labelText: 'Nama Pemilik',
-                ),
-                onChanged: (value) {
-                  setState(() {
-                    _namaPemilik = value;
-                  });
-                },
+              Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      controller: _namaPelangganController,
+                      decoration: InputDecoration(
+                        labelText: 'Nama',
+                      ),
+                      readOnly: true,
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: TextFormField(
+                      controller: _merkKendaraanController,
+                      decoration: InputDecoration(
+                        labelText: 'Merk SPM',
+                      ),
+                      readOnly: true,
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: TextFormField(
+                      controller: _tipeKendaraanController,
+                      decoration: InputDecoration(
+                        labelText: 'Tipe SPM',
+                      ),
+                      readOnly: true,
+                    ),
+                  ),
+                ],
               ),
-              SizedBox(height: 16.0),
-              TextFormField(
-                decoration: InputDecoration(
-                  labelText: 'Merk Kendaraan',
-                ),
-                onChanged: (value) {
-                  setState(() {
-                    _merkKendaraan = value;
-                  });
-                },
-              ),
-              SizedBox(height: 16.0),
-              TextFormField(
-                decoration: InputDecoration(
-                  labelText: 'Tipe Kendaraan',
-                ),
-                onChanged: (value) {
-                  setState(() {
-                    _tipeKendaraan = value;
-                  });
-                },
-              ),
+
               SizedBox(height: 16.0),
               TextFormField(
                 decoration: InputDecoration(
