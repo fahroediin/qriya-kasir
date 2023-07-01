@@ -23,7 +23,6 @@ class CalculatorScreen extends StatefulWidget {
   _CalculatorScreenState createState() => _CalculatorScreenState();
 }
 
-@override
 class _CalculatorScreenState extends State<CalculatorScreen> {
   String _output = "0";
   String _operand1 = "";
@@ -41,8 +40,13 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
           buttonText == "-" ||
           buttonText == "x" ||
           buttonText == "/") {
+        if (_operand1.isNotEmpty && _operand2.isNotEmpty) {
+          performOperation();
+          _operand1 = _output;
+        } else {
+          _operand1 = _output;
+        }
         _operator = buttonText;
-        _operand1 = _output;
         _output = "0";
       } else if (buttonText == ".") {
         if (!_output.contains(".")) {
@@ -53,22 +57,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
           _output = '';
         } else {
           _operand2 = _output;
-          double op1 = double.parse(_operand1);
-          double op2 = double.parse(_operand2);
-
-          if (_operator == "+") {
-            _output = (op1 + op2).toStringAsFixed(0);
-          }
-          if (_operator == "-") {
-            _output = (op1 - op2).toStringAsFixed(0);
-          }
-          if (_operator == "x") {
-            _output = (op1 * op2).toStringAsFixed(0);
-          }
-          if (_operator == "/") {
-            _output = (op1 / op2).toStringAsFixed(0);
-          }
-
+          performOperation();
           _operand1 = "";
           _operand2 = "";
           _operator = "";
@@ -87,6 +76,21 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
         }
       }
     });
+  }
+
+  void performOperation() {
+    double op1 = double.parse(_operand1);
+    double op2 = double.parse(_operand2);
+
+    if (_operator == "+") {
+      _output = (op1 + op2).toStringAsFixed(0);
+    } else if (_operator == "-") {
+      _output = (op1 - op2).toStringAsFixed(0);
+    } else if (_operator == "x") {
+      _output = (op1 * op2).toStringAsFixed(0);
+    } else if (_operator == "/") {
+      _output = (op1 / op2).toStringAsFixed(0);
+    }
   }
 
   Widget buildButton(String buttonText,

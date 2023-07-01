@@ -36,6 +36,7 @@ class _InputPelangganPageState extends State<InputPelangganPage>
     'Bajaj',
     'KTM',
     'Vespa',
+    'Kymco',
   ];
   String? selectedMerkSepedaMotor;
 
@@ -289,7 +290,7 @@ class _InputPelangganPageState extends State<InputPelangganPage>
                 controller: _tipeSpmController,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
-                  hintText: 'Tipe Sepeda Motor (Contoh: "Beat 2021")',
+                  hintText: 'Contoh NMAX 2022',
                 ),
                 inputFormatters: [
                   FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9 ]')),
