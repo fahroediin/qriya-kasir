@@ -31,7 +31,7 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
 
   Widget buildListItem(DataSnapshot snapshot) {
     Map<dynamic, dynamic> transaksi = snapshot.value as Map<dynamic, dynamic>;
-    String idServis = snapshot.key ?? '';
+    String idServis = transaksi['idServis'] ?? '';
     String dateTime = transaksi['dateTime'] ?? '';
     String idMekanik = transaksi['idMekanik'] ?? '';
     String namaMekanik = transaksi['namaMekanik'] ?? '';
