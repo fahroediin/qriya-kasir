@@ -597,6 +597,11 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
                 },
                 initialValue: 'Anonim',
               ),
+              SizedBox(height: 10),
+              Text(
+                'Data Sparepart',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
               SizedBox(height: 16),
               ListView.builder(
                 shrinkWrap: true,
