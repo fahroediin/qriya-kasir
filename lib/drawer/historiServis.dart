@@ -11,7 +11,11 @@ class HistoriServisPage extends StatefulWidget {
 }
 
 class _HistoriServisPageState extends State<HistoriServisPage> {
-  Query dbRef = FirebaseDatabase.instance.reference().child('transaksiServis');
+  Query dbRef = FirebaseDatabase.instance
+      .reference()
+      .child('transaksiServis')
+      .orderByKey()
+      .limitToLast(50);
   int itemCount = 0;
 
   @override
