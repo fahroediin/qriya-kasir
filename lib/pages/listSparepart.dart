@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
+import 'package:intl/intl.dart';
 import 'package:project_s/pages/home_page.dart';
 
 class ListSparepartPage extends StatefulWidget {
@@ -13,6 +14,7 @@ class ListSparepartPage extends StatefulWidget {
 class _ListSparepartPageState extends State<ListSparepartPage> {
   Query dbRef = FirebaseDatabase.instance.reference().child('daftarSparepart');
   TextEditingController searchController = TextEditingController();
+  String _formattedDateTime = '';
   List<Map> searchResultList = [];
   List<Map> sparepartList = [];
   List<Map> filteredList = [];
@@ -24,18 +26,41 @@ class _ListSparepartPageState extends State<ListSparepartPage> {
     filteredList = [];
   }
 
+  String formatCurrency(int value) {
+    final format = NumberFormat("#,###");
+    return format.format(value);
+  }
+
   Widget listItem({required Map sparepart}) {
     return Card(
       child: ListTile(
         title: Text(
           '${sparepart['namaSparepart']} (${sparepart['merkSparepart']} - ${sparepart['specSparepart']})',
+          style: TextStyle(
+              fontSize: 18), // Ubah ukuran font sesuai keinginan (contoh: 18)
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('ID: ${sparepart['idSparepart']}'),
-            Text('Harga: ${sparepart['hargaSparepart']}'),
-            Text('Stok: ${sparepart['stokSparepart']}'),
+            Text(
+              'ID: ${sparepart['idSparepart']}',
+              style: TextStyle(
+                  fontSize:
+                      16), // Ubah ukuran font sesuai keinginan (contoh: 16)
+            ),
+            Text(
+              'Harga: Rp ${formatCurrency(sparepart['hargaSparepart'])}',
+              style: TextStyle(
+                  fontSize:
+                      16), // Ubah ukuran font sesuai keinginan (contoh: 16)
+            ),
+            Text(
+              'Stok: ${sparepart['stokSparepart']}',
+              style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight
+                      .bold), // Ubah ukuran font sesuai keinginan (contoh: 16)
+            ),
           ],
         ),
       ),
