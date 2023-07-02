@@ -41,7 +41,6 @@ class _HomePageState extends State<HomePage> {
   Query dbRefPenjualan =
       FirebaseDatabase.instance.reference().child('transaksiPenjualan');
   int countdDataPenjualan = 0;
-  int _totalData = 0;
   String nameController = '';
   String addressController = '';
   String selectedRole = 'Owner';
@@ -49,12 +48,12 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    fetchDataServis();
+    fetchDataPenjualan();
     _checkCurrentUser();
     formattedDateTime();
     initializeDateFormatting(
         'id_ID', null); // Initialize date formatting for Indonesian locale
-    fetchDataServis();
-    fetchDataPenjualan();
     _databaseReference = FirebaseDatabase.instance.reference().child('user');
     getUserData();
     getUser();
@@ -100,13 +99,15 @@ class _HomePageState extends State<HomePage> {
     DataSnapshot snapshot = await dbRefServis
         .orderByChild('dateTime')
         .startAt(formattedDate)
-        .endAt(formattedDate + '\uf8ff')
+        .endAt('$formattedDate\u{f8ff}')
         .get();
 
-    if (snapshot.exists) {
-      setState(() {
-        countDataServis = snapshot.children.length;
-      });
+    if (mounted) {
+      if (snapshot.exists) {
+        setState(() {
+          countDataServis = snapshot.children.length;
+        });
+      }
     }
   }
 
@@ -114,16 +115,18 @@ class _HomePageState extends State<HomePage> {
     DateTime currentDate = DateTime.now();
     String formattedDate = DateFormat('dd/MM/yyyy').format(currentDate);
 
-    DataSnapshot snapshot = await dbRefServis
+    DataSnapshot snapshot = await dbRefPenjualan
         .orderByChild('dateTime')
         .startAt(formattedDate)
-        .endAt(formattedDate + '\uf8ff')
+        .endAt('$formattedDate\u{f8ff}')
         .get();
 
-    if (snapshot.exists) {
-      setState(() {
-        countdDataPenjualan = snapshot.children.length;
-      });
+    if (mounted) {
+      if (snapshot.exists) {
+        setState(() {
+          countdDataPenjualan = snapshot.children.length;
+        });
+      }
     }
   }
 
