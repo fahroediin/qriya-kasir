@@ -293,7 +293,7 @@ class _ReceiptServisPageState extends State<ReceiptServisPage> {
                             ),
                             SizedBox(height: 5),
                             Text(
-                              'Bayar: Rp ${formatCurrency(lastTransactionData['bayar'])}',
+                              'Total: Rp ${formatCurrency(lastTransactionData['hargaAkhir'])}',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -302,7 +302,7 @@ class _ReceiptServisPageState extends State<ReceiptServisPage> {
                             ),
                             SizedBox(height: 5),
                             Text(
-                              'Harga Akhir: Rp ${formatCurrency(lastTransactionData['hargaAkhir'])}',
+                              'Bayar: Rp ${formatCurrency(lastTransactionData['bayar'])}',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
