@@ -88,8 +88,17 @@ class AboutPage extends StatelessWidget {
               ),
             ),
             SizedBox(height: 16),
+            Text(
+              'Aplikasi Kasir',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 24,
+              ),
+            ),
+            SizedBox(height: 16),
             ElevatedButton(
-              onPressed: () => _showDeveloperModal(context),
+              onPressed: () =>
+                  _launchGithubUrl(), // Mengubah metode pemanggilan tombol
               child: Text('Kenali Developer'),
               style: ElevatedButton.styleFrom(
                 primary: Color.fromARGB(255, 219, 42, 15),
