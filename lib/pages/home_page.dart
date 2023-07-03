@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:project_s/drawer/bantuan.dart';
 import 'package:project_s/drawer/pelanggan.dart';
+import 'package:project_s/drawer/transactionReport.dart';
 import 'package:project_s/pages/insert_pelanggan.dart';
 import 'insert_pelanggan.dart';
 import 'package:project_s/drawer/calculator.dart';
@@ -510,12 +511,12 @@ class _HomePageState extends State<HomePage> {
                   context: context,
                   builder: (BuildContext context) {
                     return AlertDialog(
-                      title: Text('Pilih Jenis Histori'),
+                      title: Text('Pilih Histori'),
                       content: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           ListTile(
-                            leading: Icon(Icons.book),
+                            leading: Icon(Icons.receipt),
                             title: Text('Histori Servis'),
                             onTap: () {
                               Navigator.of(context).pop();
@@ -544,10 +545,52 @@ class _HomePageState extends State<HomePage> {
                   },
                 );
               },
-              leading: Icon(Icons.description),
+              leading: Icon(Icons.history),
               title: Text('Histori'),
             ),
-
+            ListTile(
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text('Pilih Laporan'),
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ListTile(
+                            leading: Icon(Icons.receipt),
+                            title: Text('Laporan Servis'),
+                            onTap: () {
+                              Navigator.of(context).pop();
+                              Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(
+                                  builder: (context) => HistoriServisPage(),
+                                ),
+                              );
+                            },
+                          ),
+                          ListTile(
+                            leading: Icon(Icons.shopping_cart),
+                            title: Text('Laporan Penjualan'),
+                            onTap: () {
+                              Navigator.of(context).pop();
+                              Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(
+                                  builder: (context) => TransactionReportPage(),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
+              leading: Icon(Icons.description),
+              title: Text('Laporan'),
+            ),
             ListTile(
               onTap: () {
                 Navigator.of(context).pushReplacement(
@@ -559,6 +602,7 @@ class _HomePageState extends State<HomePage> {
               leading: Icon(Icons.calculate),
               title: Text('Kalkulator'),
             ),
+
             ListTile(
               onTap: () {
                 Navigator.of(context).pushReplacement(
