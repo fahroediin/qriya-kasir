@@ -27,7 +27,16 @@ class _PelangganState extends State<Pelanggan> {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => HomePage()),
+              PageRouteBuilder(
+                transitionDuration: Duration(milliseconds: 200),
+                pageBuilder: (_, __, ___) => HomePage(),
+                transitionsBuilder: (_, animation, __, child) {
+                  return FadeTransition(
+                    opacity: animation,
+                    child: child,
+                  );
+                },
+              ),
             );
           },
         ),

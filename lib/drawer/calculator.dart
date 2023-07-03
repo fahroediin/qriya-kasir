@@ -133,16 +133,14 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.of(context).pushReplacement(
+            Navigator.push(
+              context,
               PageRouteBuilder(
-                transitionDuration: Duration(milliseconds: 190),
-                pageBuilder: (context, animation, secondaryAnimation) =>
-                    HomePage(),
-                transitionsBuilder:
-                    (context, animation, secondaryAnimation, child) {
-                  return SlideTransition(
-                    position: Tween(begin: Offset(-1.0, 0.0), end: Offset.zero)
-                        .animate(animation),
+                transitionDuration: Duration(milliseconds: 200),
+                pageBuilder: (_, __, ___) => HomePage(),
+                transitionsBuilder: (_, animation, __, child) {
+                  return FadeTransition(
+                    opacity: animation,
                     child: child,
                   );
                 },

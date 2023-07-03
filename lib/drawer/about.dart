@@ -48,13 +48,22 @@ class AboutPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Color.fromARGB(255, 219, 42, 15),
         leading: IconButton(
+          icon: Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => HomePage()),
+              PageRouteBuilder(
+                transitionDuration: Duration(milliseconds: 200),
+                pageBuilder: (_, __, ___) => HomePage(),
+                transitionsBuilder: (_, animation, __, child) {
+                  return FadeTransition(
+                    opacity: animation,
+                    child: child,
+                  );
+                },
+              ),
             );
           },
-          icon: Icon(Icons.arrow_back),
         ),
         title: Text('Tentang Aplikasi'),
       ),
