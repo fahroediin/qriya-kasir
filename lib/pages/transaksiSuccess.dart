@@ -173,15 +173,32 @@ class _TransaksiSuccessPageState extends State<TransaksiSuccessPage> {
 
           printer.printNewLine();
           printer.printCustom('--------------------------------', 0, 0);
+          double totalDiskon = (widget.totalHarga * widget.diskon) / 100;
+
+          String harga = 'Rp ${widget.totalHarga.toStringAsFixed(0)}';
+          String diskon = '${widget.diskon.toStringAsFixed(0)}%';
+          String potonganHarga = 'Total Diskon'.padRight(22) +
+              'Rp ${totalDiskon.toStringAsFixed(0)}';
+          int jumlahItem = 0;
+
+          for (var item in _items) {
+            int quantity = item['jumlahSparepart'];
+            jumlahItem += quantity;
+          }
+
+          String totalItem = jumlahItem.toString();
+          String formattedTotalItem = totalItem.padRight(5);
+
+          String totalItemLabel = 'Total Item';
+          String totalItemColumn = totalItemLabel.padRight(15);
+          String hargaColumn = harga.padRight(2);
+
           printer.printCustom(
-              'Harga'.padRight(22) +
-                  'Rp ${widget.totalHarga.toStringAsFixed(0)}',
-              1,
-              0);
-          printer.printCustom(
-              'Diskon'.padRight(22) + '${widget.diskon.toStringAsFixed(0)}%',
-              1,
-              0);
+              '$totalItemColumn$formattedTotalItem  $hargaColumn', 1, 0);
+
+          printer.printCustom('Diskon'.padRight(22) + diskon, 1, 0);
+          printer.printCustom(potonganHarga.padRight(22), 1, 0);
+
           printer.printCustom(
               'Total'.padRight(22) +
                   'Rp ${widget.hargaAkhir.toStringAsFixed(0)}',

@@ -175,15 +175,32 @@ class _ServisSuccessPageState extends State<ServisSuccessPage> {
           }
           printer.printNewLine();
           printer.printCustom('--------------------------------', 0, 0);
+          double totalDiskon = (widget.totalHarga * widget.diskon) /
+              100; // Calculate totalDiskon
+
+          String harga = 'Rp ${widget.totalHarga.toStringAsFixed(0)}';
+          String diskon = '${widget.diskon.toStringAsFixed(0)}%';
+          int jumlahItem = 0;
+
+          for (var item in _items) {
+            int quantity = item['jumlahSparepart'];
+            jumlahItem += quantity;
+          }
+          String potonganHarga = 'Total Diskon'.padRight(22) +
+              'Rp ${totalDiskon.toStringAsFixed(0)}';
+
+          String totalItem = jumlahItem.toString();
+          String formattedTotalItem = totalItem.padRight(5);
+
+          String totalItemLabel = 'Total Item';
+          String totalItemColumn = totalItemLabel.padRight(15);
+          String hargaColumn = harga.padRight(2);
+
           printer.printCustom(
-              'Total Sparepart '.padRight(22) +
-                  'Rp ${widget.totalHarga.toStringAsFixed(0)}',
-              1,
-              0);
-          printer.printCustom(
-              'Diskon '.padRight(22) + '${widget.diskon.toStringAsFixed(0)}% ',
-              1,
-              0);
+              '$totalItemColumn$formattedTotalItem  $hargaColumn', 1, 0);
+
+          printer.printCustom('Diskon'.padRight(22) + diskon, 1, 0);
+          printer.printCustom(potonganHarga, 1, 0);
           printer.printCustom(
               'Subtotal '.padRight(22) +
                   'Rp ${widget.hargaAkhir.toStringAsFixed(0)}',
