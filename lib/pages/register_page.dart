@@ -16,7 +16,8 @@ class RegisterPage extends StatefulWidget {
   State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _RegisterPageState extends State<RegisterPage>
+    with SingleTickerProviderStateMixin {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   final TextEditingController _emailController = TextEditingController();
@@ -26,6 +27,32 @@ class _RegisterPageState extends State<RegisterPage> {
   bool _passwordVisible = false;
   bool _confirmPasswordVisible = false;
   final _formKey = GlobalKey<FormState>(); // Add form key
+  late AnimationController _animationController;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 500),
+    );
+    _animation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.easeInOut,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    _animationController.dispose();
+    super.dispose();
+  }
 
   Future<void> signUpWithEmail() async {
     try {
@@ -43,18 +70,13 @@ class _RegisterPageState extends State<RegisterPage> {
           );
           ScaffoldMessenger.of(context).showSnackBar(snackBar);
 
-          Navigator.pushReplacement(
+          _animationController.forward().then((value) {
+            Navigator.pushReplacement(
               context,
-              PageRouteBuilder(
-                  transitionDuration: Duration(milliseconds: 500),
-                  pageBuilder: (_, __, ___) =>
-                      LoginPage(showRegisterPage: () {}),
-                  transitionsBuilder: (_, animation, __, child) {
-                    return FadeTransition(
-                      opacity: animation,
-                      child: child,
-                    );
-                  }));
+              MaterialPageRoute(
+                  builder: (_) => LoginPage(showRegisterPage: () {})),
+            );
+          });
         }
       } else {
         showDialog(
@@ -124,14 +146,6 @@ class _RegisterPageState extends State<RegisterPage> {
         print('Error checking email existence: $e');
       }
     }
-  }
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
-    super.dispose();
   }
 
   @override
@@ -296,10 +310,18 @@ class _RegisterPageState extends State<RegisterPage> {
                         onTap: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(
-                                builder: (_) => LoginPage(
-                                      showRegisterPage: () {},
-                                    )),
+                            PageRouteBuilder(
+                              transitionDuration: Duration(milliseconds: 500),
+                              pageBuilder: (_, __, ___) => LoginPage(
+                                showRegisterPage: () {},
+                              ),
+                              transitionsBuilder: (_, animation, __, child) {
+                                return FadeTransition(
+                                  opacity: animation,
+                                  child: child,
+                                );
+                              },
+                            ),
                           );
                         },
                         child: Text(

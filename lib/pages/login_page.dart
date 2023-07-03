@@ -146,7 +146,7 @@ class _LoginPageState extends State<LoginPage>
     Navigator.push(
       context,
       PageRouteBuilder(
-        transitionDuration: Duration(milliseconds: 1000),
+        transitionDuration: Duration(milliseconds: 300),
         pageBuilder: (_, __, ___) => RegisterPage(
           showLoginPage: () {},
         ),
@@ -327,41 +327,45 @@ class _LoginPageState extends State<LoginPage>
                     ),
                   ),
                   SizedBox(height: 80),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Don`t have an account?',
-                        style: TextStyle(
-                          fontWeight: FontWeight.normal,
-                          fontSize: 20,
-                        ),
+                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                    Text(
+                      'Don`t have an account?',
+                      style: TextStyle(
+                        fontWeight: FontWeight.normal,
+                        fontSize: 20,
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                        child: GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => RegisterPage(
-                                  showLoginPage: () {},
-                                ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            PageRouteBuilder(
+                              transitionDuration: Duration(milliseconds: 500),
+                              pageBuilder: (_, __, ___) => RegisterPage(
+                                showLoginPage: () {},
                               ),
-                            );
-                          },
-                          child: Text(
-                            'Register',
-                            style: TextStyle(
-                              color: Color.fromARGB(255, 220, 53, 3),
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20,
+                              transitionsBuilder: (_, animation, __, child) {
+                                return FadeTransition(
+                                  opacity: animation,
+                                  child: child,
+                                );
+                              },
                             ),
+                          );
+                        },
+                        child: Text(
+                          'Register',
+                          style: TextStyle(
+                            color: Color.fromARGB(255, 220, 53, 3),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
                           ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ]),
                 ],
               ),
             ),
