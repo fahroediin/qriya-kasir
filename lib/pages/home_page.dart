@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:project_s/drawer/bantuan.dart';
 import 'package:project_s/drawer/pelanggan.dart';
+import 'package:project_s/drawer/serviceReport.dart';
 import 'package:project_s/drawer/transactionReport.dart';
 import 'package:project_s/pages/insert_pelanggan.dart';
 import 'insert_pelanggan.dart';
@@ -565,7 +566,7 @@ class _HomePageState extends State<HomePage> {
                               Navigator.of(context).pop();
                               Navigator.of(context).pushReplacement(
                                 MaterialPageRoute(
-                                  builder: (context) => HistoriServisPage(),
+                                  builder: (context) => ServiceReportPage(),
                                 ),
                               );
                             },

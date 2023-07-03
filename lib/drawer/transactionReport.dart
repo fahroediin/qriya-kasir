@@ -17,8 +17,7 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
   int jumlahItemTerjual = 0; // Menyimpan jumlah item terjual
 
   Future<void> fetchDataPenjualan() async {
-    DateTime currentDate = DateTime.now();
-    String formattedDate = DateFormat('dd/MM/yyyy').format(currentDate);
+    String formattedDate = DateFormat('dd/MM/yyyy').format(selectedDate);
 
     DataSnapshot snapshot = await dbRefPenjualan
         .orderByChild('dateTime')
@@ -30,8 +29,7 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
       if (snapshot.exists) {
         setState(() {
           countdDataPenjualan = snapshot.children.length;
-          jumlahTransaksi =
-              countdDataPenjualan; // Set jumlah transaksi sesuai dengan jumlah data penjualan
+          jumlahTransaksi = countdDataPenjualan;
         });
       }
     }
@@ -49,20 +47,21 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Color.fromARGB(255, 219, 42, 15),
         title: Text('Laporan Transaksi'),
       ),
       body: Column(
         children: [
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(10.0),
               child: Column(
                 children: [
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Text(
-                        'Laporan Bulan',
+                        'Laporan Bulan:',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
