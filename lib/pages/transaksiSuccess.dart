@@ -136,7 +136,7 @@ class _TransaksiSuccessPageState extends State<TransaksiSuccessPage> {
             1,
           );
           printer.printCustom(
-            '53257 Cilacap',
+            '53257 Cilacap, Jawa Tengah',
             0,
             1,
           );
@@ -183,7 +183,7 @@ class _TransaksiSuccessPageState extends State<TransaksiSuccessPage> {
 
           String harga = 'Rp ${widget.totalHarga.toStringAsFixed(0)}';
           String diskon = '${widget.diskon.toStringAsFixed(0)}%';
-          String potonganHarga = 'Total Diskon'.padRight(22) +
+          String potonganHarga = 'Total Diskon'.padRight(20) +
               'Rp ${formatCurrency(totalDiskon.toInt())}';
           int jumlahItem = 0;
 
@@ -193,7 +193,7 @@ class _TransaksiSuccessPageState extends State<TransaksiSuccessPage> {
           }
 
           String totalItem = jumlahItem.toString();
-          String formattedTotalItem = totalItem.padRight(5);
+          String formattedTotalItem = totalItem.padRight(3);
 
           String totalItemLabel = 'Total Item';
           String totalItemColumn = totalItemLabel.padRight(15);
@@ -203,21 +203,21 @@ class _TransaksiSuccessPageState extends State<TransaksiSuccessPage> {
           printer.printCustom(
               '$totalItemColumn$formattedTotalItem  $hargaColumn', 1, 0);
 
-          printer.printCustom('Diskon'.padRight(22) + diskon, 1, 0);
-          printer.printCustom(potonganHarga.padRight(22), 1, 0);
+          printer.printCustom('Diskon'.padRight(20) + diskon, 1, 0);
+          printer.printCustom(potonganHarga.padRight(20), 1, 0);
 
           printer.printCustom(
-              'Total'.padRight(22) +
+              'Total'.padRight(20) +
                   'Rp ${formatCurrency(widget.hargaAkhir.toInt())}',
               1,
               0);
 
           printer.printCustom(
-              'Bayar'.padRight(22) + 'Rp ${formatCurrency(_bayar.toInt())}',
+              'Bayar'.padRight(20) + 'Rp ${formatCurrency(_bayar.toInt())}',
               1,
               0);
           printer.printCustom(
-              'Kembalian'.padRight(22) +
+              'Kembalian'.padRight(20) +
                   'Rp ${formatCurrency(_kembalian.toInt())}',
               1,
               0);
