@@ -162,7 +162,16 @@ class _MekanikPageState extends State<MekanikPage> {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => HomePage()),
+              PageRouteBuilder(
+                transitionDuration: Duration(milliseconds: 200),
+                pageBuilder: (_, __, ___) => HomePage(),
+                transitionsBuilder: (_, animation, __, child) {
+                  return FadeTransition(
+                    opacity: animation,
+                    child: child,
+                  );
+                },
+              ),
             );
           },
         ),
@@ -232,10 +241,18 @@ class _MekanikPageState extends State<MekanikPage> {
         margin: EdgeInsets.only(bottom: 25),
         child: FloatingActionButton(
           onPressed: () {
-            // Implementasi navigasi ke halaman tambah data mekanik
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => AddMekanikPage()),
+              PageRouteBuilder(
+                transitionDuration: Duration(milliseconds: 200),
+                pageBuilder: (_, __, ___) => AddMekanikPage(),
+                transitionsBuilder: (_, animation, __, child) {
+                  return FadeTransition(
+                    opacity: animation,
+                    child: child,
+                  );
+                },
+              ),
             );
           },
           child: Icon(Icons.add),

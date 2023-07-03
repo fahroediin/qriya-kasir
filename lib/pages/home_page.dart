@@ -472,12 +472,19 @@ class _HomePageState extends State<HomePage> {
                     color: Color.fromARGB(255, 219, 42, 15),
                   ),
                 )),
-
             ListTile(
               onTap: () {
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (context) => MekanikPage(),
+                Navigator.push(
+                  context,
+                  PageRouteBuilder(
+                    transitionDuration: Duration(milliseconds: 200),
+                    pageBuilder: (_, __, ___) => MekanikPage(),
+                    transitionsBuilder: (_, animation, __, child) {
+                      return FadeTransition(
+                        opacity: animation,
+                        child: child,
+                      );
+                    },
                   ),
                 );
               },
@@ -486,9 +493,17 @@ class _HomePageState extends State<HomePage> {
             ),
             ListTile(
               onTap: () {
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (context) => SparepartPage(),
+                Navigator.push(
+                  context,
+                  PageRouteBuilder(
+                    transitionDuration: Duration(milliseconds: 200),
+                    pageBuilder: (_, __, ___) => SparepartPage(),
+                    transitionsBuilder: (_, animation, __, child) {
+                      return FadeTransition(
+                        opacity: animation,
+                        child: child,
+                      );
+                    },
                   ),
                 );
               },
@@ -497,9 +512,17 @@ class _HomePageState extends State<HomePage> {
             ),
             ListTile(
               onTap: () {
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (context) => Pelanggan(),
+                Navigator.push(
+                  context,
+                  PageRouteBuilder(
+                    transitionDuration: Duration(milliseconds: 200),
+                    pageBuilder: (_, __, ___) => Pelanggan(),
+                    transitionsBuilder: (_, animation, __, child) {
+                      return FadeTransition(
+                        opacity: animation,
+                        child: child,
+                      );
+                    },
                   ),
                 );
               },
@@ -521,9 +544,20 @@ class _HomePageState extends State<HomePage> {
                             title: Text('Histori Servis'),
                             onTap: () {
                               Navigator.of(context).pop();
-                              Navigator.of(context).pushReplacement(
-                                MaterialPageRoute(
-                                  builder: (context) => HistoriServisPage(),
+                              Navigator.push(
+                                context,
+                                PageRouteBuilder(
+                                  transitionDuration:
+                                      Duration(milliseconds: 200),
+                                  pageBuilder: (_, __, ___) =>
+                                      HistoriServisPage(),
+                                  transitionsBuilder:
+                                      (_, animation, __, child) {
+                                    return FadeTransition(
+                                      opacity: animation,
+                                      child: child,
+                                    );
+                                  },
                                 ),
                               );
                             },
@@ -533,9 +567,20 @@ class _HomePageState extends State<HomePage> {
                             title: Text('Histori Penjualan'),
                             onTap: () {
                               Navigator.of(context).pop();
-                              Navigator.of(context).pushReplacement(
-                                MaterialPageRoute(
-                                  builder: (context) => HistoriPenjualanPage(),
+                              Navigator.push(
+                                context,
+                                PageRouteBuilder(
+                                  transitionDuration:
+                                      Duration(milliseconds: 200),
+                                  pageBuilder: (_, __, ___) =>
+                                      HistoriPenjualanPage(),
+                                  transitionsBuilder:
+                                      (_, animation, __, child) {
+                                    return FadeTransition(
+                                      opacity: animation,
+                                      child: child,
+                                    );
+                                  },
                                 ),
                               );
                             },
@@ -564,9 +609,20 @@ class _HomePageState extends State<HomePage> {
                             title: Text('Laporan Servis'),
                             onTap: () {
                               Navigator.of(context).pop();
-                              Navigator.of(context).pushReplacement(
-                                MaterialPageRoute(
-                                  builder: (context) => ServiceReportPage(),
+                              Navigator.push(
+                                context,
+                                PageRouteBuilder(
+                                  transitionDuration:
+                                      Duration(milliseconds: 200),
+                                  pageBuilder: (_, __, ___) =>
+                                      ServiceReportPage(),
+                                  transitionsBuilder:
+                                      (_, animation, __, child) {
+                                    return FadeTransition(
+                                      opacity: animation,
+                                      child: child,
+                                    );
+                                  },
                                 ),
                               );
                             },
@@ -576,9 +632,20 @@ class _HomePageState extends State<HomePage> {
                             title: Text('Laporan Penjualan'),
                             onTap: () {
                               Navigator.of(context).pop();
-                              Navigator.of(context).pushReplacement(
-                                MaterialPageRoute(
-                                  builder: (context) => TransactionReportPage(),
+                              Navigator.push(
+                                context,
+                                PageRouteBuilder(
+                                  transitionDuration:
+                                      Duration(milliseconds: 200),
+                                  pageBuilder: (_, __, ___) =>
+                                      TransactionReportPage(),
+                                  transitionsBuilder:
+                                      (_, animation, __, child) {
+                                    return FadeTransition(
+                                      opacity: animation,
+                                      child: child,
+                                    );
+                                  },
                                 ),
                               );
                             },
@@ -594,33 +661,55 @@ class _HomePageState extends State<HomePage> {
             ),
             ListTile(
               onTap: () {
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (context) => CalculatorApp(),
+                Navigator.push(
+                  context,
+                  PageRouteBuilder(
+                    transitionDuration: Duration(milliseconds: 200),
+                    pageBuilder: (_, __, ___) => CalculatorApp(),
+                    transitionsBuilder: (_, animation, __, child) {
+                      return FadeTransition(
+                        opacity: animation,
+                        child: child,
+                      );
+                    },
                   ),
                 );
               },
               leading: Icon(Icons.calculate),
               title: Text('Kalkulator'),
             ),
-
             ListTile(
               onTap: () {
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (context) => AboutPage(),
+                Navigator.push(
+                  context,
+                  PageRouteBuilder(
+                    transitionDuration: Duration(milliseconds: 200),
+                    pageBuilder: (_, __, ___) => AboutPage(),
+                    transitionsBuilder: (_, animation, __, child) {
+                      return FadeTransition(
+                        opacity: animation,
+                        child: child,
+                      );
+                    },
                   ),
                 );
               },
               leading: Icon(Icons.filter_b_and_w_rounded),
               title: Text('Tentang Aplikasi'),
             ),
-            // Add more options here for other drawers
             ListTile(
               onTap: () {
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (context) => HelpPage(),
+                Navigator.push(
+                  context,
+                  PageRouteBuilder(
+                    transitionDuration: Duration(milliseconds: 200),
+                    pageBuilder: (_, __, ___) => HelpPage(),
+                    transitionsBuilder: (_, animation, __, child) {
+                      return FadeTransition(
+                        opacity: animation,
+                        child: child,
+                      );
+                    },
                   ),
                 );
               },
