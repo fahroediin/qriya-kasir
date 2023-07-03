@@ -59,6 +59,11 @@ class _TransaksiSuccessPageState extends State<TransaksiSuccessPage> {
     _items.addAll(widget.items);
   }
 
+  String formatCurrency(int value) {
+    final format = NumberFormat("#,###");
+    return format.format(value);
+  }
+
   void getDevices() async {
     devices = await printer.getBondedDevices();
     setState(() {});
@@ -161,12 +166,13 @@ class _TransaksiSuccessPageState extends State<TransaksiSuccessPage> {
 
             // Calculate the indentation for quantity and price
             int quantityIndentation = (5 - paddedQuantity.length) ~/ 2;
-            int priceIndentation = (8 - paddedPrice.length) ~/ 2;
+            int priceIndentation = (16 - paddedPrice.length) ~/ 2;
 
             // Create the final formatted line
             String formattedLine = '$paddedItemName';
             formattedLine += '${' ' * quantityIndentation}$paddedQuantity';
-            formattedLine += '${' ' * priceIndentation}$paddedPrice';
+            formattedLine +=
+                '${' ' * priceIndentation}${formatCurrency(int.parse(paddedPrice))}';
 
             printer.printCustom(formattedLine, 1, 0);
           }
@@ -178,7 +184,7 @@ class _TransaksiSuccessPageState extends State<TransaksiSuccessPage> {
           String harga = 'Rp ${widget.totalHarga.toStringAsFixed(0)}';
           String diskon = '${widget.diskon.toStringAsFixed(0)}%';
           String potonganHarga = 'Total Diskon'.padRight(22) +
-              'Rp ${totalDiskon.toStringAsFixed(0)}';
+              'Rp ${formatCurrency(totalDiskon.toInt())}';
           int jumlahItem = 0;
 
           for (var item in _items) {
@@ -191,7 +197,8 @@ class _TransaksiSuccessPageState extends State<TransaksiSuccessPage> {
 
           String totalItemLabel = 'Total Item';
           String totalItemColumn = totalItemLabel.padRight(15);
-          String hargaColumn = harga.padRight(2);
+          String hargaColumn =
+              'Rp ' + formatCurrency(widget.totalHarga.toInt()).padRight(2);
 
           printer.printCustom(
               '$totalItemColumn$formattedTotalItem  $hargaColumn', 1, 0);
@@ -201,15 +208,20 @@ class _TransaksiSuccessPageState extends State<TransaksiSuccessPage> {
 
           printer.printCustom(
               'Total'.padRight(22) +
-                  'Rp ${widget.hargaAkhir.toStringAsFixed(0)}',
+                  'Rp ${formatCurrency(widget.hargaAkhir.toInt())}',
+              1,
+              0);
+
+          printer.printCustom(
+              'Bayar'.padRight(22) + 'Rp ${formatCurrency(_bayar.toInt())}',
               1,
               0);
           printer.printCustom(
-              'Bayar'.padRight(22) + 'Rp ${_bayar.toStringAsFixed(0)}', 1, 0);
-          printer.printCustom(
-              'Kembalian'.padRight(22) + 'Rp ${_kembalian.toStringAsFixed(0)}',
+              'Kembalian'.padRight(22) +
+                  'Rp ${formatCurrency(_kembalian.toInt())}',
               1,
               0);
+
           printer.printNewLine();
           printer.printCustom('Terima Kasih', 2, 1);
           printer.printCustom('Semoga Hari Anda Menyenangkan!', 1, 1);
@@ -287,7 +299,7 @@ class _TransaksiSuccessPageState extends State<TransaksiSuccessPage> {
                   ),
                   Expanded(
                     child: Text(
-                      'Rp ${_kembalian.toStringAsFixed(0)}',
+                      'Rp ${formatCurrency(_kembalian.toInt())}',
                       style: TextStyle(fontSize: 22),
                       textAlign: TextAlign.right,
                     ),

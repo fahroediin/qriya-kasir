@@ -143,7 +143,7 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
   }
 
   String formatCurrency(int value) {
-    final format = NumberFormat("#,###");
+    final format = NumberFormat("#.###");
     return format.format(value);
   }
 

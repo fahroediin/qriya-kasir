@@ -70,6 +70,11 @@ class _ServisSuccessPageState extends State<ServisSuccessPage> {
     setState(() {});
   }
 
+  String formatCurrency(int value) {
+    final format = NumberFormat("#,###");
+    return format.format(value);
+  }
+
   void _selectPrinter() async {
     if (devices.isEmpty) {
       return;
@@ -164,12 +169,13 @@ class _ServisSuccessPageState extends State<ServisSuccessPage> {
 
             // Calculate the indentation for quantity and price
             int quantityIndentation = (5 - paddedQuantity.length) ~/ 2;
-            int priceIndentation = (8 - paddedPrice.length) ~/ 2;
+            int priceIndentation = (16 - paddedPrice.length) ~/ 2;
 
             // Create the final formatted line
             String formattedLine = '$paddedItemName';
             formattedLine += '${' ' * quantityIndentation}$paddedQuantity';
-            formattedLine += '${' ' * priceIndentation}$paddedPrice';
+            formattedLine +=
+                '${' ' * priceIndentation}${formatCurrency(int.parse(paddedPrice))}';
 
             printer.printCustom(formattedLine, 1, 0);
           }
@@ -187,14 +193,15 @@ class _ServisSuccessPageState extends State<ServisSuccessPage> {
             jumlahItem += quantity;
           }
           String potonganHarga = 'Total Diskon'.padRight(22) +
-              'Rp ${totalDiskon.toStringAsFixed(0)}';
+              'Rp ${formatCurrency(totalDiskon.toInt())}';
 
           String totalItem = jumlahItem.toString();
           String formattedTotalItem = totalItem.padRight(5);
 
           String totalItemLabel = 'Total Item';
           String totalItemColumn = totalItemLabel.padRight(15);
-          String hargaColumn = harga.padRight(2);
+          String hargaColumn =
+              'Rp ' + formatCurrency(widget.totalHarga.toInt()).padRight(2);
 
           printer.printCustom(
               '$totalItemColumn$formattedTotalItem  $hargaColumn', 1, 0);
@@ -202,25 +209,28 @@ class _ServisSuccessPageState extends State<ServisSuccessPage> {
           printer.printCustom('Diskon'.padRight(22) + diskon, 1, 0);
           printer.printCustom(potonganHarga, 1, 0);
           printer.printCustom(
-              'Subtotal '.padRight(22) +
-                  'Rp ${widget.hargaAkhir.toStringAsFixed(0)}',
+              'Total '.padRight(22) +
+                  'Rp ${formatCurrency(widget.hargaAkhir.toInt())}',
               1,
               0);
           printer.printCustom(
               'Biaya Servis '.padRight(22) +
-                  'Rp ${widget.biayaServis.toStringAsFixed(0)}',
+                  'Rp ${formatCurrency(widget.biayaServis.toInt())}',
               1,
               0);
           double total = widget.hargaAkhir + widget.biayaServis;
           printer.printCustom(
-              'Jumlah '.padRight(22) + 'Rp ${total.toStringAsFixed(0)}', 1, 0);
+              'Jumlah '.padRight(22) + 'Rp ${formatCurrency(total.toInt())}',
+              1,
+              0);
           printer.printCustom(
-              'Bayar '.padRight(22) + 'Rp ${widget.bayar.toStringAsFixed(0)}',
+              'Bayar '.padRight(22) +
+                  'Rp ${formatCurrency(widget.bayar.toInt())}',
               1,
               0);
           printer.printCustom(
               'Kembalian '.padRight(22) +
-                  'Rp ${widget.kembalian.toStringAsFixed(0)}',
+                  'Rp ${formatCurrency(widget.kembalian.toInt())}',
               1,
               0);
           printer.printNewLine();
@@ -301,7 +311,7 @@ class _ServisSuccessPageState extends State<ServisSuccessPage> {
                   ),
                   Expanded(
                     child: Text(
-                      'Rp ${widget.kembalian.toStringAsFixed(0)}',
+                      'Rp ${formatCurrency(widget.kembalian.toInt())}',
                       style: TextStyle(fontSize: 22),
                       textAlign: TextAlign.right,
                     ),
