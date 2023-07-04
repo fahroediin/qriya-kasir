@@ -245,7 +245,6 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                                 color: Colors.black,
                               ),
                             ),
-                            const SizedBox(height: 5),
                             Divider(
                               color: Colors.grey,
                               thickness: 1.5,
@@ -367,11 +366,12 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                                 ),
                               ],
                             ),
+                            SizedBox(height: 5),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  'Harga',
+                                  'Subtotal Sparepart',
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
@@ -379,7 +379,7 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                                   ),
                                 ),
                                 Text(
-                                  'Rp ${formatCurrency(lastTransactionData['totalHarga'])} (*disc ${lastTransactionData['diskon']}%)',
+                                  'Rp ${formatCurrency(lastTransactionData['totalHarga'])}',
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
@@ -389,6 +389,28 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                               ],
                             ),
                             const SizedBox(height: 5),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Diskon',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                Text(
+                                  '${lastTransactionData['diskon']}%',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 10),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -409,6 +431,10 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                                   ),
                                 ),
                               ],
+                            ),
+                            Divider(
+                              color: Colors.grey,
+                              thickness: 1.5,
                             ),
                             const SizedBox(height: 5),
                             Row(

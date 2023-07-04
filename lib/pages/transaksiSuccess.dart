@@ -148,12 +148,10 @@ class _TransaksiSuccessPageState extends State<TransaksiSuccessPage> {
           printer.printNewLine();
           printer.printCustom('ID Penjualan: $_idPenjualan', 1, 0);
           printer.printCustom('Date/Time: $_tanggalTransaksi', 1, 0);
-          printer.printNewLine();
+          printer.printCustom('--------------------------------', 0, 0);
           printer.printCustom('Nama Pembeli: $_namaPembeli', 1, 0);
-          printer.printNewLine();
           printer.printCustom('--------------------------------', 0, 0);
           printer.printCustom('Items               Qty   Price', 0, 0);
-
           for (var item in _items) {
             String itemName = item['namaSparepart'];
             int quantity = item['jumlahSparepart'];

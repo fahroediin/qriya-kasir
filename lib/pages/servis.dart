@@ -121,6 +121,10 @@ class _ServisPageState extends State<ServisPage> {
       totalJumlahSparepart +=
           jumlah; // Menambahkan jumlahSparepart ke totalJumlahSparepart
     }
+    double totalDiskon = totalHarga * (diskon / 100); // Calculate totalDiskon
+
+    double hargaAkhir = totalHarga - totalDiskon;
+    double totalAkhir = hargaAkhir + _biayaServis;
 
     Map<String, dynamic> data = {
       'idServis': _idServis,
@@ -135,9 +139,11 @@ class _ServisPageState extends State<ServisPage> {
       'items': _items,
       'jumlahItem': totalJumlahSparepart,
       'diskon': diskon,
+      'totalDiskon': totalDiskon,
       'totalHargaSparepart': totalHarga,
       'hargaAkhir': _totalBayar,
       'biayaServis': _biayaServis,
+      'totalAkhir': totalAkhir,
       'bayar': _bayar,
       'kembalian': _kembalian,
     };
