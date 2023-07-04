@@ -30,6 +30,7 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
       if (snapshot.exists) {
         setState(() {
           countDataServis = snapshot.children.length;
+          jumlahServis = countDataServis;
         });
       }
     }

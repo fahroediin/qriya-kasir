@@ -257,7 +257,7 @@ class _SparepartPageState extends State<SparepartPage> {
                 controller: searchController,
                 onChanged: searchList,
                 decoration: InputDecoration(
-                  labelText: 'Cari Sparepart',
+                  labelText: 'Cari Sparepart [ID/Nama/Spec]',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(5),
                   ),

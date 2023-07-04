@@ -195,7 +195,7 @@ class _MekanikPageState extends State<MekanikPage> {
                 controller: searchController,
                 onChanged: searchList,
                 decoration: InputDecoration(
-                  labelText: 'Cari Mekanik',
+                  labelText: 'Cari Mekanik [ID/Nama]',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(5),
                   ),
