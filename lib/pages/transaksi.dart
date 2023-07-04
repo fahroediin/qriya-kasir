@@ -152,21 +152,34 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
         FirebaseDatabase.instance.reference().child('transaksiPenjualan');
 
     List<Map<String, dynamic>> items = _items.map((item) {
+      int jumlahSparepart = item['jumlahSparepart'];
+      int totalJumlahItem = 0;
+
+      // Menghitung total jumlahItem berdasarkan jumlahSparepart
+      if (jumlahSparepart != null) {
+        totalJumlahItem = jumlahSparepart.toInt();
+      }
+
       return {
         'idSparepart': item['idSparepart'],
         'namaSparepart': item['namaSparepart'],
         'hargaSparepart': item['hargaSparepart'].toInt(),
-        'jumlahSparepart': item['jumlahSparepart'],
+        'jumlahSparepart': jumlahSparepart,
+        'jumlahItem': totalJumlahItem, // Menambahkan jumlahItem
       };
     }).toList();
 
     double diskon = double.tryParse(diskonController.text) ?? 0;
 
     double totalHarga = 0;
+    int totalJumlahSparepart = 0; // Menyimpan total jumlahSparepart
+
     for (var item in _items) {
       double harga = double.tryParse(item['hargaSparepart'].toString()) ?? 0;
       int jumlah = int.tryParse(item['jumlahSparepart'].toString()) ?? 0;
       totalHarga += harga * jumlah;
+      totalJumlahSparepart +=
+          jumlah; // Menambahkan jumlahSparepart ke totalJumlahSparepart
     }
 
     double totalDiskon = totalHarga * (diskon / 100); // Calculate totalDiskon
@@ -180,6 +193,8 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
       'items': items,
       'totalHarga': totalHarga,
       'hargaAkhir': hargaAkhir,
+      'jumlahItem':
+          totalJumlahSparepart, // Menggunakan totalJumlahSparepart sebagai jumlahItem
       'bayar': _bayar,
       'kembalian': _kembalian,
       'diskon': diskon.toInt(),
