@@ -169,7 +169,9 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
       totalHarga += harga * jumlah;
     }
 
-    double hargaAkhir = totalHarga - (totalHarga * (diskon / 100));
+    double totalDiskon = totalHarga * (diskon / 100); // Calculate totalDiskon
+
+    double hargaAkhir = totalHarga - totalDiskon;
 
     Map<String, dynamic> data = {
       'idPenjualan': _idPenjualan,
@@ -181,6 +183,7 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
       'bayar': _bayar,
       'kembalian': _kembalian,
       'diskon': diskon.toInt(),
+      'totalDiskon': totalDiskon,
     };
 
     reference.push().set(data).then((_) {
