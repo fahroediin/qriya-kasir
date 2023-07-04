@@ -22,6 +22,9 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
   BluetoothDevice? selectedDevice;
   BlueThermalPrinter printer = BlueThermalPrinter.instance;
   int itemCount = 0;
+  TextEditingController searchController = TextEditingController();
+  String searchQuery = '';
+  Query? searchRef;
 
   Widget buildListItem(DataSnapshot snapshot) {
     Map? transaksi = snapshot.value as Map?;
@@ -36,55 +39,75 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
     int hargaAkhir = totalBayar - (totalBayar * diskon ~/ 100);
 
     return Card(
-      child: ListTile(
-        title: Text('ID Penjualan: $idPenjualan'),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Tanggal dan Waktu: $dateTime'),
-            Text('Nama Pembeli: $namaPembeli'),
-            Text('Items:'),
-            Column(
-              children: items?.map((item) {
-                    String idSparepart = item['idSparepart'] ?? '';
-                    String namaSparepart = item['namaSparepart'] ?? '';
-                    int hargaSparepart = item['hargaSparepart'] as int? ?? 0;
-                    int jumlahItem = item['jumlahSparepart'] ?? 0;
-                    return Padding(
-                      padding: EdgeInsets.only(left: 16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('ID Sparepart: $idSparepart'),
-                          Text('Nama Sparepart: $namaSparepart'),
-                          Text('Harga Sparepart: Rp ${hargaSparepart}'),
-                          Text('Jumlah Item: $jumlahItem'),
-                        ],
+      child: Stack(
+        children: [
+          ListTile(
+            title: Text('ID Penjualan: $idPenjualan'),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Tanggal dan Waktu: $dateTime'),
+                Text('Nama Pembeli: $namaPembeli'),
+                Text('Items:'),
+                Column(
+                  children: items?.map((item) {
+                        String idSparepart = item['idSparepart'] ?? '';
+                        String namaSparepart = item['namaSparepart'] ?? '';
+                        int hargaSparepart =
+                            item['hargaSparepart'] as int? ?? 0;
+                        int jumlahItem = item['jumlahSparepart'] ?? 0;
+                        return Padding(
+                          padding: EdgeInsets.only(left: 16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('ID Sparepart: $idSparepart'),
+                              Text('Nama Sparepart: $namaSparepart'),
+                              Text('Harga Sparepart: Rp $hargaSparepart'),
+                              Text('Jumlah Item: $jumlahItem'),
+                            ],
+                          ),
+                        );
+                      }).toList() ??
+                      [],
+                ),
+                Text('Harga: Rp $totalBayar'),
+                Text('Diskon: $diskon%'),
+                Text('Harga Akhir: Rp $hargaAkhir'),
+                Text('Bayar: Rp $bayar'),
+                Text('Kembalian: Rp $kembalian'),
+              ],
+            ),
+          ),
+          Positioned(
+            bottom: 0,
+            right: 0,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EditHistoriPenjualanPage(
+                          idPenjualan: '',
+                        ),
                       ),
                     );
-                  }).toList() ??
-                  [],
-            ),
-            Text('Harga: Rp $totalBayar'),
-            Text('Diskon: $diskon%'),
-            Text('Harga Akhir: Rp $hargaAkhir'),
-            Text('Bayar: Rp $bayar'),
-            Text('Kembalian: Rp $kembalian'),
-          ],
-        ),
-        trailing: ElevatedButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => EditHistoriPenjualanPage(
-                  idPenjualan: '',
+                  },
+                  icon: Icon(Icons.edit),
                 ),
-              ),
-            );
-          },
-          child: Text('Edit'),
-        ),
+                IconButton(
+                  onPressed: () {
+                    // Tambahkan kode untuk fungsi print di sini
+                  },
+                  icon: Icon(Icons.print),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -114,7 +137,19 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
   }
 
   Future<void> fetchData() async {
-    DataSnapshot snapshot = await dbRef.get();
+    if (searchQuery.isNotEmpty) {
+      searchRef = FirebaseDatabase.instance
+          .reference()
+          .child('transaksiPenjualan')
+          .orderByChild('namaPembeli_idPenjualan')
+          .startAt(searchQuery.toLowerCase())
+          .endAt(searchQuery.toLowerCase() + '\uf8ff');
+    } else {
+      searchRef = dbRef;
+    }
+
+    DataSnapshot snapshot = await searchRef!.get();
+
     if (snapshot.exists) {
       setState(() {
         itemCount = snapshot.children.length;
@@ -164,36 +199,60 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
         children: [
           Container(
             padding: EdgeInsets.all(16),
-            child: Text(
-              'Total Transaksi: $itemCount',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.normal,
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Total Transaksi: $itemCount',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: searchController,
+                        onChanged: (value) {
+                          setState(() {
+                            searchQuery = value;
+                            fetchData(); // Tambahkan baris ini
+                          });
+                        },
+                        decoration: InputDecoration(
+                          labelText: 'Cari Transaksi [Nama Pembeli]',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 16),
+                    IconButton(
+                      onPressed: () {
+                        searchController.clear();
+                        setState(() {
+                          searchQuery = '';
+                        });
+                        fetchData();
+                      },
+                      icon: Icon(Icons.clear),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
           Expanded(
-            child: Container(
-              padding: EdgeInsets.all(16),
-              child: FirebaseAnimatedList(
-                shrinkWrap: true,
-                physics: ClampingScrollPhysics(),
-                query: dbRef,
-                itemBuilder: (BuildContext context, DataSnapshot snapshot,
-                    Animation<double> animation, int index) {
-                  if (snapshot.value == null) {
-                    return buildNoDataWidget();
-                  } else {
-                    return Column(
-                      children: [
-                        buildListItem(snapshot),
-                        SizedBox(height: 8),
-                        Divider(color: Colors.grey[400]),
-                      ],
-                    );
-                  }
-                },
-              ),
+            child: FirebaseAnimatedList(
+              query: searchRef ?? dbRef,
+              itemBuilder: (BuildContext context, DataSnapshot snapshot,
+                  Animation<double> animation, int index) {
+                return buildListItem(snapshot);
+              },
+              defaultChild: buildNoDataWidget(),
             ),
           ),
         ],

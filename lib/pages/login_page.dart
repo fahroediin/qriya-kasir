@@ -89,7 +89,7 @@ class _LoginPageState extends State<LoginPage>
         Navigator.pushReplacement(
           context,
           PageRouteBuilder(
-            transitionDuration: Duration(milliseconds: 600),
+            transitionDuration: Duration(milliseconds: 300),
             pageBuilder: (_, __, ___) => HomePage(),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
