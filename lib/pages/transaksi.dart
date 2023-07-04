@@ -165,7 +165,6 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
         'namaSparepart': item['namaSparepart'],
         'hargaSparepart': item['hargaSparepart'].toInt(),
         'jumlahSparepart': jumlahSparepart,
-        'jumlahItem': totalJumlahItem, // Menambahkan jumlahItem
       };
     }).toList();
 

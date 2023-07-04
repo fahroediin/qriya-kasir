@@ -94,8 +94,33 @@ class _ServisPageState extends State<ServisPage> {
     DatabaseReference reference =
         FirebaseDatabase.instance.reference().child('transaksiServis');
 
+    List<Map<String, dynamic>> items = _items.map((item) {
+      int jumlahSparepart = item['jumlahSparepart'];
+      int totalJumlahItem = 0;
+
+      // Menghitung total jumlahItem berdasarkan jumlahSparepart
+      if (jumlahSparepart != null) {
+        totalJumlahItem = jumlahSparepart.toInt();
+      }
+
+      return {
+        'idSparepart': item['idSparepart'],
+        'namaSparepart': item['namaSparepart'],
+        'hargaSparepart': item['hargaSparepart'].toInt(),
+        'jumlahSparepart': jumlahSparepart,
+      };
+    }).toList();
     double diskon = double.tryParse(diskonController.text) ?? 0;
-    double totalHarga = calculateTotalPriceBeforeDiscount();
+    double totalHarga = 0;
+    int totalJumlahSparepart = 0; // Menyimpan total jumlahSparepart
+
+    for (var item in _items) {
+      double harga = double.tryParse(item['hargaSparepart'].toString()) ?? 0;
+      int jumlah = int.tryParse(item['jumlahSparepart'].toString()) ?? 0;
+      totalHarga += harga * jumlah; // Perbaikan perhitungan totalHargaSparepart
+      totalJumlahSparepart +=
+          jumlah; // Menambahkan jumlahSparepart ke totalJumlahSparepart
+    }
 
     Map<String, dynamic> data = {
       'idServis': _idServis,
@@ -108,6 +133,7 @@ class _ServisPageState extends State<ServisPage> {
       'tipeSpm': _tipeKendaraanController.text,
       'kerusakan': _kerusakan,
       'items': _items,
+      'jumlahItem': totalJumlahSparepart,
       'diskon': diskon,
       'totalHargaSparepart': totalHarga,
       'hargaAkhir': _totalBayar,
@@ -518,7 +544,6 @@ class _ServisPageState extends State<ServisPage> {
           'namaSparepart': sparepart['namaSparepart'],
           'hargaSparepart': sparepart['hargaSparepart'].toInt(),
           'jumlahSparepart': jumlahItem,
-          'stokSparepart': stokSparepart,
         });
         sparepart['stokSparepart'] = (stokSparepart - jumlahItem).toString();
       });

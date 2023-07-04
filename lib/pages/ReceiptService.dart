@@ -265,6 +265,28 @@ class _ReceiptServisPageState extends State<ReceiptServisPage> {
                               ],
                             ),
                             const SizedBox(height: 20),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Jumlah Item',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                Text(
+                                  '${lastTransactionData['jumlahItem']}',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 5),
                             Text(
                               'Subtotal Sparepart: Rp ${formatCurrency(lastTransactionData['totalHargaSparepart'])}',
                               style: TextStyle(
