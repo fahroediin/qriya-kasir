@@ -135,7 +135,7 @@ class _ServisPageState extends State<ServisPage> {
       'namaPelanggan': _namaPelangganController.text,
       'merkSpm': _merkKendaraanController.text,
       'tipeSpm': _tipeKendaraanController.text,
-      'kerusakan': _kerusakan,
+      'keluhan': _kerusakan,
       'items': _items,
       'jumlahItem': totalJumlahSparepart,
       'diskon': diskon,
@@ -162,7 +162,7 @@ class _ServisPageState extends State<ServisPage> {
                     namaPelanggan: data['namaPelanggan'],
                     merkSpm: data['merkSpm'],
                     tipeSpm: data['tipeSpm'],
-                    kerusakan: data['kerusakan'],
+                    kerusakan: data['keluhan'],
                     items: data['items'],
                     totalHarga: data['totalHargaSparepart'],
                     diskon: data['diskon'],
@@ -772,7 +772,7 @@ class _ServisPageState extends State<ServisPage> {
               SizedBox(height: 16.0),
               TextFormField(
                 decoration: InputDecoration(
-                  labelText: 'Kerusakan',
+                  labelText: 'Keluhan',
                 ),
                 onChanged: (value) {
                   setState(() {

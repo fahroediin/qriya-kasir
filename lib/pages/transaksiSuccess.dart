@@ -126,6 +126,11 @@ class _TransaksiSuccessPageState extends State<TransaksiSuccessPage> {
             1,
           );
           printer.printCustom(
+            'Servis & Suku Cadang',
+            0,
+            1,
+          );
+          printer.printCustom(
             'Jl. Marta Atmaja RT 003/011',
             0,
             1,
@@ -222,7 +227,7 @@ class _TransaksiSuccessPageState extends State<TransaksiSuccessPage> {
 
           printer.printNewLine();
           printer.printCustom('Terima Kasih', 2, 1);
-          printer.printCustom('Semoga Hari Anda Menyenangkan!', 1, 1);
+          printer.printCustom('Atas Kunjungan Anda', 1, 1);
           printer.printNewLine();
           printer.paperCut();
           Future.delayed(Duration(seconds: 5), () {

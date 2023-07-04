@@ -123,6 +123,11 @@ class _ServisSuccessPageState extends State<ServisSuccessPage> {
             1,
           );
           printer.printCustom(
+            'Servis & Suku Cadang',
+            0,
+            1,
+          );
+          printer.printCustom(
             'Jl. Marta Atmaja RT 003/011',
             0,
             1,
@@ -153,7 +158,7 @@ class _ServisSuccessPageState extends State<ServisSuccessPage> {
           printer.printCustom('Nama Pelanggan: ${widget.namaPelanggan}', 1, 0);
           printer.printCustom('Merk SPM: ${widget.merkSpm}', 1, 0);
           printer.printCustom('Tipe SPM: ${widget.tipeSpm}', 1, 0);
-          printer.printCustom('Kerusakan: ${widget.kerusakan}', 1, 0);
+          printer.printCustom('Keluhan: ${widget.kerusakan}', 1, 0);
           printer.printNewLine();
           printer.printCustom('--------------------------------', 0, 0);
           printer.printCustom('Items               Qty   Price', 0, 0);

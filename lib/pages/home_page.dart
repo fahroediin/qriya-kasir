@@ -150,7 +150,7 @@ class _HomePageState extends State<HomePage> {
           children: [
             Image.asset(
               'assets/airamotor.png',
-              height: 170,
+              height: 100,
               width: 400,
             ),
             SizedBox(height: 0),
@@ -288,7 +288,7 @@ class _HomePageState extends State<HomePage> {
                           Text(
                             'SERVIS',
                             style: TextStyle(
-                                fontSize: 23,
+                                fontSize: 20,
                                 color: Color.fromARGB(239, 42, 41, 41)),
                           ),
                         ],
@@ -337,7 +337,7 @@ class _HomePageState extends State<HomePage> {
                           Text(
                             'PENJUALAN',
                             style: TextStyle(
-                                fontSize: 23,
+                                fontSize: 20,
                                 color: Color.fromARGB(239, 42, 41, 41)),
                           ),
                         ],
@@ -386,7 +386,7 @@ class _HomePageState extends State<HomePage> {
                           Text(
                             'SPAREPART',
                             style: TextStyle(
-                              fontSize: 23,
+                              fontSize: 20,
                               color: Color.fromARGB(239, 42, 41, 41),
                             ),
                           ),
@@ -436,7 +436,7 @@ class _HomePageState extends State<HomePage> {
                           Text(
                             'INPUT',
                             style: TextStyle(
-                                fontSize: 23,
+                                fontSize: 20,
                                 color: Color.fromARGB(239, 42, 41, 41)),
                           ),
                         ],

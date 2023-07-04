@@ -241,7 +241,7 @@ class _InputPelangganPageState extends State<InputPelangganPage>
                       ),
                       inputFormatters: [
                         FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z]')),
-                        LengthLimitingTextInputFormatter(2),
+                        LengthLimitingTextInputFormatter(3),
                       ],
                       textCapitalization: TextCapitalization.characters,
                       onChanged: (value) {
