@@ -13,6 +13,7 @@ class Pelanggan extends StatefulWidget {
 }
 
 class _PelangganState extends State<Pelanggan> {
+  TextEditingController searchController = TextEditingController();
   Query dbRef = FirebaseDatabase.instance
       .reference()
       .child('daftarPelanggan')

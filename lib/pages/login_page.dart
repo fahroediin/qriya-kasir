@@ -56,7 +56,9 @@ class _LoginPageState extends State<LoginPage>
   void _showSnackBar(String message) {
     _scaffoldMessengerState.showSnackBar(
       SnackBar(
-        content: Text(message),
+        content: Text(
+          message,
+        ),
       ),
     );
   }
@@ -83,6 +85,7 @@ class _LoginPageState extends State<LoginPage>
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
         );
+
         _saveEmailHistory(); // Simpan histori email
 
         // Menggunakan Navigator.pushReplacement dengan PageRouteBuilder untuk animasi transisi
@@ -100,7 +103,9 @@ class _LoginPageState extends State<LoginPage>
             },
           ),
         );
-
+        _showSnackBar(
+            'Login berhasil'); // Menampilkan snackbar "Login berhasil"
+      } on FirebaseAuthException catch (e) {
         // Menyimpan data user yang sudah login agar tidak otomatis logout
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString('email', _emailController.text.trim());
