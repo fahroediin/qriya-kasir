@@ -205,7 +205,7 @@ class _TransaksiSuccessPageState extends State<TransaksiSuccessPage> {
 
           printer.printCustom('Diskon'.padRight(20) + diskon, 1, 0);
           printer.printCustom(potonganHarga.padRight(20), 1, 0);
-
+          printer.printCustom('--------------------------------', 0, 0);
           printer.printCustom(
               'Total'.padRight(20) +
                   'Rp ${formatCurrency(widget.hargaAkhir.toInt())}',

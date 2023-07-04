@@ -193,6 +193,7 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                   } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                     Map<String, dynamic> lastTransactionData = snapshot.data!
                         .cast<String, dynamic>(); // Use cast to enforce type
+
                     return Container(
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -300,50 +301,57 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                                   ],
                                 ),
                                 ...lastTransactionData['items']
-                                    .map<TableRow>(
-                                      (item) => TableRow(
-                                        children: [
-                                          TableCell(
-                                            child: Text(
-                                              item['idSparepart'],
-                                              style: TextStyle(
-                                                  color: Colors.black),
+                                    .map<TableRow>((item) => TableRow(
+                                          children: [
+                                            TableCell(
+                                              child: Text(
+                                                item['idSparepart'],
+                                                style: TextStyle(
+                                                    color: Colors.black),
+                                              ),
                                             ),
-                                          ),
-                                          TableCell(
-                                            child: Text(
-                                              item['namaSparepart'],
-                                              style: TextStyle(
-                                                  color: Colors.black),
+                                            TableCell(
+                                              child: Text(
+                                                item['namaSparepart'],
+                                                style: TextStyle(
+                                                    color: Colors.black),
+                                              ),
                                             ),
-                                          ),
-                                          TableCell(
-                                            child: Text(
-                                              'Rp' +
-                                                  formatCurrency(
-                                                      item['hargaSparepart']),
-                                              style: TextStyle(
-                                                  color: Colors.black),
+                                            TableCell(
+                                              child: Text(
+                                                'Rp' +
+                                                    formatCurrency(
+                                                        item['hargaSparepart']),
+                                                style: TextStyle(
+                                                    color: Colors.black),
+                                              ),
                                             ),
-                                          ),
-                                          TableCell(
-                                            child: Text(
-                                              item['jumlahSparepart']
-                                                  .toString()
-                                                  .padLeft(3),
-                                              style: TextStyle(
-                                                  color: Colors.black),
+                                            TableCell(
+                                              child: Text(
+                                                item['jumlahSparepart']
+                                                    .toString()
+                                                    .padLeft(3),
+                                                style: TextStyle(
+                                                    color: Colors.black),
+                                              ),
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                    )
+                                          ],
+                                        ))
                                     .toList(),
                               ],
                             ),
                             const SizedBox(height: 20),
                             Text(
                               'Harga: Rp ${formatCurrency(lastTransactionData['totalHarga'])} (*disc ${lastTransactionData['diskon']}%)',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                            SizedBox(height: 5),
+                            Text(
+                              'Total Diskon: Rp  ${formatCurrency(lastTransactionData['totalDiskon'])}',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,

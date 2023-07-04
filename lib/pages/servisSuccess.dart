@@ -219,8 +219,9 @@ class _ServisSuccessPageState extends State<ServisSuccessPage> {
               1,
               0);
           double total = widget.hargaAkhir + widget.biayaServis;
+          printer.printCustom('--------------------------------', 0, 0);
           printer.printCustom(
-              'Jumlah '.padRight(20) + 'Rp ${formatCurrency(total.toInt())}',
+              'Total '.padRight(20) + 'Rp ${formatCurrency(total.toInt())}',
               1,
               0);
           printer.printCustom(
