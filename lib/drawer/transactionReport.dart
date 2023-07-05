@@ -9,40 +9,47 @@ class TransactionReportPage extends StatefulWidget {
 }
 
 class _TransactionReportPageState extends State<TransactionReportPage> {
-  DateTime selectedDate = DateTime.now();
-  Query dbRefPenjualan =
+  List<String> monthList = [];
+  String selectedMonth = '';
+  DateTime selectedMonthDateTime = DateTime.now();
+  List<Map<String, dynamic>> transaksiPenjualan = [];
+  DatabaseReference dbRefPenjualan =
       FirebaseDatabase.instance.reference().child('transaksiPenjualan');
-  int countdDataPenjualan = 0;
+  int countDataPenjualan = 0;
   int jumlahTransaksi = 0; // Menyimpan jumlah transaksi
   int jumlahItemTerjual = 0; // Menyimpan jumlah item terjual
   int jumlahTotalPendapatan = 0; // Menyimpan jumlah total pendapatan
   int totalDiskon = 0; // Menyimpan total diskon yang diberikan
   int totalPendapatanBersih = 0; // Menyimpan total pendapatan bersih
-  List<Map<dynamic, dynamic>> rankingSparepart =
+  List<Map<String, dynamic>> rankingSparepart =
       []; // Menyimpan ranking sparepart
 
   Future<void> fetchDataPenjualan() async {
-    String formattedMonth = DateFormat('MM/yyyy').format(selectedDate);
-    DateTime firstDayOfMonth =
-        DateTime(selectedDate.year, selectedDate.month, 1);
-    DateTime lastDayOfMonth =
-        DateTime(selectedDate.year, selectedDate.month + 1, 0);
+    String formattedMonth = DateFormat('MM/yyyy').format(selectedMonthDateTime);
+    DateTime firstDayOfMonth = DateTime(
+      selectedMonthDateTime.year,
+      selectedMonthDateTime.month,
+      1,
+    );
+    DateTime lastDayOfMonth = DateTime(
+      selectedMonthDateTime.year,
+      selectedMonthDateTime.month + 1,
+      0,
+    );
     String formattedFirstDayOfMonth =
         DateFormat('dd/MM/yyyy').format(firstDayOfMonth);
     String formattedLastDayOfMonth =
         DateFormat('dd/MM/yyyy').format(lastDayOfMonth);
 
     DataSnapshot snapshot = await dbRefPenjualan
-        .orderByChild('dateTime')
-        .startAt(formattedFirstDayOfMonth)
-        .endAt(formattedLastDayOfMonth + '\u{f8ff}')
+        .orderByChild('bulan')
+        .equalTo(formattedMonth)
         .get();
     if (mounted) {
       if (snapshot.exists) {
         int totalJumlahItemTerjual = 0;
         int totalHarga = 0;
         int totalDiskonPenjualan = 0;
-
         Map<String, int> sparepartCountMap = {};
 
         Map<dynamic, dynamic> snapshotValue =
@@ -98,7 +105,12 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
       } else {
         // If snapshot does not exist or data is empty
         setState(() {
-          rankingSparepart = []; // Clear the existing data
+          jumlahTransaksi = 0;
+          jumlahItemTerjual = 0;
+          jumlahTotalPendapatan = 0;
+          totalDiskon = 0;
+          totalPendapatanBersih = 0;
+          rankingSparepart = [];
         });
       }
     }
@@ -112,8 +124,21 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
   @override
   void initState() {
     super.initState();
-    initializeDateFormatting(
-        'id_ID', null); // Inisialisasi locale bahasa Indonesia
+    initializeDateFormatting('id_ID', null);
+
+    // Generate list of months
+    DateTime now = DateTime.now();
+    for (int i = 0; i < 12; i++) {
+      DateTime month = DateTime(now.year, now.month - i, 1);
+      String monthName = DateFormat('MMMM yyyy', 'id_ID').format(month);
+      monthList.add(monthName);
+    }
+
+    if (monthList.isNotEmpty) {
+      selectedMonth = monthList[0]; // Set the initial selected month
+      selectedMonthDateTime = DateFormat('MMMM yyyy', 'id_ID')
+          .parse(selectedMonth); // Parse the selected month DateTime
+    }
     fetchDataPenjualan();
   }
 
@@ -145,23 +170,26 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
                               ),
                             ),
                             SizedBox(width: 10),
-                            GestureDetector(
-                              onTap: () async {
-                                DateTime? pickedDate = await showDatePicker(
-                                  context: context,
-                                  initialDate: selectedDate,
-                                  firstDate: DateTime(2020),
-                                  lastDate: DateTime(2025),
-                                );
-
-                                if (pickedDate != null) {
-                                  setState(() {
-                                    selectedDate = pickedDate;
-                                  });
-                                  fetchDataPenjualan();
-                                }
+                            DropdownButton<String>(
+                              value: selectedMonth,
+                              onChanged: (String? newValue) {
+                                setState(() {
+                                  selectedMonth = newValue!;
+                                  selectedMonthDateTime =
+                                      DateFormat('MMMM yyyy', 'id_ID')
+                                          .parse(selectedMonth);
+                                });
+                                fetchDataPenjualan();
                               },
-                              child: Icon(Icons.calendar_today),
+                              items: monthList.map((String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(
+                                    value,
+                                    style: TextStyle(fontSize: 18),
+                                  ),
+                                );
+                              }).toList(),
                             ),
                           ],
                         ),
@@ -181,7 +209,7 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
                                     padding: EdgeInsets.only(left: 20),
                                     child: Text(
                                       DateFormat('MMMM yyyy', 'id_ID')
-                                          .format(selectedDate),
+                                          .format(selectedMonthDateTime),
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 18),
@@ -331,7 +359,8 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
                           children: [
                             Text(
                               'Total Pendapatan Bersih',
-                              style: TextStyle(fontSize: 18),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 18),
                             ),
                             Text(
                               'Rp ' + formatCurrency(totalPendapatanBersih),
