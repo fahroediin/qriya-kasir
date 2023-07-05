@@ -203,9 +203,8 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
     double totalDiskon = totalHarga * (diskon / 100); // Calculate totalDiskon
 
     double hargaAkhir = totalHarga - totalDiskon;
-    String namaBulan = DateFormat('MMMM', 'id_ID').format(_selectedDate) +
-        ' ' +
-        _selectedDate.year.toString();
+    String namaBulan = DateFormat('MMMM yyyy', 'id_ID').format(
+        _selectedDate); // Menggunakan DateFormat untuk mendapatkan nama bulan
 
     Map<String, dynamic> data = {
       'idPenjualan': _idPenjualan,
