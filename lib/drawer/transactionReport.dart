@@ -147,9 +147,10 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
                   child: Padding(
                     padding: const EdgeInsets.all(10.0),
                     child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
                               'Laporan Bulan:',

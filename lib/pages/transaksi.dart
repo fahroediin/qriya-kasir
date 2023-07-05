@@ -431,10 +431,10 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
                                                       builder: (BuildContext
                                                           context) {
                                                         return AlertDialog(
-                                                          title:
-                                                              Text('Kesalahan'),
+                                                          title: Text(
+                                                              'Input Invalid'),
                                                           content: Text(
-                                                              'Jumlah item tidak valid atau melebihi stok sparepart.'),
+                                                              'Jumlah item lebih banyak / kurang dari stok yang ada'),
                                                           actions: [
                                                             TextButton(
                                                               onPressed: () {

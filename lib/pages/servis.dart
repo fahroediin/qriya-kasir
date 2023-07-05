@@ -557,6 +557,7 @@ class _ServisPageState extends State<ServisPage> {
           'namaSparepart': sparepart['namaSparepart'],
           'hargaSparepart': sparepart['hargaSparepart'].toInt(),
           'jumlahSparepart': jumlahItem,
+          'stokSparepart': stokSparepart,
         });
         sparepart['stokSparepart'] = (stokSparepart - jumlahItem).toString();
       });
@@ -575,9 +576,9 @@ class _ServisPageState extends State<ServisPage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Kesalahan'),
+            title: Text('Input Invalid'),
             content:
-                Text('Jumlah item tidak valid atau melebihi stok sparepart.'),
+                Text('Jumlah item lebih banyak / kurang dari stok yang ada'),
             actions: [
               TextButton(
                 onPressed: () {
@@ -827,8 +828,7 @@ class _ServisPageState extends State<ServisPage> {
                             builder: (BuildContext context) {
                               return AlertDialog(
                                 title: Text('Konfirmasi'),
-                                content: Text(
-                                    'Apakah Anda yakin ingin menghapus item ini?'),
+                                content: Text('Hapus item?'),
                                 actions: [
                                   TextButton(
                                     onPressed: () {
