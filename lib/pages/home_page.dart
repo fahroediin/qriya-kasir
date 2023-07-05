@@ -150,7 +150,7 @@ class _HomePageState extends State<HomePage> {
           children: [
             Image.asset(
               'assets/airamotor.png',
-              height: 100,
+              height: 170,
               width: 400,
             ),
             SizedBox(height: 0),

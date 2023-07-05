@@ -159,6 +159,14 @@ class _ReceiptServisPageState extends State<ReceiptServisPage> {
                               ),
                             ),
                             const SizedBox(height: 10),
+                            Text(
+                              'Keluhan: ${lastTransactionData['keluhan']}',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            const SizedBox(height: 20),
                             const Text(
                               'List Item:',
                               style: TextStyle(
