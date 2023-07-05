@@ -18,6 +18,7 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
   DateTime _selectedDate = DateTime.now();
   String? _idPenjualan;
   String _formattedDateTime = '';
+  String _formattedMonth = DateFormat('MM').format(DateTime.now());
   String? _namaPembeli;
   double _totalHarga = 0;
   double _bayar = 0;
@@ -76,8 +77,25 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
     setState(() {
       _formattedDateTime =
           DateFormat('dd/MM/yyyy HH:mm:ss').format(_selectedDate);
+      _formattedMonth = DateFormat('MM').format(_selectedDate);
     });
   }
+
+  List<String> _namaBulan = [
+    '', // Indeks 0 tidak digunakan
+    'Januari',
+    'Februari',
+    'Maret',
+    'April',
+    'Mei',
+    'Juni',
+    'Juli',
+    'Agustus',
+    'September',
+    'Oktober',
+    'November',
+    'Desember',
+  ];
 
   void initializeFirebase() async {
     await Firebase.initializeApp();
@@ -185,9 +203,12 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
     double totalDiskon = totalHarga * (diskon / 100); // Calculate totalDiskon
 
     double hargaAkhir = totalHarga - totalDiskon;
+    String namaBulan = DateFormat('MMMM', 'id_ID').format(
+        _selectedDate); // Menggunakan DateFormat untuk mendapatkan nama bulan
 
     Map<String, dynamic> data = {
       'idPenjualan': _idPenjualan,
+      'bulan': namaBulan,
       'dateTime': _formattedDateTime,
       'namaPembeli': _namaPembeli,
       'items': items,
