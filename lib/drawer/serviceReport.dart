@@ -9,31 +9,82 @@ class ServiceReportPage extends StatefulWidget {
 }
 
 class _ServiceReportPageState extends State<ServiceReportPage> {
-  DateTime selectedDate = DateTime.now();
+  List<String> monthList = [];
+  String selectedMonth = '';
+  int selectedYear = DateTime.now().year;
   Query dbRefServis =
       FirebaseDatabase.instance.reference().child('transaksiServis');
   int countDataServis = 0;
   int jumlahServis = 0; // Menyimpan jumlah servis
   int totalPendapatan = 0; // Menyimpan total pendapatan
+  List<Map<String, dynamic>> pelangganRanking = [];
 
-  Future<void> fetchDataServis() async {
-    DateTime currentDate = DateTime.now();
-    String formattedDate = DateFormat('dd/MM/yyyy').format(currentDate);
-
+  Future<void> fetchDataServis(String selectedMonth) async {
+    String formattedMonth = DateFormat('MM/yyyy')
+        .format(DateFormat('MMMM yyyy', 'id_ID').parse(selectedMonth));
+    DateTime firstDayOfMonth = DateTime(int.parse(formattedMonth.split('/')[1]),
+        int.parse(formattedMonth.split('/')[0]), 1);
+    DateTime lastDayOfMonth = DateTime(int.parse(formattedMonth.split('/')[1]),
+        int.parse(formattedMonth.split('/')[0]) + 1, 0);
+    String formattedFirstDayOfMonth =
+        DateFormat('dd/MM/yyyy').format(firstDayOfMonth);
+    String formattedLastDayOfMonth =
+        DateFormat('dd/MM/yyyy').format(lastDayOfMonth);
     DataSnapshot snapshot = await dbRefServis
         .orderByChild('dateTime')
-        .startAt(formattedDate)
-        .endAt('$formattedDate\u{f8ff}')
+        .startAt(formattedFirstDayOfMonth)
+        .endAt(formattedLastDayOfMonth + '\u{f8ff}')
         .get();
-
     if (mounted) {
       if (snapshot.exists) {
+        int count = (snapshot.value as Map<dynamic, dynamic>).length;
+        int totalBiayaServis = 0;
+        Map<String, int> nopolCountMap = {};
+
+        (snapshot.value as Map<dynamic, dynamic>).forEach((key, value) {
+          totalBiayaServis += (value['biayaServis'] ?? 0) as int;
+          String nopol = value['nopol'];
+          if (nopolCountMap.containsKey(nopol)) {
+            nopolCountMap[nopol] = nopolCountMap[nopol]! + 1;
+          } else {
+            nopolCountMap[nopol] = 1;
+          }
+        });
+
+        List<MapEntry<String, int>> nopolCountList =
+            nopolCountMap.entries.toList();
+        nopolCountList.sort((a, b) => b.value.compareTo(a.value));
+        pelangganRanking = nopolCountList
+            .take(10)
+            .map((entry) => {
+                  'nopol': entry.key,
+                  'jumlah': entry.value,
+                })
+            .toList();
+
         setState(() {
-          countDataServis = snapshot.children.length;
+          countDataServis = count;
           jumlahServis = countDataServis;
+          totalPendapatan = totalBiayaServis;
         });
       }
     }
+  }
+
+  Future<List<String>> getDistinctMonths() async {
+    DataSnapshot snapshot = await dbRefServis.orderByChild('bulan').get();
+    List<String> distinctMonths = [];
+
+    if (snapshot.exists) {
+      (snapshot.value as Map<dynamic, dynamic>).forEach((key, value) {
+        String month = value['bulan'];
+        if (!distinctMonths.contains(month)) {
+          distinctMonths.add(month);
+        }
+      });
+    }
+
+    return distinctMonths;
   }
 
   @override
@@ -41,7 +92,18 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
     super.initState();
     initializeDateFormatting(
         'id_ID', null); // Inisialisasi locale bahasa Indonesia
-    fetchDataServis();
+    fetchDistinctMonths();
+  }
+
+  Future<void> fetchDistinctMonths() async {
+    List<String> months = await getDistinctMonths();
+    if (months.isNotEmpty) {
+      setState(() {
+        monthList = months;
+        selectedMonth = months[0];
+      });
+      fetchDataServis(selectedMonth);
+    }
   }
 
   @override
@@ -69,35 +131,33 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
                         ),
                       ),
                       SizedBox(width: 10),
-                      GestureDetector(
-                        onTap: () async {
-                          DateTime? pickedDate = await showDatePicker(
-                            context: context,
-                            initialDate: selectedDate,
-                            firstDate: DateTime(2020),
-                            lastDate: DateTime(2025),
-                          );
-
-                          if (pickedDate != null) {
-                            setState(() {
-                              selectedDate = pickedDate;
-                            });
-                            fetchDataServis();
-                          }
+                      DropdownButton<String>(
+                        value: selectedMonth,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedMonth = newValue!;
+                          });
+                          fetchDataServis(selectedMonth);
                         },
-                        child: Icon(Icons.calendar_today),
+                        items: monthList.map((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(
+                              value,
+                              style: TextStyle(fontSize: 18),
+                            ),
+                          );
+                        }).toList(),
                       ),
                     ],
                   ),
-                  SizedBox(height: 20),
+                  SizedBox(height: 10),
                   Row(
                     children: [
                       Text('Bulan:'),
                       SizedBox(width: 10),
                       Text(
-                        DateFormat('MMMM yyyy', 'id_ID').format(
-                          selectedDate,
-                        ), // Gunakan locale bahasa Indonesia
+                        '$selectedMonth',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                         ),
@@ -120,7 +180,7 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
                   SizedBox(height: 10),
                   Row(
                     children: [
-                      Text('Total Pendapatan:'),
+                      Text('Total Pendapatan Servis:'),
                       SizedBox(width: 10),
                       Text(
                         'Rp ${NumberFormat.decimalPattern('id_ID').format(totalPendapatan)}',
@@ -133,6 +193,65 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
                 ],
               ),
             ),
+          ),
+          SizedBox(height: 20),
+          Text(
+            'Pelanggan Ranking',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(height: 10),
+          DataTable(
+            columns: [
+              DataColumn(
+                label: Text('No.'),
+              ),
+              DataColumn(
+                label: Text('Nopol'),
+              ),
+              DataColumn(
+                label: Text('Nama'),
+              ),
+              DataColumn(
+                label: Text('TipeSpm'),
+              ),
+              DataColumn(
+                label: Text('Jumlah'),
+              ),
+            ],
+            rows: pelangganRanking.asMap().entries.map((entry) {
+              int index = entry.key + 1;
+              Map<String, dynamic> pelanggan = entry.value;
+              String nopol = pelanggan['nopol'];
+
+              String nama =
+                  ''; // Mengganti dengan logic mendapatkan namaPelanggan dari transaksiServis
+              String tipeSpm =
+                  ''; // Mengganti dengan logic mendapatkan tipeSpm dari transaksiServis
+              int jumlah = pelanggan['jumlah'];
+
+              return DataRow(
+                cells: [
+                  DataCell(
+                    Text(index.toString()),
+                  ),
+                  DataCell(
+                    Text(nopol),
+                  ),
+                  DataCell(
+                    Text(nama),
+                  ),
+                  DataCell(
+                    Text(tipeSpm),
+                  ),
+                  DataCell(
+                    Text(jumlah.toString()),
+                  ),
+                ],
+              );
+            }).toList(),
           ),
         ],
       ),

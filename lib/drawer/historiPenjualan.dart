@@ -222,7 +222,7 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
                           });
                         },
                         decoration: InputDecoration(
-                          labelText: 'Cari Transaksi [Nama Pembeli]',
+                          labelText: 'Cari Data Transaksi [Nama Pembeli]',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(5),
                           ),

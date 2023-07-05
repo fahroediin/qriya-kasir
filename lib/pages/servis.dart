@@ -58,13 +58,6 @@ class _ServisPageState extends State<ServisPage> {
     getPelangganList();
   }
 
-  void updateDateTime() {
-    setState(() {
-      _formattedDateTime =
-          DateFormat('dd/MM/yyyy HH:mm:ss').format(DateTime.now());
-    });
-  }
-
   void initializeFirebase() async {
     await Firebase.initializeApp();
   }
@@ -90,6 +83,13 @@ class _ServisPageState extends State<ServisPage> {
     }
   }
 
+  void updateDateTime() {
+    setState(() {
+      _formattedDateTime =
+          DateFormat('dd/MM/yyyy HH:mm:ss').format(DateTime.now());
+    });
+  }
+
   void saveServisData() {
     DatabaseReference reference =
         FirebaseDatabase.instance.reference().child('transaksiServis');
@@ -110,6 +110,7 @@ class _ServisPageState extends State<ServisPage> {
         'jumlahSparepart': jumlahSparepart,
       };
     }).toList();
+
     double diskon = double.tryParse(diskonController.text) ?? 0;
     double totalHarga = 0;
     int totalJumlahSparepart = 0; // Menyimpan total jumlahSparepart
@@ -121,14 +122,19 @@ class _ServisPageState extends State<ServisPage> {
       totalJumlahSparepart +=
           jumlah; // Menambahkan jumlahSparepart ke totalJumlahSparepart
     }
+
     double totalDiskon = totalHarga * (diskon / 100); // Calculate totalDiskon
 
     double hargaAkhir = totalHarga - totalDiskon;
     double totalAkhir = hargaAkhir + _biayaServis;
 
+    // Mendapatkan bulan dari dateTime
+    String bulan = DateFormat('MMMM y', 'id_ID').format(DateTime.now());
+
     Map<String, dynamic> data = {
       'idServis': _idServis,
       'dateTime': _formattedDateTime,
+      'bulan': bulan, // Menambahkan property 'bulan'
       'idMekanik': _idMekanik,
       'namaMekanik': _namaMekanik,
       'nopol': _nopol,
@@ -153,24 +159,25 @@ class _ServisPageState extends State<ServisPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => ServisSuccessPage(
-                    idServis: data['idServis'],
-                    dateTime: data['dateTime'] ?? '',
-                    idMekanik: data['idMekanik'],
-                    namaMekanik: data['namaMekanik'],
-                    nopol: data['nopol'],
-                    namaPelanggan: data['namaPelanggan'],
-                    merkSpm: data['merkSpm'],
-                    tipeSpm: data['tipeSpm'],
-                    kerusakan: data['keluhan'],
-                    items: data['items'],
-                    totalHarga: data['totalHargaSparepart'],
-                    diskon: data['diskon'],
-                    biayaServis: data['biayaServis'],
-                    hargaAkhir: data['hargaAkhir'],
-                    bayar: data['bayar'],
-                    kembalian: data['kembalian'],
-                  )),
+            builder: (context) => ServisSuccessPage(
+              idServis: data['idServis'],
+              dateTime: data['dateTime'] ?? '',
+              idMekanik: data['idMekanik'],
+              namaMekanik: data['namaMekanik'],
+              nopol: data['nopol'],
+              namaPelanggan: data['namaPelanggan'],
+              merkSpm: data['merkSpm'],
+              tipeSpm: data['tipeSpm'],
+              kerusakan: data['keluhan'],
+              items: data['items'],
+              totalHarga: data['totalHargaSparepart'],
+              diskon: data['diskon'],
+              biayaServis: data['biayaServis'],
+              hargaAkhir: data['hargaAkhir'],
+              bayar: data['bayar'],
+              kembalian: data['kembalian'],
+            ),
+          ),
         );
       },
     );

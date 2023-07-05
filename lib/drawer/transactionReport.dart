@@ -11,11 +11,10 @@ class TransactionReportPage extends StatefulWidget {
 class _TransactionReportPageState extends State<TransactionReportPage> {
   List<String> monthList = [];
   String selectedMonth = '';
-  DateTime selectedMonthDateTime = DateTime.now();
-  List<Map<String, dynamic>> transaksiPenjualan = [];
-  DatabaseReference dbRefPenjualan =
+
+  Query dbRefPenjualan =
       FirebaseDatabase.instance.reference().child('transaksiPenjualan');
-  int countDataPenjualan = 0;
+  int countdDataPenjualan = 0;
   int jumlahTransaksi = 0; // Menyimpan jumlah transaksi
   int jumlahItemTerjual = 0; // Menyimpan jumlah item terjual
   int jumlahTotalPendapatan = 0; // Menyimpan jumlah total pendapatan
@@ -25,31 +24,27 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
       []; // Menyimpan ranking sparepart
 
   Future<void> fetchDataPenjualan() async {
-    String formattedMonth = DateFormat('MM/yyyy').format(selectedMonthDateTime);
-    DateTime firstDayOfMonth = DateTime(
-      selectedMonthDateTime.year,
-      selectedMonthDateTime.month,
-      1,
-    );
-    DateTime lastDayOfMonth = DateTime(
-      selectedMonthDateTime.year,
-      selectedMonthDateTime.month + 1,
-      0,
-    );
+    String formattedMonth = DateFormat('MM/yyyy')
+        .format(DateFormat('MMMM yyyy', 'id_ID').parse(selectedMonth));
+    DateTime firstDayOfMonth = DateTime(int.parse(formattedMonth.split('/')[1]),
+        int.parse(formattedMonth.split('/')[0]), 1);
+    DateTime lastDayOfMonth = DateTime(int.parse(formattedMonth.split('/')[1]),
+        int.parse(formattedMonth.split('/')[0]) + 1, 0);
     String formattedFirstDayOfMonth =
         DateFormat('dd/MM/yyyy').format(firstDayOfMonth);
     String formattedLastDayOfMonth =
         DateFormat('dd/MM/yyyy').format(lastDayOfMonth);
-
     DataSnapshot snapshot = await dbRefPenjualan
-        .orderByChild('bulan')
-        .equalTo(formattedMonth)
+        .orderByChild('dateTime')
+        .startAt(formattedFirstDayOfMonth)
+        .endAt(formattedLastDayOfMonth + '\u{f8ff}')
         .get();
     if (mounted) {
       if (snapshot.exists) {
         int totalJumlahItemTerjual = 0;
         int totalHarga = 0;
         int totalDiskonPenjualan = 0;
+
         Map<String, int> sparepartCountMap = {};
 
         Map<dynamic, dynamic> snapshotValue =
@@ -79,7 +74,7 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
         List<Map<String, dynamic>> rankingSparepartList =
             sparepartCountMap.entries.map((entry) {
           String idSparepart = entry.key;
-          int jumlahItem = entry.value;
+          int jumlahSparepart = entry.value;
           String namaSparepart = ''; // Ganti dengan nama sparepart yang sesuai
           String merkSparepart = ''; // Ganti dengan merk sparepart yang sesuai
 
@@ -87,12 +82,12 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
             'idSparepart': idSparepart,
             'namaSparepart': namaSparepart,
             'merkSparepart': merkSparepart,
-            'jumlahItem': jumlahItem,
+            'jumlahSparepart': jumlahSparepart,
           };
         }).toList();
 
-        rankingSparepartList
-            .sort((a, b) => b['jumlahItem'].compareTo(a['jumlahItem']));
+        rankingSparepartList.sort(
+            (a, b) => b['jumlahSparepart'].compareTo(a['jumlahSparepart']));
 
         setState(() {
           jumlahTransaksi = snapshot.children.length;
@@ -105,12 +100,7 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
       } else {
         // If snapshot does not exist or data is empty
         setState(() {
-          jumlahTransaksi = 0;
-          jumlahItemTerjual = 0;
-          jumlahTotalPendapatan = 0;
-          totalDiskon = 0;
-          totalPendapatanBersih = 0;
-          rankingSparepart = [];
+          rankingSparepart = []; // Clear the existing data
         });
       }
     }
@@ -124,7 +114,8 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
   @override
   void initState() {
     super.initState();
-    initializeDateFormatting('id_ID', null);
+    initializeDateFormatting(
+        'id_ID', null); // Inisialisasi locale bahasa Indonesia
 
     // Generate list of months
     DateTime now = DateTime.now();
@@ -136,8 +127,6 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
 
     if (monthList.isNotEmpty) {
       selectedMonth = monthList[0]; // Set the initial selected month
-      selectedMonthDateTime = DateFormat('MMMM yyyy', 'id_ID')
-          .parse(selectedMonth); // Parse the selected month DateTime
     }
     fetchDataPenjualan();
   }
@@ -175,9 +164,6 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
                               onChanged: (String? newValue) {
                                 setState(() {
                                   selectedMonth = newValue!;
-                                  selectedMonthDateTime =
-                                      DateFormat('MMMM yyyy', 'id_ID')
-                                          .parse(selectedMonth);
                                 });
                                 fetchDataPenjualan();
                               },
@@ -208,8 +194,7 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
                                   Padding(
                                     padding: EdgeInsets.only(left: 20),
                                     child: Text(
-                                      DateFormat('MMMM yyyy', 'id_ID')
-                                          .format(selectedMonthDateTime),
+                                      selectedMonth,
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 18),
@@ -292,11 +277,11 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
                             final sparepart = rankingSparepart[index];
                             return ListTile(
                               title: Text(
-                                '${sparepart['namaSparepart']} - ${sparepart['merkSparepart']}',
+                                '${sparepart['idSparepart']} - ${sparepart['namaSparepart']} - ${sparepart['merkSparepart']}',
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                               subtitle: Text(
-                                  'Jumlah Item Terjual: ${sparepart['jumlahItem']}'),
+                                  'Jumlah Sparepart: ${sparepart['jumlahSparepart']}'),
                             );
                           },
                         ),
@@ -320,7 +305,7 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
                               style: TextStyle(fontSize: 18),
                             ),
                             Text(
-                              'Rp ' + formatCurrency(jumlahTotalPendapatan),
+                              formatCurrency(jumlahTotalPendapatan),
                               style: TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 18),
                             ),
@@ -329,7 +314,7 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 10),
+                  SizedBox(height: 5),
                   Row(
                     children: [
                       Expanded(
@@ -337,11 +322,11 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'Total Diskon yang diberikan',
+                              'Total Diskon',
                               style: TextStyle(fontSize: 18),
                             ),
                             Text(
-                              'Rp ' + formatCurrency(totalDiskon),
+                              formatCurrency(totalDiskon),
                               style: TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 18),
                             ),
@@ -350,7 +335,7 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 10),
+                  SizedBox(height: 5),
                   Row(
                     children: [
                       Expanded(
@@ -359,11 +344,10 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
                           children: [
                             Text(
                               'Total Pendapatan Bersih',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 18),
+                              style: TextStyle(fontSize: 18),
                             ),
                             Text(
-                              'Rp ' + formatCurrency(totalPendapatanBersih),
+                              formatCurrency(totalPendapatanBersih),
                               style: TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 18),
                             ),

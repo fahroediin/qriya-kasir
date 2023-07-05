@@ -17,6 +17,9 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
       .orderByKey()
       .limitToLast(50);
   int itemCount = 0;
+  TextEditingController searchController = TextEditingController();
+  String searchQuery = '';
+  Query? searchRef;
 
   @override
   void initState() {
@@ -25,7 +28,17 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
   }
 
   Future<void> fetchData() async {
-    DataSnapshot snapshot = await dbRef.get();
+    if (searchQuery.isNotEmpty) {
+      searchRef = FirebaseDatabase.instance
+          .reference()
+          .child('transaksiServis')
+          .orderByChild('namaPelanggan')
+          .startAt(searchQuery.toLowerCase())
+          .endAt(searchQuery.toLowerCase() + '\uf8ff');
+    } else {
+      searchRef = dbRef;
+    }
+    DataSnapshot snapshot = await searchRef!.get();
     if (snapshot.exists) {
       setState(() {
         itemCount = snapshot.children.length;
@@ -43,7 +56,7 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
     String namaPelanggan = transaksi['namaPelanggan'] ?? '';
     String merkSpm = transaksi['merkSpm'] ?? '';
     String tipeSpm = transaksi['tipeSpm'] ?? '';
-    String kerusakan = transaksi['kerusakan'] ?? '';
+    String kerusakan = transaksi['keluhan'] ?? '';
     List<Map>? items = (transaksi['items'] as List<dynamic>?)?.cast<Map>();
     int biayaServis = transaksi['biayaServis'] ?? 0;
     int totalHargaSparepart = transaksi['totalHargaSparepart'] ?? 0;
@@ -51,7 +64,6 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
     int hargaAkhir = transaksi['hargaAkhir'] ?? 0;
     int bayar = transaksi['bayar'] ?? 0;
     int kembalian = transaksi['kembalian'] ?? 0;
-
     return Card(
       child: ListTile(
         title: Text('ID Servis: $idServis'),
@@ -65,7 +77,7 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
             Text('Nama Pelanggan: $namaPelanggan'),
             Text('Merk SPM: $merkSpm'),
             Text('Tipe SPM: $tipeSpm'),
-            Text('Kerusakan: $kerusakan'),
+            Text('Keluhan: $kerusakan'),
             Text('Items:'),
             Column(
               children: items?.map((item) {
@@ -95,6 +107,23 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
             Text('Biaya Servis: Rp $biayaServis'),
             Text('Bayar: Rp $bayar'),
             Text('Kembalian: Rp $kembalian'),
+          ],
+        ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              onPressed: () {
+                // Perform edit functionality here
+              },
+              icon: Icon(Icons.edit),
+            ),
+            IconButton(
+              onPressed: () {
+                // Perform print functionality here
+              },
+              icon: Icon(Icons.print),
+            ),
           ],
         ),
       ),
@@ -130,7 +159,6 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
                   var begin = Offset(1.0, 0.0);
                   var end = Offset.zero;
                   var curve = Curves.ease;
-
                   var tween = Tween(begin: begin, end: end)
                       .chain(CurveTween(curve: curve));
 
@@ -157,36 +185,60 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
         children: [
           Container(
             padding: EdgeInsets.all(16),
-            child: Text(
-              'Total Servis: $itemCount',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.normal,
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Total Servis: $itemCount',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: searchController,
+                        onChanged: (value) {
+                          setState(() {
+                            searchQuery = value;
+                            fetchData(); // Tambahkan baris ini
+                          });
+                        },
+                        decoration: InputDecoration(
+                          labelText: 'Cari Data Servis [Nopol]',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 16),
+                    IconButton(
+                      onPressed: () {
+                        searchController.clear();
+                        setState(() {
+                          searchQuery = '';
+                        });
+                        fetchData();
+                      },
+                      icon: Icon(Icons.clear),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
           Expanded(
-            child: Container(
-              padding: EdgeInsets.all(16),
-              child: FirebaseAnimatedList(
-                shrinkWrap: true,
-                physics: ClampingScrollPhysics(),
-                query: dbRef,
-                itemBuilder: (BuildContext context, DataSnapshot snapshot,
-                    Animation<double> animation, int index) {
-                  if (!snapshot.exists) {
-                    return buildNoDataWidget();
-                  } else {
-                    return Column(
-                      children: [
-                        buildListItem(snapshot),
-                        SizedBox(height: 8),
-                        Divider(color: Colors.grey[400]),
-                      ],
-                    );
-                  }
-                },
-              ),
+            child: FirebaseAnimatedList(
+              query: searchRef ?? dbRef,
+              itemBuilder: (BuildContext context, DataSnapshot snapshot,
+                  Animation<double> animation, int index) {
+                return buildListItem(snapshot);
+              },
+              defaultChild: buildNoDataWidget(),
             ),
           ),
         ],
