@@ -15,21 +15,77 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
   int countdDataPenjualan = 0;
   int jumlahTransaksi = 0; // Menyimpan jumlah transaksi
   int jumlahItemTerjual = 0; // Menyimpan jumlah item terjual
+  List<Map<dynamic, dynamic>> rankingSparepart =
+      []; // Menyimpan ranking sparepart
 
   Future<void> fetchDataPenjualan() async {
-    String formattedDate = DateFormat('dd/MM/yyyy').format(selectedDate);
+    String formattedMonth = DateFormat('MM/yyyy').format(selectedDate);
+    DateTime firstDayOfMonth =
+        DateTime(selectedDate.year, selectedDate.month, 1);
+    DateTime lastDayOfMonth =
+        DateTime(selectedDate.year, selectedDate.month + 1, 0);
+    String formattedFirstDayOfMonth =
+        DateFormat('dd/MM/yyyy').format(firstDayOfMonth);
+    String formattedLastDayOfMonth =
+        DateFormat('dd/MM/yyyy').format(lastDayOfMonth);
 
     DataSnapshot snapshot = await dbRefPenjualan
         .orderByChild('dateTime')
-        .startAt(formattedDate)
-        .endAt('$formattedDate\u{f8ff}')
+        .startAt(formattedFirstDayOfMonth)
+        .endAt(formattedLastDayOfMonth + '\u{f8ff}')
         .get();
 
     if (mounted) {
       if (snapshot.exists) {
+        int totalJumlahItemTerjual = 0;
+        Map<String, int> sparepartCountMap = {};
+
+        Map<dynamic, dynamic> snapshotValue =
+            snapshot.value as Map<dynamic, dynamic>;
+        snapshotValue.forEach((key, value) {
+          if (value is Map<dynamic, dynamic>) {
+            String? idSparepart = value['idSparepart'] as String?;
+            int? jumlahItem = int.tryParse(value['jumlahItem'].toString());
+
+            if (idSparepart != null && jumlahItem != null) {
+              if (sparepartCountMap.containsKey(idSparepart)) {
+                sparepartCountMap[idSparepart] =
+                    (sparepartCountMap[idSparepart] ?? 0) + jumlahItem;
+              } else {
+                sparepartCountMap[idSparepart] = jumlahItem;
+              }
+            }
+
+            totalJumlahItemTerjual += jumlahItem ?? 0;
+          }
+        });
+
+        List<String> uniqueIdSpareparts = sparepartCountMap.keys.toList();
+
+        rankingSparepart = uniqueIdSpareparts.map((idSparepart) {
+          String namaSparepart = ''; // Ganti dengan nama sparepart yang sesuai
+          String merkSparepart = ''; // Ganti dengan merk sparepart yang sesuai
+          int jumlahItem = sparepartCountMap[idSparepart] ?? 0;
+
+          return {
+            'idSparepart': idSparepart,
+            'namaSparepart': namaSparepart,
+            'merkSparepart': merkSparepart,
+            'jumlahItem': jumlahItem,
+          };
+        }).toList();
+
+        rankingSparepart
+            .sort((a, b) => b['jumlahItem'].compareTo(a['jumlahItem']));
+
         setState(() {
-          countdDataPenjualan = snapshot.children.length;
-          jumlahTransaksi = countdDataPenjualan;
+          jumlahTransaksi = snapshot.children.length;
+          jumlahItemTerjual = totalJumlahItemTerjual;
+        });
+      } else {
+        // If snapshot does not exist or data is empty
+        setState(() {
+          rankingSparepart = []; // Clear the existing data
         });
       }
     }
@@ -128,163 +184,32 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 20),
-                  Text(
-                    'Sparepart Ranking',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    'List Item:',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                  Divider(
-                    color: Colors.grey,
-                    thickness: 1.5,
-                  ),
-                  const SizedBox(height: 5),
-                  Table(
-                    columnWidths: {
-                      0: FlexColumnWidth(2),
-                      1: FlexColumnWidth(2),
-                      2: FlexColumnWidth(2),
-                      3: FlexColumnWidth(1),
-                      4: FlexColumnWidth(2),
-                    },
-                    children: [
-                      TableRow(
-                        children: [
-                          TableCell(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                'ID',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            ),
-                          ),
-                          TableCell(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                'Name',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            ),
-                          ),
-                          TableCell(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                'Price',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            ),
-                          ),
-                          TableCell(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                'Qty',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      TableRow(
-                        children: [
-                          TableCell(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text('1'),
-                            ),
-                          ),
-                          TableCell(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text('SP001'),
-                            ),
-                          ),
-                          TableCell(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text('Sparepart 1'),
-                            ),
-                          ),
-                          TableCell(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text('Merk 1'),
-                            ),
-                          ),
-                          TableCell(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text('10'),
-                            ),
-                          ),
-                        ],
-                      ),
-                      TableRow(
-                        children: [
-                          TableCell(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text('2'),
-                            ),
-                          ),
-                          TableCell(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text('SP002'),
-                            ),
-                          ),
-                          TableCell(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text('Sparepart 2'),
-                            ),
-                          ),
-                          TableCell(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text('Merk 2'),
-                            ),
-                          ),
-                          TableCell(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text('8'),
-                            ),
-                          ),
-                        ],
-                      ),
-                      // Add more rows as needed
-                    ],
-                  ),
                 ],
               ),
             ),
+          ),
+          Divider(),
+          Expanded(
+            child: rankingSparepart.isEmpty
+                ? Center(
+                    child: Text('Data tidak ada'),
+                  )
+                : ListView.builder(
+                    itemCount: rankingSparepart.length > 10
+                        ? 10
+                        : rankingSparepart.length,
+                    itemBuilder: (context, index) {
+                      final sparepart = rankingSparepart[index];
+                      return ListTile(
+                        title: Text(
+                          '${sparepart['namaSparepart']} - ${sparepart['merkSparepart']}',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Text(
+                            'Jumlah Item Terjual: ${sparepart['jumlahItem']}'),
+                      );
+                    },
+                  ),
           ),
         ],
       ),

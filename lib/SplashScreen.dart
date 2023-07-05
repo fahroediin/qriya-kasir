@@ -57,7 +57,7 @@ class _SplashScreenState extends State<SplashScreen> {
             width: MediaQuery.of(context).size.width,
             child: Center(
               child: Text(
-                'Versi 0.5.0',
+                'Versi 0.8.0',
                 style: TextStyle(
                   fontSize: 12.0,
                   color: Colors.black,
