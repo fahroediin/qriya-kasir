@@ -3,6 +3,8 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:project_s/pages/home_page.dart';
 
+import 'editHistoriServis.dart';
+
 class HistoriServisPage extends StatefulWidget {
   const HistoriServisPage({Key? key}) : super(key: key);
 
@@ -65,67 +67,83 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
     int bayar = transaksi['bayar'] ?? 0;
     int kembalian = transaksi['kembalian'] ?? 0;
     return Card(
-      child: ListTile(
-        title: Text('ID Servis: $idServis'),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Tanggal dan Waktu: $dateTime'),
-            Text('ID Mekanik: $idMekanik'),
-            Text('Nama Mekanik: $namaMekanik'),
-            Text('Nomor Polisi: $nopol'),
-            Text('Nama Pelanggan: $namaPelanggan'),
-            Text('Merk SPM: $merkSpm'),
-            Text('Tipe SPM: $tipeSpm'),
-            Text('Keluhan: $kerusakan'),
-            Text('Items:'),
-            Column(
-              children: items?.map((item) {
-                    String idSparepart = item['idSparepart'] ?? '';
-                    String namaSparepart = item['namaSparepart'] ?? '';
-                    String merkSparepart = item['merkSparepart'] ?? '';
-                    String specSparepart = item['specSparepart'] ?? '';
-                    int hargaSparepart = item['hargaSparepart'] as int? ?? 0;
-                    int jumlahItem = item['jumlahSparepart'] ?? 0;
-                    return Padding(
-                      padding: EdgeInsets.only(left: 16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('ID Sparepart: $idSparepart'),
-                          Text('Nama Sparepart: $namaSparepart'),
-                          Text('Harga Sparepart: Rp ${hargaSparepart}'),
-                          Text('Jumlah Item: $jumlahItem'),
-                        ],
+      child: Stack(
+        children: [
+          ListTile(
+            title: Text('ID Servis: $idServis'),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Tanggal dan Waktu: $dateTime'),
+                Text('ID Mekanik: $idMekanik'),
+                Text('Nama Mekanik: $namaMekanik'),
+                Text('Nomor Polisi: $nopol'),
+                Text('Nama Pelanggan: $namaPelanggan'),
+                Text('Merk SPM: $merkSpm'),
+                Text('Tipe SPM: $tipeSpm'),
+                Text('Keluhan: $kerusakan'),
+                Text('Items:'),
+                Column(
+                  children: items?.map((item) {
+                        String idSparepart = item['idSparepart'] ?? '';
+                        String namaSparepart = item['namaSparepart'] ?? '';
+                        String merkSparepart = item['merkSparepart'] ?? '';
+                        String specSparepart = item['specSparepart'] ?? '';
+                        int hargaSparepart =
+                            item['hargaSparepart'] as int? ?? 0;
+                        int jumlahItem = item['jumlahSparepart'] ?? 0;
+                        return Padding(
+                          padding: EdgeInsets.only(left: 16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('ID Sparepart: $idSparepart'),
+                              Text('Nama Sparepart: $namaSparepart'),
+                              Text('Harga Sparepart: Rp ${hargaSparepart}'),
+                              Text('Jumlah Item: $jumlahItem'),
+                            ],
+                          ),
+                        );
+                      }).toList() ??
+                      [],
+                ),
+                Text('Subtotal Sparepart: Rp $totalHargaSparepart'),
+                Text('Diskon: $diskon%'),
+                Text('Biaya Servis: Rp $biayaServis'),
+                Text('Bayar: Rp $bayar'),
+                Text('Kembalian: Rp $kembalian'),
+              ],
+            ),
+          ),
+          Positioned(
+            bottom: 0,
+            right: 0,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EditHistoriServisPage(
+                          idServis: '',
+                        ),
                       ),
                     );
-                  }).toList() ??
-                  [],
+                  },
+                  icon: Icon(Icons.edit),
+                ),
+                IconButton(
+                  onPressed: () {
+                    // Tambahkan kode untuk fungsi print di sini
+                  },
+                  icon: Icon(Icons.print),
+                ),
+              ],
             ),
-            Text('Subtotal Sparepart: Rp $totalHargaSparepart'),
-            Text('Diskon: $diskon%'),
-            Text('Biaya Servis: Rp $biayaServis'),
-            Text('Bayar: Rp $bayar'),
-            Text('Kembalian: Rp $kembalian'),
-          ],
-        ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              onPressed: () {
-                // Perform edit functionality here
-              },
-              icon: Icon(Icons.edit),
-            ),
-            IconButton(
-              onPressed: () {
-                // Perform print functionality here
-              },
-              icon: Icon(Icons.print),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

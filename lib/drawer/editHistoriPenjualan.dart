@@ -78,6 +78,7 @@ class _EditHistoriPenjualanPageState extends State<EditHistoriPenjualanPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Edit Histori Penjualan'),
+        backgroundColor: Color.fromARGB(255, 219, 42, 15),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),

@@ -1,4 +1,5 @@
 import 'package:firebase_database/firebase_database.dart';
+
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
@@ -77,9 +78,11 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
 
     if (snapshot.exists) {
       (snapshot.value as Map<dynamic, dynamic>).forEach((key, value) {
-        String month = value['bulan'];
-        if (!distinctMonths.contains(month)) {
-          distinctMonths.add(month);
+        if (value['bulan'] != null) {
+          String month = value['bulan'];
+          if (!distinctMonths.contains(month)) {
+            distinctMonths.add(month);
+          }
         }
       });
     }
@@ -119,97 +122,83 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
             child: Padding(
               padding: const EdgeInsets.all(10.0),
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Laporan Bulan:',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              DropdownButton<String>(
-                                value: selectedMonth,
-                                onChanged: (String? newValue) {
-                                  setState(() {
-                                    selectedMonth = newValue!;
-                                  });
-                                  fetchDataServis(selectedMonth);
-                                },
-                                items: monthList.map((String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Text(
-                                      value,
-                                      style: TextStyle(fontSize: 18),
-                                    ),
-                                  );
-                                }).toList(),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 10),
-                          Row(
-                            children: [
-                              Text(
-                                'Bulan:',
-                                style: TextStyle(fontSize: 18),
-                              ),
-                              SizedBox(width: 10),
-                              Text(
-                                '$selectedMonth',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18,
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 10),
-                          Row(
-                            children: [
-                              Text(
-                                'Jumlah Servis:',
-                                style: TextStyle(fontSize: 18),
-                              ),
-                              SizedBox(width: 10),
-                              Text(
-                                jumlahServis.toString(),
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18,
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 10),
-                          Row(
-                            children: [
-                              Text(
-                                'Total Pendapatan Servis:',
-                                style: TextStyle(fontSize: 18),
-                              ),
-                              SizedBox(width: 10),
-                              Text(
-                                'Rp ${NumberFormat.decimalPattern('id_ID').format(totalPendapatan)}',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Laporan Bulan:',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
+                      SizedBox(width: 10),
+                      DropdownButton<String>(
+                        value: selectedMonth,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedMonth = newValue!;
+                          });
+                          fetchDataServis(selectedMonth);
+                        },
+                        items: monthList.map((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(
+                              value,
+                              style: TextStyle(fontSize: 18),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Text(
+                        'Bulan:',
+                        style: TextStyle(fontSize: 18),
+                      ),
+                      SizedBox(width: 10),
+                      Text(
+                        '$selectedMonth',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 18),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Text(
+                        'Jumlah Servis:',
+                        style: TextStyle(fontSize: 18),
+                      ),
+                      SizedBox(width: 10),
+                      Text(
+                        jumlahServis.toString(),
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 18),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Text(
+                        'Total Pendapatan Servis:',
+                        style: TextStyle(fontSize: 18),
+                      ),
+                      SizedBox(width: 10),
+                      Text(
+                        'Rp ${NumberFormat.decimalPattern('id_ID').format(totalPendapatan)}',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 18),
+                      ),
+                    ],
                   ),
                 ],
               ),

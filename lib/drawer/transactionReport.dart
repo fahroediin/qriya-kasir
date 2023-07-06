@@ -306,7 +306,7 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
                               style: TextStyle(fontSize: 18),
                             ),
                             Text(
-                              formatCurrency(jumlahTotalPendapatan),
+                              'Rp ' + formatCurrency(jumlahTotalPendapatan),
                               style: TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 18),
                             ),
@@ -327,7 +327,7 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
                               style: TextStyle(fontSize: 18),
                             ),
                             Text(
-                              formatCurrency(totalDiskon),
+                              'Rp ' + formatCurrency(totalDiskon),
                               style: TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 18),
                             ),
@@ -348,7 +348,7 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
                               style: TextStyle(fontSize: 18),
                             ),
                             Text(
-                              formatCurrency(totalPendapatanBersih),
+                              'Rp ' + formatCurrency(totalPendapatanBersih),
                               style: TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 18),
                             ),
