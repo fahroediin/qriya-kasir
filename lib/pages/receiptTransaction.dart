@@ -11,9 +11,6 @@ class ReceiptTransactionPage extends StatefulWidget {
 }
 
 class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
-  final DatabaseReference _databaseReference =
-      FirebaseDatabase.instance.reference();
-
   late Future<Map<String, dynamic>> _lastTransactionFuture;
 
   @override
@@ -24,6 +21,7 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
 
   Future<Map<String, dynamic>> fetchLastTransaction() async {
     final DatabaseReference databaseRef =
+        // ignore: deprecated_member_use
         FirebaseDatabase.instance.reference().child('transaksiPenjualan');
 
     final DataSnapshot snapshot =

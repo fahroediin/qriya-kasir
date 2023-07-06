@@ -74,16 +74,11 @@ class _TransaksiSuccessPageState extends State<TransaksiSuccessPage> {
       return;
     }
 
-    String formatCurrency(int value) {
-      final format = NumberFormat("#,###");
-      return format.format(value);
-    }
-
     final selectedDevice = await showDialog<BluetoothDevice>(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Pilih Printer'),
+          title: const Text('Pilih Printer'),
           content: SingleChildScrollView(
             child: ListBody(
               children: devices.map((device) {
@@ -91,7 +86,7 @@ class _TransaksiSuccessPageState extends State<TransaksiSuccessPage> {
                   onTap: () {
                     Navigator.of(context).pop(device);
                   },
-                  leading: Icon(Icons.print),
+                  leading: const Icon(Icons.print),
                   title: Text(device.name.toString()),
                 );
               }).toList(),

@@ -124,21 +124,21 @@ class _SparepartPageState extends State<SparepartPage> {
                   color: Colors.blue,
                 ),
               ),
-              SizedBox(width: 16),
+              const SizedBox(width: 16),
               GestureDetector(
                 onTap: () {
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
                       return AlertDialog(
-                        title: Text('Confirm'),
-                        content: Text('Hapus data sparepart?'),
+                        title: const Text('Confirm'),
+                        content: const Text('Hapus data sparepart?'),
                         actions: [
                           TextButton(
                             onPressed: () {
                               Navigator.of(context).pop(); // Tutup dialog
                             },
-                            child: Text('No'),
+                            child: const Text('No'),
                           ),
                           TextButton(
                             onPressed: () {
@@ -146,7 +146,7 @@ class _SparepartPageState extends State<SparepartPage> {
                               reference.child(sparepart['key']).remove();
                               Navigator.of(context).pop(); // Tutup dialog
                             },
-                            child: Text('Yes'),
+                            child: const Text('Yes'),
                           ),
                         ],
                       );

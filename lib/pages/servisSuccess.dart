@@ -241,7 +241,7 @@ class _ServisSuccessPageState extends State<ServisSuccessPage> {
               0);
           printer.printNewLine();
           printer.printCustom('Terima Kasih', 2, 1);
-          printer.printCustom('Semoga Hari Anda Menyenangkan!', 1, 1);
+          printer.printCustom('Atas Kunjungan Anda', 1, 1);
           printer.printNewLine();
           printer.paperCut();
           // Menambahkan jeda 5 detik sebelum memutuskan koneksi
