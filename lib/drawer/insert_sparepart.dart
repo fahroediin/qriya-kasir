@@ -133,7 +133,7 @@ class _InputSparepartPageState extends State<InputSparepartPage>
             );
           },
         ),
-        title: Text('Tambah Suku Cadang'),
+        title: Text('Tambah Sparepart'),
         backgroundColor: Color.fromARGB(255, 219, 42, 15),
       ),
       body: Padding(
