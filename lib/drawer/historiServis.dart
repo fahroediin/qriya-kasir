@@ -131,8 +131,38 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton(
-                  onPressed: () {},
-                  icon: Icon(Icons.edit),
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: Text('Konfirmasi'),
+                          content: Text('Hapus data transaksi ini?'),
+                          actions: [
+                            TextButton(
+                              child: Text('Batal'),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                            TextButton(
+                              child: Text('Hapus'),
+                              onPressed: () {
+                                FirebaseDatabase.instance
+                                    .reference()
+                                    .child('transaksiServis')
+                                    .child(snapshot.key!)
+                                    .remove();
+                                Navigator.of(context).pop();
+                                fetchData();
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                  icon: Icon(Icons.delete),
                 ),
                 IconButton(
                   onPressed: () {
