@@ -184,12 +184,37 @@ class _EditHistoriPenjualanPageState extends State<EditHistoriPenjualanPage> {
   }
 }
 
-TransaksiPenjualan(
-    {required String idPenjualan,
-    required String dateTime,
-    required String namaPembeli,
-    required double hargaTotal,
-    required double diskon,
-    required double hargaAkhir,
-    required double bayar,
-    required double kembalian}) {}
+class TransaksiPenjualan {
+  final String idPenjualan;
+  final String dateTime;
+  final String namaPembeli;
+  final double hargaTotal;
+  final double diskon;
+  final double hargaAkhir;
+  final double bayar;
+  final double kembalian;
+
+  TransaksiPenjualan({
+    required this.idPenjualan,
+    required this.dateTime,
+    required this.namaPembeli,
+    required this.hargaTotal,
+    required this.diskon,
+    required this.hargaAkhir,
+    required this.bayar,
+    required this.kembalian,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'idPenjualan': idPenjualan,
+      'dateTime': dateTime,
+      'namaPembeli': namaPembeli,
+      'hargaTotal': hargaTotal,
+      'diskon': diskon,
+      'hargaAkhir': hargaAkhir,
+      'bayar': bayar,
+      'kembalian': kembalian,
+    };
+  }
+}
