@@ -54,6 +54,7 @@ dependencies:
   blue_thermal_printer: ^1.1.8
   flutter_blue_plus: ^1.5.2
   animations: ^2.0.7
+  date_time_picker: ^2.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

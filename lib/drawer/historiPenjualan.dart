@@ -4,7 +4,6 @@ import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:intl/intl.dart';
 import 'package:project_s/pages/home_page.dart';
 import 'package:blue_thermal_printer/blue_thermal_printer.dart';
-import 'editHistoriPenjualan.dart';
 import 'package:blue_thermal_printer/blue_thermal_printer.dart';
 import 'package:flutter/services.dart';
 
@@ -99,17 +98,38 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
               children: [
                 IconButton(
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => EditHistoriPenjualanPage(
-                          idPenjualan:
-                              idPenjualan, // Menggunakan idPenjualan dari data yang dipilih
-                        ),
-                      ),
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: Text('Hapus Data'),
+                          content: Text(
+                              'Apakah Anda yakin ingin menghapus data ini?'),
+                          actions: [
+                            TextButton(
+                              child: Text('Batal'),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                            TextButton(
+                              child: Text('Hapus'),
+                              onPressed: () {
+                                FirebaseDatabase.instance
+                                    .reference()
+                                    .child('transaksiPenjualan')
+                                    .child(snapshot.key!)
+                                    .remove();
+                                Navigator.of(context).pop();
+                                fetchData();
+                              },
+                            ),
+                          ],
+                        );
+                      },
                     );
                   },
-                  icon: Icon(Icons.edit),
+                  icon: Icon(Icons.delete),
                 ),
                 IconButton(
                   onPressed: () {
@@ -156,15 +176,16 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
   }
 
   void _selectPrinter(
-      String idPenjualan,
-      String dateTime,
-      String namaPembeli,
-      List<Map>? items,
-      int totalBayar,
-      int bayar,
-      int kembalian,
-      int diskon,
-      int hargaAkhir) async {
+    String idPenjualan,
+    String dateTime,
+    String namaPembeli,
+    List<Map>? items,
+    int totalBayar,
+    int bayar,
+    int kembalian,
+    int diskon,
+    int hargaAkhir,
+  ) async {
     if (devices.isEmpty) {
       return;
     }

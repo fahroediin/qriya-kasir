@@ -3,8 +3,6 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:project_s/pages/home_page.dart';
 
-import 'editHistoriServis.dart';
-
 class HistoriServisPage extends StatefulWidget {
   const HistoriServisPage({Key? key}) : super(key: key);
 
@@ -122,16 +120,7 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => EditHistoriServisPage(
-                          idServis: '',
-                        ),
-                      ),
-                    );
-                  },
+                  onPressed: () {},
                   icon: Icon(Icons.edit),
                 ),
                 IconButton(
