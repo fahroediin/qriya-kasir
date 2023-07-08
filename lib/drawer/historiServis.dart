@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
+import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:project_s/pages/home_page.dart';
+import 'package:blue_thermal_printer/blue_thermal_printer.dart';
 
 class HistoriServisPage extends StatefulWidget {
   const HistoriServisPage({Key? key}) : super(key: key);
@@ -20,28 +23,36 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
   TextEditingController searchController = TextEditingController();
   String searchQuery = '';
   Query? searchRef;
+  List<BluetoothDevice> devices = [];
+  BluetoothDevice? selectedDevice;
+  BlueThermalPrinter printer = BlueThermalPrinter.instance;
 
   @override
   void initState() {
     super.initState();
     fetchData();
+    getDevices();
   }
 
   Future<void> fetchData() async {
+    Query newSearchRef;
+
     if (searchQuery.isNotEmpty) {
-      searchRef = FirebaseDatabase.instance
+      newSearchRef = FirebaseDatabase.instance
           .reference()
           .child('transaksiServis')
           .orderByChild('namaPelanggan')
           .startAt(searchQuery.toLowerCase())
           .endAt(searchQuery.toLowerCase() + '\uf8ff');
     } else {
-      searchRef = dbRef;
+      newSearchRef = dbRef;
     }
-    DataSnapshot snapshot = await searchRef!.get();
+
+    DataSnapshot snapshot = await newSearchRef.get();
     if (snapshot.exists) {
       setState(() {
         itemCount = snapshot.children.length;
+        searchRef = newSearchRef;
       });
     }
   }
@@ -125,7 +136,7 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
                 ),
                 IconButton(
                   onPressed: () {
-                    // Tambahkan kode untuk fungsi print di sini
+                    _selectPrinter(transaksi);
                   },
                   icon: Icon(Icons.print),
                 ),
@@ -147,6 +158,211 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
         ),
       ),
     );
+  }
+
+  String formatCurrency(int value) {
+    final format = NumberFormat("#,###");
+    return format.format(value);
+  }
+
+  void getDevices() async {
+    devices = await printer.getBondedDevices();
+    setState(() {});
+  }
+
+  void _selectPrinter(Map<dynamic, dynamic> transaksi) async {
+    if (devices.isEmpty) {
+      return;
+    }
+
+    final selectedDevice = await showDialog<BluetoothDevice>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Pilih Printer'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: devices.map((device) {
+                return ListTile(
+                  onTap: () {
+                    Navigator.of(context).pop(device);
+                  },
+                  leading: const Icon(Icons.print),
+                  title: Text(device.name.toString()),
+                );
+              }).toList(),
+            ),
+          ),
+        );
+      },
+    );
+
+    if (selectedDevice != null) {
+      setState(() {
+        this.selectedDevice = selectedDevice;
+      });
+
+      printReceipt(selectedDevice, transaksi);
+    }
+  }
+
+  void printReceipt(
+      BluetoothDevice selectedDevice, Map<dynamic, dynamic> transaksi) {
+    try {
+      printer.connect(selectedDevice).then((_) {
+        printer.paperCut();
+        printer.printNewLine();
+        printer.printCustom(
+          'Aira Motor Padangjaya',
+          3,
+          1,
+        );
+        printer.printCustom(
+          'Servis & Suku Cadang',
+          0,
+          1,
+        );
+        printer.printCustom(
+          'Jl. Marta Atmaja RT 003/011',
+          0,
+          1,
+        );
+        printer.printCustom(
+          'Padangjaya, Majenang ',
+          0,
+          1,
+        );
+        printer.printCustom(
+          '53257 Cilacap, Jawa Tengah',
+          0,
+          1,
+        );
+        printer.printCustom(
+          'HP 0818-0280-7674',
+          1,
+          1,
+        );
+        printer.printNewLine();
+        printer.printCustom('ID Servis: ${transaksi['idServis']}', 1, 0);
+        printer.printCustom('Date/Time: ${transaksi['dateTime']}', 1, 0);
+        printer.printCustom('--------------------------------', 0, 0);
+        printer.printCustom('ID Mekanik: ${transaksi['idMekanik']}', 1, 0);
+        printer.printCustom('Nama Mekanik: ${transaksi['namaMekanik']}', 1, 0);
+        printer.printCustom('--------------------------------', 0, 0);
+        printer.printCustom('Nopol: ${transaksi['nopol']}', 1, 0);
+        printer.printCustom(
+            'Nama Pelanggan: ${transaksi['namaPelanggan']}', 1, 0);
+        printer.printCustom('Merk SPM: ${transaksi['merkSpm']}', 1, 0);
+        printer.printCustom('Tipe SPM: ${transaksi['tipeSpm']}', 1, 0);
+        printer.printCustom('Keluhan: ${transaksi['keluhan']}', 1, 0);
+        printer.printNewLine();
+        printer.printCustom('--------------------------------', 0, 0);
+        printer.printCustom('Items               Qty   Price', 0, 0);
+        for (var item in transaksi['items']) {
+          String itemName = item['namaSparepart'];
+          int quantity = item['jumlahSparepart'];
+          int price = item['hargaSparepart'];
+
+          // Pad the strings to align the columns
+          String paddedItemName = itemName.padRight(18);
+          String paddedQuantity = quantity.toString().padLeft(4);
+          String paddedPrice = formatCurrency(price).padLeft(9);
+
+          // Create the final formatted line
+          String formattedLine = '$paddedItemName$paddedQuantity$paddedPrice';
+
+          printer.printCustom(formattedLine, 1, 0);
+        }
+        printer.printNewLine();
+        printer.printCustom('--------------------------------', 0, 0);
+        double totalDiskon =
+            (transaksi['totalHargaSparepart'] * transaksi['diskon']) /
+                100; // Calculate totalDiskon
+
+        String harga =
+            'Rp ${formatCurrency(transaksi['totalHargaSparepart'].toInt())}';
+        String diskon = '${transaksi['diskon'].toStringAsFixed(0)}%';
+        int jumlahItem = 0;
+
+        for (var item in transaksi['items']) {
+          int quantity = item['jumlahSparepart'];
+          jumlahItem += quantity;
+        }
+        String potonganHarga = 'Total Diskon'.padRight(20) +
+            'Rp ${formatCurrency(totalDiskon.toInt())}';
+
+        String totalItem = jumlahItem.toString();
+        String formattedTotalItem = totalItem.padRight(3);
+
+        String totalItemLabel = 'Total Item';
+        String totalItemColumn = totalItemLabel.padRight(15);
+        String hargaColumn = 'Rp ' +
+            formatCurrency(transaksi['totalHargaSparepart'].toInt())
+                .padRight(2);
+
+        printer.printCustom(
+            '$totalItemColumn$formattedTotalItem  $hargaColumn', 1, 0);
+
+        printer.printCustom('Diskon'.padRight(20) + diskon, 1, 0);
+        printer.printCustom(potonganHarga, 1, 0);
+        printer.printCustom(
+            'Total '.padRight(20) +
+                'Rp ${formatCurrency(transaksi['hargaAkhir'].toInt())}',
+            1,
+            0);
+        printer.printCustom(
+            'Biaya Servis '.padRight(20) +
+                'Rp ${formatCurrency(transaksi['biayaServis'].toInt())}',
+            1,
+            0);
+
+        printer.printCustom('--------------------------------', 0, 0);
+        printer.printCustom(
+            'Total '.padRight(20) +
+                'Rp ${formatCurrency(transaksi['totalAkhir'].toInt())}',
+            1,
+            0);
+        printer.printCustom(
+            'Bayar '.padRight(20) +
+                'Rp ${formatCurrency(transaksi['bayar'].toInt())}',
+            1,
+            0);
+        printer.printCustom(
+            'Kembalian '.padRight(20) +
+                'Rp ${formatCurrency(transaksi['kembalian'].toInt())}',
+            1,
+            0);
+        printer.printNewLine();
+        printer.printCustom('Terima Kasih', 2, 1);
+        printer.printCustom('Atas Kunjungan Anda', 1, 1);
+        printer.printNewLine();
+        printer.paperCut();
+        // Menambahkan jeda 5 detik sebelum memutuskan koneksi
+        Future.delayed(Duration(seconds: 5), () {
+          printer.disconnect().then((_) {
+            showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  title: Text('Cetak Kuitansi'),
+                  content: Text('Berhasil mencetak kuitansi'),
+                  actions: <Widget>[
+                    TextButton(
+                      child: Text('OK'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                );
+              },
+            );
+          });
+        });
+      });
+    } on PlatformException catch (e) {
+      print(e.message);
+    }
   }
 
   @override
@@ -211,7 +427,6 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
                         onChanged: (value) {
                           setState(() {
                             searchQuery = value;
-                            fetchData(); // Tambahkan baris ini
                           });
                         },
                         decoration: InputDecoration(

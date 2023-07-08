@@ -102,9 +102,8 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
                       context: context,
                       builder: (context) {
                         return AlertDialog(
-                          title: Text('Hapus Data'),
-                          content: Text(
-                              'Apakah Anda yakin ingin menghapus data ini?'),
+                          title: Text('Konfirmasi'),
+                          content: Text('Hapus data transaksi ini?'),
                           actions: [
                             TextButton(
                               child: Text('Batal'),
