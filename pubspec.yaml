@@ -95,6 +95,7 @@ flutter:
   #Register asset
   - assets/register.png
   #drawer asset
+  - assets/kasir.png
   - assets/about.png
   - assets/mekanik.png
   - assets/reminder.png

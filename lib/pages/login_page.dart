@@ -110,13 +110,13 @@ class _LoginPageState extends State<LoginPage>
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString('email', _emailController.text.trim());
         prefs.setString('password', _passwordController.text.trim());
-      } on FirebaseAuthException catch (e) {
+
         if (e.code == 'user-not-found') {
           _showSnackBar('Email tidak terdaftar');
         } else if (e.code == 'wrong-password') {
           _showSnackBar('Password salah');
         } else {
-          _showSnackBar('Email dan Password tidak boleh kosong');
+          _showSnackBar('Terjadi kesalahan saat login');
         }
       } catch (e) {
         _showSnackBar('Terjadi kesalahan saat login');

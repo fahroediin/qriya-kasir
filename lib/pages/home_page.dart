@@ -466,7 +466,7 @@ class _HomePageState extends State<HomePage> {
                   accountEmail: Text(_user?.email ?? ''),
                   currentAccountPicture: CircleAvatar(
                     backgroundColor: Colors.white,
-                    child: Icon(Icons.admin_panel_settings_rounded),
+                    backgroundImage: AssetImage('assets/kasir.png'),
                   ),
                   decoration: BoxDecoration(
                     color: Color.fromARGB(255, 219, 42, 15),
