@@ -1,5 +1,4 @@
 import 'package:firebase_database/firebase_database.dart';
-
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
@@ -19,14 +18,22 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
   int jumlahServis = 0; // Menyimpan jumlah servis
   int totalPendapatan = 0; // Menyimpan total pendapatan
   List<Map<String, dynamic>> pelangganRanking = [];
+  Map<String, String> namaPelangganMap = {};
+  Map<String, int> jumlahMap = {};
 
   Future<void> fetchDataServis(String selectedMonth) async {
     String formattedMonth = DateFormat('MM/yyyy')
         .format(DateFormat('MMMM yyyy', 'id_ID').parse(selectedMonth));
-    DateTime firstDayOfMonth = DateTime(int.parse(formattedMonth.split('/')[1]),
-        int.parse(formattedMonth.split('/')[0]), 1);
-    DateTime lastDayOfMonth = DateTime(int.parse(formattedMonth.split('/')[1]),
-        int.parse(formattedMonth.split('/')[0]) + 1, 0);
+    DateTime firstDayOfMonth = DateTime(
+      int.parse(formattedMonth.split('/')[1]),
+      int.parse(formattedMonth.split('/')[0]),
+      1,
+    );
+    DateTime lastDayOfMonth = DateTime(
+      int.parse(formattedMonth.split('/')[1]),
+      int.parse(formattedMonth.split('/')[0]) + 1,
+      0,
+    );
     String formattedFirstDayOfMonth =
         DateFormat('dd/MM/yyyy').format(firstDayOfMonth);
     String formattedLastDayOfMonth =
@@ -45,21 +52,20 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
         (snapshot.value as Map<dynamic, dynamic>).forEach((key, value) {
           totalBiayaServis += (value['biayaServis'] ?? 0) as int;
           String nopol = value['nopol'];
-          if (nopolCountMap.containsKey(nopol)) {
-            nopolCountMap[nopol] = nopolCountMap[nopol]! + 1;
-          } else {
-            nopolCountMap[nopol] = 1;
-          }
+          String namaPelanggan = value['namaPelanggan'];
+          int jumlah = value['jumlah'] ?? 0;
+          // Simpan data nama pelanggan dan jumlah ke dalam map
+          namaPelangganMap[nopol] = namaPelanggan;
+          jumlahMap[nopol] = (jumlahMap[nopol] ?? 0) + 1;
         });
 
-        List<MapEntry<String, int>> nopolCountList =
-            nopolCountMap.entries.toList();
+        List<MapEntry<String, int>> nopolCountList = jumlahMap.entries.toList();
         nopolCountList.sort((a, b) => b.value.compareTo(a.value));
         pelangganRanking = nopolCountList
             .take(10)
             .map((entry) => {
                   'nopol': entry.key,
-                  'jumlah': entry.value,
+                  'jumlah': entry.value.toString(),
                 })
             .toList();
 
@@ -214,6 +220,7 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
           ),
           SizedBox(height: 10),
           DataTable(
+            dataRowHeight: 40,
             columns: [
               DataColumn(
                 label: Text('No.'),
@@ -225,9 +232,6 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
                 label: Text('Nama'),
               ),
               DataColumn(
-                label: Text('TipeSpm'),
-              ),
-              DataColumn(
                 label: Text('Jumlah'),
               ),
             ],
@@ -236,28 +240,36 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
               Map<String, dynamic> pelanggan = entry.value;
               String nopol = pelanggan['nopol'];
 
-              String nama =
-                  ''; // Mengganti dengan logic mendapatkan namaPelanggan dari transaksiServis
-              String tipeSpm =
-                  ''; // Mengganti dengan logic mendapatkan tipeSpm dari transaksiServis
-              int jumlah = pelanggan['jumlah'];
+              String nama = namaPelangganMap[nopol] ?? '';
+              int jumlah = jumlahMap[nopol] ?? 0;
 
               return DataRow(
                 cells: [
                   DataCell(
-                    Text(index.toString()),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal:
+                              2), // Atur padding horizontal sesuai kebutuhan
+                      child: Text(index.toString()),
+                    ),
                   ),
                   DataCell(
-                    Text(nopol),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 2),
+                      child: Text(nopol),
+                    ),
                   ),
                   DataCell(
-                    Text(nama),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 2),
+                      child: Text(nama),
+                    ),
                   ),
                   DataCell(
-                    Text(tipeSpm),
-                  ),
-                  DataCell(
-                    Text(jumlah.toString()),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20),
+                      child: Text(jumlah.toString()),
+                    ),
                   ),
                 ],
               );
