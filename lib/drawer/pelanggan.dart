@@ -201,7 +201,7 @@ class _PelangganState extends State<Pelanggan> {
           ),
           SizedBox(height: 4),
           Text(
-            'Nama Pemilik: $namaPelanggan',
+            'Nama Pelanggan: $namaPelanggan',
             style: GoogleFonts.lato(
               fontSize: 18,
               fontWeight: FontWeight.w400,

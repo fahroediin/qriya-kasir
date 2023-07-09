@@ -54,6 +54,13 @@ class _RegisterPageState extends State<RegisterPage>
     super.dispose();
   }
 
+  void showSnackbar(String message) {
+    final snackBar = SnackBar(
+      content: Text(message),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   Future<void> signUpWithEmail() async {
     try {
       if (_passwordController.text == _confirmPasswordController.text) {
@@ -64,17 +71,14 @@ class _RegisterPageState extends State<RegisterPage>
         );
 
         if (userCredential.user != null) {
-          // Show snackbar
-          final snackBar = SnackBar(
-            content: Text('Pendaftaran berhasil'),
-          );
-          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          showSnackbar('Pendaftaran berhasil');
 
           _animationController.forward().then((value) {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                  builder: (_) => LoginPage(showRegisterPage: () {})),
+                builder: (_) => LoginPage(showRegisterPage: () {}),
+              ),
             );
           });
         }
@@ -130,13 +134,8 @@ class _RegisterPageState extends State<RegisterPage>
           await _auth.fetchSignInMethodsForEmail(email);
 
       if (signInMethods.isNotEmpty) {
-        // Email already exists, show snackbar
-        final snackBar = SnackBar(
-          content: Text('Email sudah terdaftar'),
-        );
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        showSnackbar('Email sudah terdaftar');
       } else {
-        // Email does not exist, proceed with registration
         signUpWithEmail();
       }
     } on FirebaseAuthException catch (e) {
@@ -156,8 +155,7 @@ class _RegisterPageState extends State<RegisterPage>
         child: Center(
           child: SingleChildScrollView(
             child: Form(
-              // Wrap with Form widget
-              key: _formKey, // Assign form key
+              key: _formKey,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -178,7 +176,6 @@ class _RegisterPageState extends State<RegisterPage>
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 25.0),
                     child: TextFormField(
-                      // Replace TextField with TextFormField
                       controller: _emailController,
                       decoration: InputDecoration(
                         labelText: 'Email',
@@ -188,7 +185,6 @@ class _RegisterPageState extends State<RegisterPage>
                         if (value == null || value.isEmpty) {
                           return 'Email tidak boleh kosong';
                         }
-                        // Check email format
                         final emailRegex = RegExp(
                             r'^[\w-]+(\.[\w-]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*(\.[a-zA-Z]{2,4})$');
                         if (!emailRegex.hasMatch(value)) {
@@ -202,7 +198,6 @@ class _RegisterPageState extends State<RegisterPage>
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 25.0),
                     child: TextFormField(
-                      // Replace TextField with TextFormField
                       controller: _passwordController,
                       obscureText: !_passwordVisible,
                       decoration: InputDecoration(
@@ -233,7 +228,6 @@ class _RegisterPageState extends State<RegisterPage>
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 25.0),
                     child: TextFormField(
-                      // Replace TextField with TextFormField
                       controller: _confirmPasswordController,
                       obscureText: !_confirmPasswordVisible,
                       decoration: InputDecoration(
@@ -273,7 +267,6 @@ class _RegisterPageState extends State<RegisterPage>
                       child: ElevatedButton(
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
-                            // Validate the form
                             checkEmailExists(_emailController.text.trim());
                           }
                         },
@@ -293,8 +286,6 @@ class _RegisterPageState extends State<RegisterPage>
                     ),
                   ),
                   SizedBox(height: 75),
-                  // Sign up with Google button
-
                   SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,

@@ -8,7 +8,7 @@ class AboutPage extends StatelessWidget {
   Future<void> _launchGithubUrl() async {
     const url = 'https://github.com/fahroediin';
     if (await canLaunch(url)) {
-      await launch(url);
+      await launch(url, forceWebView: true, enableJavaScript: true);
     } else {
       throw 'Could not launch $url';
     }
@@ -76,29 +76,34 @@ class AboutPage extends StatelessWidget {
           children: [
             Image.asset(
               'assets/qriya-logo.png',
-              width: 120,
-              height: 120,
+              width: 200,
+              height: 200,
             ),
             SizedBox(height: 16),
             Text(
-              'Aplikasi Kasir',
+              'QRIYA',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 24,
               ),
             ),
-            SizedBox(height: 16),
             Text(
-              'Aplikasi Kasir',
+              'Aplikasi Kasir Bengkel Sepeda Motor',
               style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 24,
+                fontWeight: FontWeight.normal,
+                fontSize: 20,
+              ),
+            ),
+            Text(
+              'versi 1.0.0',
+              style: TextStyle(
+                fontWeight: FontWeight.normal,
+                fontSize: 20,
               ),
             ),
             SizedBox(height: 16),
             ElevatedButton(
-              onPressed: () =>
-                  _launchGithubUrl(), // Mengubah metode pemanggilan tombol
+              onPressed: _launchGithubUrl,
               child: Text('Kenali Developer'),
               style: ElevatedButton.styleFrom(
                 primary: Color.fromARGB(255, 219, 42, 15),
