@@ -270,21 +270,22 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
                       ? Center(
                           child: Text('Data tidak ada'),
                         )
-                      : ListView.builder(
-                          itemCount: rankingSparepart.length > 10
-                              ? 10
-                              : rankingSparepart.length,
-                          itemBuilder: (context, index) {
-                            final sparepart = rankingSparepart[index];
-                            return ListTile(
-                              title: Text(
-                                '${sparepart['idSparepart']} - ${sparepart['namaSparepart']} - ${sparepart['merkSparepart']}',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              subtitle: Text(
-                                  'Jumlah Sparepart: ${sparepart['jumlahSparepart']}'),
-                            );
-                          },
+                      : DataTable(
+                          columns: [
+                            DataColumn(label: Text('ID Sparepart')),
+                            DataColumn(label: Text('Nama Sparepart')),
+                            DataColumn(label: Text('Merk Sparepart')),
+                            DataColumn(label: Text('Jumlah Sparepart')),
+                          ],
+                          rows: rankingSparepart
+                              .map((sparepart) => DataRow(cells: [
+                                    DataCell(Text(sparepart['idSparepart'])),
+                                    DataCell(Text(sparepart['namaSparepart'])),
+                                    DataCell(Text(sparepart['merkSparepart'])),
+                                    DataCell(Text(sparepart['jumlahSparepart']
+                                        .toString())),
+                                  ]))
+                              .toList(),
                         ),
                 ),
               ],

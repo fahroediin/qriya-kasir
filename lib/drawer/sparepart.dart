@@ -131,7 +131,7 @@ class _SparepartPageState extends State<SparepartPage> {
                     context: context,
                     builder: (BuildContext context) {
                       return AlertDialog(
-                        title: const Text('Confirm'),
+                        title: const Text('Konfirmasi'),
                         content: const Text('Hapus data sparepart?'),
                         actions: [
                           TextButton(

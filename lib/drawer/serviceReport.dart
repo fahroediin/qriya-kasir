@@ -20,6 +20,7 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
   List<Map<String, dynamic>> pelangganRanking = [];
   Map<String, String> namaPelangganMap = {};
   Map<String, int> jumlahMap = {};
+  List<Map<String, dynamic>> merkSpmRanking = [];
 
   Future<void> fetchDataServis(String selectedMonth) async {
     String formattedMonth = DateFormat('MM/yyyy')
@@ -131,7 +132,8 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment
+                        .spaceBetween, // Menambahkan MainAxisAlignment.spaceBetween
                     children: [
                       Text(
                         'Laporan Bulan:',
@@ -163,6 +165,8 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
                   ),
                   SizedBox(height: 10),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment
+                        .spaceBetween, // Menambahkan MainAxisAlignment.spaceBetween
                     children: [
                       Text(
                         'Bulan:',
@@ -178,6 +182,8 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
                   ),
                   SizedBox(height: 10),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment
+                        .spaceBetween, // Menambahkan MainAxisAlignment.spaceBetween
                     children: [
                       Text(
                         'Jumlah Servis:',
@@ -193,6 +199,8 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
                   ),
                   SizedBox(height: 10),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment
+                        .spaceBetween, // Menambahkan MainAxisAlignment.spaceBetween
                     children: [
                       Text(
                         'Total Pendapatan Servis:',
@@ -210,29 +218,44 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
               ),
             ),
           ),
-          SizedBox(height: 20),
+          SizedBox(height: 10),
           Text(
             'Pelanggan Ranking',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),
-          SizedBox(height: 10),
+          Divider(
+            color: Colors.grey,
+            thickness: 1.5,
+          ),
           DataTable(
             dataRowHeight: 40,
             columns: [
               DataColumn(
-                label: Text('No.'),
+                label: Text(
+                  'No.',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
               ),
               DataColumn(
-                label: Text('Nopol'),
+                label: Text(
+                  'Nopol',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
               ),
               DataColumn(
-                label: Text('Nama'),
+                label: Text(
+                  'Nama',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
               ),
               DataColumn(
-                label: Text('Jumlah'),
+                label: Text(
+                  'Jumlah',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
               ),
             ],
             rows: pelangganRanking.asMap().entries.map((entry) {
@@ -247,10 +270,10 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
                 cells: [
                   DataCell(
                     Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal:
-                              2), // Atur padding horizontal sesuai kebutuhan
-                      child: Text(index.toString()),
+                      padding: const EdgeInsets.symmetric(horizontal: 2),
+                      child: Text(
+                        index.toString(),
+                      ),
                     ),
                   ),
                   DataCell(

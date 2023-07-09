@@ -106,7 +106,7 @@ class _MekanikPageState extends State<MekanikPage> {
                     context: context,
                     builder: (BuildContext context) {
                       return AlertDialog(
-                        title: Text('Confirm'),
+                        title: Text('Konfirmasi'),
                         content: Text('Hapus data mekanik?'),
                         actions: [
                           TextButton(
