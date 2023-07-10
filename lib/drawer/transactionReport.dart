@@ -1,7 +1,13 @@
+import 'dart:io';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:number_to_words/number_to_words.dart';
 
 class TransactionReportPage extends StatefulWidget {
   @override
@@ -12,9 +18,9 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
   List<String> monthList = [];
   String selectedMonth = '';
 
-  Query dbRefPenjualan =
+  DatabaseReference dbRefPenjualan =
       FirebaseDatabase.instance.reference().child('transaksiPenjualan');
-  int countdDataPenjualan = 0;
+  int countDataPenjualan = 0;
   int jumlahTransaksi = 0; // Menyimpan jumlah transaksi
   int jumlahItemTerjual = 0; // Menyimpan jumlah item terjual
   int jumlahTotalPendapatan = 0; // Menyimpan jumlah total pendapatan
@@ -40,16 +46,16 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
         .endAt(formattedLastDayOfMonth + '\u{f8ff}')
         .get();
     if (mounted) {
-      if (snapshot.exists) {
+      if (snapshot.value != null) {
         int totalJumlahItemTerjual = 0;
         int totalHarga = 0;
         int totalDiskonPenjualan = 0;
 
         Map<String, int> sparepartCountMap = {};
 
-        Map<dynamic, dynamic> snapshotValue =
-            snapshot.value as Map<dynamic, dynamic>;
-        snapshotValue.forEach((key, value) {
+        Map<dynamic, dynamic>? snapshotValue =
+            snapshot.value as Map<dynamic, dynamic>?;
+        snapshotValue?.forEach((key, value) {
           if (value is Map<dynamic, dynamic>) {
             String? idSparepart = value['idSparepart'] as String?;
             int? jumlahItem = int.tryParse(value['jumlahItem'].toString());
@@ -98,9 +104,9 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
           rankingSparepart = rankingSparepartList;
         });
       } else {
-        // If snapshot does not exist or data is empty
+        // Jika snapshot tidak ada atau data kosong
         setState(() {
-          rankingSparepart = []; // Clear the existing data
+          rankingSparepart = []; // Hapus data yang ada
         });
       }
     }
@@ -137,6 +143,12 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
       appBar: AppBar(
         backgroundColor: Color.fromARGB(255, 219, 42, 15),
         title: Text('Laporan Transaksi'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.save),
+            onPressed: savePdf,
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -363,6 +375,84 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Future<void> savePdf() async {
+    final pdf = pw.Document();
+
+    pdf.addPage(
+      pw.Page(
+        build: (pw.Context context) => pw.Column(
+          children: [
+            pw.Header(
+              level: 0,
+              child: pw.Text('Laporan Transaksi'),
+            ),
+            pw.Header(
+              level: 1,
+              child: pw.Text('Bulan: $selectedMonth'),
+            ),
+            pw.Paragraph(
+              text: 'Jumlah Transaksi: ${jumlahTransaksi.toString()}',
+            ),
+            pw.Paragraph(
+              text: 'Jumlah Item Terjual: ${jumlahItemTerjual.toString()}',
+            ),
+            pw.Header(
+              level: 2,
+              child: pw.Text('Ranking Sparepart'),
+            ),
+            pw.Table.fromTextArray(
+              headers: [
+                'ID Sparepart',
+                'Nama Sparepart',
+                'Merk Sparepart',
+                'Jumlah Sparepart'
+              ],
+              data: rankingSparepart
+                  .map((sparepart) => [
+                        sparepart['idSparepart'],
+                        sparepart['namaSparepart'],
+                        sparepart['merkSparepart'],
+                        sparepart['jumlahSparepart'].toString(),
+                      ])
+                  .toList(),
+            ),
+            pw.Paragraph(
+              text:
+                  'Jumlah Total Pendapatan: Rp ${formatCurrency(jumlahTotalPendapatan)}',
+            ),
+            pw.Paragraph(
+              text: 'Total Diskon: Rp ${formatCurrency(totalDiskon)}',
+            ),
+            pw.Paragraph(
+              text:
+                  'Total Pendapatan Bersih: Rp ${formatCurrency(totalPendapatanBersih)}',
+            ),
+          ],
+        ),
+      ),
+    );
+
+    final output = await getTemporaryDirectory();
+    final file = File("${output.path}/transaction_report.pdf");
+    await file.writeAsBytes(await pdf.save());
+
+    // Open the saved PDF file
+    OpenFile.open(file.path);
+
+    // Show a SnackBar to inform the user that the PDF has been saved.
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('The transaction report PDF is saved successfully.'),
+        action: SnackBarAction(
+          label: 'OK',
+          onPressed: () {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          },
+        ),
       ),
     );
   }

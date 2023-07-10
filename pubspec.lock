@@ -478,6 +478,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.8.0"
+  number_to_words:
+    dependency: "direct main"
+    description:
+      name: number_to_words
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.0"
   open_file:
     dependency: "direct main"
     description:

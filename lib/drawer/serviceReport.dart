@@ -120,12 +120,85 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
     }
   }
 
+  Future<void> savePdf() async {
+    final pdf = pdfWidgets.Document();
+
+    pdf.addPage(
+      pdfWidgets.Page(
+        build: (pdfWidgets.Context context) => pdfWidgets.Column(
+          children: [
+            pdfWidgets.Header(
+              level: 0,
+              child: pdfWidgets.Text('Laporan Servis'),
+            ),
+            pdfWidgets.Header(
+              level: 1,
+              child: pdfWidgets.Text('Bulan: $selectedMonth'),
+            ),
+            pdfWidgets.Paragraph(
+              text: 'Jumlah Servis: ${jumlahServis.toString()}',
+            ),
+            pdfWidgets.Paragraph(
+              text:
+                  'Total Pendapatan Servis: Rp ${NumberFormat.decimalPattern('id_ID').format(totalPendapatan)}',
+            ),
+            pdfWidgets.Header(
+              level: 2,
+              child: pdfWidgets.Text('Pelanggan Ranking'),
+            ),
+            pdfWidgets.Table.fromTextArray(
+              headers: ['No.', 'Nopol', 'Nama', 'Jumlah'],
+              data: pelangganRanking
+                  .asMap()
+                  .entries
+                  .map(
+                    (entry) => [
+                      (entry.key + 1).toString(),
+                      entry.value['nopol'],
+                      namaPelangganMap[entry.value['nopol']] ?? '',
+                      entry.value['jumlah'],
+                    ],
+                  )
+                  .toList(),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    final output = await getTemporaryDirectory();
+    final file = File("${output.path}/service_report.pdf");
+    await file.writeAsBytes(await pdf.save());
+
+    // Open the saved PDF file
+    OpenFile.open(file.path);
+
+    // Show a SnackBar to inform the user that the PDF has been saved.
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('The service report PDF is saved successfully.'),
+        action: SnackBarAction(
+          label: 'OK',
+          onPressed: () {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          },
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color.fromARGB(255, 219, 42, 15),
         title: Text('Laporan Servis'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.save),
+            onPressed: savePdf,
+          ),
+        ],
       ),
       body: Column(
         children: [
