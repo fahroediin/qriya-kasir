@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/widgets.dart' as pdfWidgets;
+import 'package:open_file/open_file.dart';
 
 class ReceiptTransactionPage extends StatefulWidget {
   @override
@@ -49,7 +50,7 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
 
   Future<void> _saveAsPdf(
       BuildContext context, Map<String, dynamic> lastTransactionData) async {
-    final pdfWidgets.Document pdf = pdfWidgets.Document();
+    final pdf = pdfWidgets.Document();
 
     pdf.addPage(
       pdfWidgets.Page(
@@ -91,7 +92,8 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                   cellAlignment: pdfWidgets.Alignment.centerLeft,
                   headerStyle: pdfWidgets.TextStyle(
                       fontWeight: pdfWidgets.FontWeight.bold),
-                  data: (lastTransactionData['items'] ?? []).map((item) {
+                  data: (lastTransactionData['items'] ?? [])
+                      .map<List<dynamic>>((item) {
                     return [
                       item['idSparepart'],
                       item['namaSparepart'],
@@ -124,49 +126,25 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
     );
 
     // Get the document directory path
-    final Directory? directory = await getApplicationSupportDirectory();
-    if (directory != null) {
-      final String path =
-          '${directory.path}/receipt_${lastTransactionData['idPenjualan']}.pdf';
-      final File file = File(path);
-      await file.writeAsBytes(await pdf.save());
+    final output = await getApplicationDocumentsDirectory();
+    final file = File("${output.path}/transaction_receipt.pdf");
+    await file.writeAsBytes(await pdf.save());
 
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('PDF Saved'),
-            content: const Text('The PDF file has been saved successfully.'),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-    } else {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Error'),
-            content: const Text('Failed to get the document directory.'),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-    }
+    // Open the saved PDF file
+    OpenFile.open(file.path);
+
+    // Show a SnackBar to inform the user that the PDF has been saved.
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Receipt Transaction Has Been Saved'),
+        action: SnackBarAction(
+          label: 'OK',
+          onPressed: () {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          },
+        ),
+      ),
+    );
   }
 
   @override

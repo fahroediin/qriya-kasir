@@ -163,24 +163,18 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
             ),
             pw.Table.fromTextArray(
               headers: [
-                'No.',
                 'ID Sparepart',
                 'Nama Sparepart',
                 'Merk Sparepart',
                 'Jumlah Sparepart',
               ],
               data: rankingSparepart
-                  .asMap()
-                  .entries
-                  .map(
-                    (entry) => [
-                      (entry.key + 1).toString(),
-                      entry.value['idSparepart'],
-                      entry.value['namaSparepart'],
-                      entry.value['merkSparepart'],
-                      entry.value['jumlahSparepart'].toString(),
-                    ],
-                  )
+                  .map((sparepart) => [
+                        sparepart['idSparepart'],
+                        sparepart['namaSparepart'],
+                        sparepart['merkSparepart'],
+                        sparepart['jumlahSparepart'].toString(),
+                      ])
                   .toList(),
             ),
             pw.Paragraph(
@@ -198,15 +192,14 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
         ),
       ),
     );
-
     final output = await getTemporaryDirectory();
     final file = File("${output.path}/transaction_report.pdf");
     await file.writeAsBytes(await pdf.save());
 
-    // Open the saved PDF file
+// Open the saved PDF file
     OpenFile.open(file.path);
 
-    // Show a SnackBar to inform the user that the PDF has been saved.
+// Show a SnackBar to inform the user that the PDF has been saved.
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('The transaction report PDF is saved successfully.'),
@@ -365,26 +358,31 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
                       ? Center(
                           child: Text('Data tidak ada'),
                         )
-                      : SingleChildScrollView(
-                          child: DataTable(
-                            columns: [
-                              DataColumn(label: Text('ID Sparepart')),
-                              DataColumn(label: Text('Nama Sparepart')),
-                              DataColumn(label: Text('Merk Sparepart')),
-                              DataColumn(label: Text('Jumlah Sparepart')),
-                            ],
-                            rows: rankingSparepart
-                                .map((sparepart) => DataRow(cells: [
-                                      DataCell(Text(sparepart['idSparepart'])),
-                                      DataCell(
-                                          Text(sparepart['namaSparepart'])),
-                                      DataCell(
-                                          Text(sparepart['merkSparepart'])),
-                                      DataCell(Text(sparepart['jumlahSparepart']
-                                          .toString())),
-                                    ]))
-                                .toList(),
-                          ),
+                      : DataTable(
+                          columns: [
+                            DataColumn(label: Text('ID Sparepart')),
+                            DataColumn(label: Text('Nama Sparepart')),
+                            DataColumn(label: Text('Merk Sparepart')),
+                            DataColumn(label: Text('Jumlah Sparepart')),
+                          ],
+                          rows: rankingSparepart.asMap().entries.map((entry) {
+                            int index = entry.key + 1;
+                            Map<String, dynamic> sparepart = entry.value;
+                            String idSparepart = sparepart['idSparepart'];
+                            String namaSparepart = sparepart['namaSparepart'];
+                            String merkSparepart = sparepart['merkSparepart'];
+                            int jumlahSparepart = sparepart['jumlahSparepart'];
+
+                            return DataRow(
+                              cells: [
+                                DataCell(Text('$index')),
+                                DataCell(Text(idSparepart)),
+                                DataCell(Text(namaSparepart)),
+                                DataCell(Text(merkSparepart)),
+                                DataCell(Text(jumlahSparepart.toString())),
+                              ],
+                            );
+                          }).toList(),
                         ),
                 ),
               ],

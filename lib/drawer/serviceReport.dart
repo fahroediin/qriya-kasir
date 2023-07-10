@@ -347,11 +347,15 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
           ),
           DataTable(
             dataRowHeight: 40,
+            columnSpacing: 30,
             columns: [
               DataColumn(
-                label: Text(
-                  'No.',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                label: Container(
+                  width: 40,
+                  child: Text(
+                    'No.',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                 ),
               ),
               DataColumn(
@@ -367,9 +371,14 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
                 ),
               ),
               DataColumn(
-                label: Text(
-                  'Jumlah',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                label: Expanded(
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Jumlah',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -384,8 +393,9 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
               return DataRow(
                 cells: [
                   DataCell(
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 2),
+                    Container(
+                      width: 40,
+                      alignment: Alignment.centerLeft,
                       child: Text(
                         index.toString(),
                       ),
@@ -404,18 +414,25 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
                     ),
                   ),
                   DataCell(
-                    Padding(
-                      padding: const EdgeInsets.only(left: 20),
-                      child: Text(jumlah.toString()),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 20),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            jumlah.toString(),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ],
               );
             }).toList(),
-          ),
-          Divider(
-            color: Colors.grey,
-            thickness: 1.5,
+            dividerThickness: 1.5,
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey),
+            ),
           ),
           SizedBox(height: 20),
           Text(
@@ -431,11 +448,15 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
           ),
           DataTable(
             dataRowHeight: 40,
+            columnSpacing: 30,
             columns: [
               DataColumn(
-                label: Text(
-                  'No.',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                label: Container(
+                  width: 40,
+                  child: Text(
+                    'No.',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                 ),
               ),
               DataColumn(
@@ -451,9 +472,14 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
                 ),
               ),
               DataColumn(
-                label: Text(
-                  'Jumlah',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                label: Expanded(
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Jumlah',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -467,8 +493,9 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
               return DataRow(
                 cells: [
                   DataCell(
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 2),
+                    Container(
+                      width: 40,
+                      alignment: Alignment.centerLeft,
                       child: Text(
                         index.toString(),
                       ),
@@ -487,14 +514,25 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
                     ),
                   ),
                   DataCell(
-                    Padding(
-                      padding: const EdgeInsets.only(left: 20),
-                      child: Text(jumlah.toString()),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 20),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            jumlah.toString(),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ],
               );
             }).toList(),
+            dividerThickness: 1.5,
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey),
+            ),
           ),
         ],
       ),
