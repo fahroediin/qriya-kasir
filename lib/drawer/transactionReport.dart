@@ -91,7 +91,6 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
             'jumlahSparepart': jumlahSparepart,
           };
         }).toList();
-
         rankingSparepartList.sort(
             (a, b) => b['jumlahSparepart'].compareTo(a['jumlahSparepart']));
 
@@ -135,6 +134,90 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
       selectedMonth = monthList[0]; // Set the initial selected month
     }
     fetchDataPenjualan();
+  }
+
+  Future<void> savePdf() async {
+    final pdf = pw.Document();
+
+    pdf.addPage(
+      pw.Page(
+        build: (pw.Context context) => pw.Column(
+          children: [
+            pw.Header(
+              level: 0,
+              child: pw.Text('Laporan Transaksi'),
+            ),
+            pw.Header(
+              level: 1,
+              child: pw.Text('Bulan: $selectedMonth'),
+            ),
+            pw.Paragraph(
+              text: 'Jumlah Transaksi: ${jumlahTransaksi.toString()}',
+            ),
+            pw.Paragraph(
+              text: 'Jumlah Item Terjual: ${jumlahItemTerjual.toString()}',
+            ),
+            pw.Header(
+              level: 2,
+              child: pw.Text('Ranking Sparepart'),
+            ),
+            pw.Table.fromTextArray(
+              headers: [
+                'No.',
+                'ID Sparepart',
+                'Nama Sparepart',
+                'Merk Sparepart',
+                'Jumlah Sparepart',
+              ],
+              data: rankingSparepart
+                  .asMap()
+                  .entries
+                  .map(
+                    (entry) => [
+                      (entry.key + 1).toString(),
+                      entry.value['idSparepart'],
+                      entry.value['namaSparepart'],
+                      entry.value['merkSparepart'],
+                      entry.value['jumlahSparepart'].toString(),
+                    ],
+                  )
+                  .toList(),
+            ),
+            pw.Paragraph(
+              text:
+                  'Jumlah Total Pendapatan: Rp ${formatCurrency(jumlahTotalPendapatan)}',
+            ),
+            pw.Paragraph(
+              text: 'Total Diskon: Rp ${formatCurrency(totalDiskon)}',
+            ),
+            pw.Paragraph(
+              text:
+                  'Total Pendapatan Bersih: Rp ${formatCurrency(totalPendapatanBersih)}',
+            ),
+          ],
+        ),
+      ),
+    );
+
+    final output = await getTemporaryDirectory();
+    final file = File("${output.path}/transaction_report.pdf");
+    await file.writeAsBytes(await pdf.save());
+
+    // Open the saved PDF file
+    OpenFile.open(file.path);
+
+    // Show a SnackBar to inform the user that the PDF has been saved.
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('The transaction report PDF is saved successfully.'),
+        action: SnackBarAction(
+          label: 'OK',
+          onPressed: () {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          },
+        ),
+      ),
+    );
   }
 
   @override
@@ -282,22 +365,26 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
                       ? Center(
                           child: Text('Data tidak ada'),
                         )
-                      : DataTable(
-                          columns: [
-                            DataColumn(label: Text('ID Sparepart')),
-                            DataColumn(label: Text('Nama Sparepart')),
-                            DataColumn(label: Text('Merk Sparepart')),
-                            DataColumn(label: Text('Jumlah Sparepart')),
-                          ],
-                          rows: rankingSparepart
-                              .map((sparepart) => DataRow(cells: [
-                                    DataCell(Text(sparepart['idSparepart'])),
-                                    DataCell(Text(sparepart['namaSparepart'])),
-                                    DataCell(Text(sparepart['merkSparepart'])),
-                                    DataCell(Text(sparepart['jumlahSparepart']
-                                        .toString())),
-                                  ]))
-                              .toList(),
+                      : SingleChildScrollView(
+                          child: DataTable(
+                            columns: [
+                              DataColumn(label: Text('ID Sparepart')),
+                              DataColumn(label: Text('Nama Sparepart')),
+                              DataColumn(label: Text('Merk Sparepart')),
+                              DataColumn(label: Text('Jumlah Sparepart')),
+                            ],
+                            rows: rankingSparepart
+                                .map((sparepart) => DataRow(cells: [
+                                      DataCell(Text(sparepart['idSparepart'])),
+                                      DataCell(
+                                          Text(sparepart['namaSparepart'])),
+                                      DataCell(
+                                          Text(sparepart['merkSparepart'])),
+                                      DataCell(Text(sparepart['jumlahSparepart']
+                                          .toString())),
+                                    ]))
+                                .toList(),
+                          ),
                         ),
                 ),
               ],
@@ -375,84 +462,6 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Future<void> savePdf() async {
-    final pdf = pw.Document();
-
-    pdf.addPage(
-      pw.Page(
-        build: (pw.Context context) => pw.Column(
-          children: [
-            pw.Header(
-              level: 0,
-              child: pw.Text('Laporan Transaksi'),
-            ),
-            pw.Header(
-              level: 1,
-              child: pw.Text('Bulan: $selectedMonth'),
-            ),
-            pw.Paragraph(
-              text: 'Jumlah Transaksi: ${jumlahTransaksi.toString()}',
-            ),
-            pw.Paragraph(
-              text: 'Jumlah Item Terjual: ${jumlahItemTerjual.toString()}',
-            ),
-            pw.Header(
-              level: 2,
-              child: pw.Text('Ranking Sparepart'),
-            ),
-            pw.Table.fromTextArray(
-              headers: [
-                'ID Sparepart',
-                'Nama Sparepart',
-                'Merk Sparepart',
-                'Jumlah Sparepart'
-              ],
-              data: rankingSparepart
-                  .map((sparepart) => [
-                        sparepart['idSparepart'],
-                        sparepart['namaSparepart'],
-                        sparepart['merkSparepart'],
-                        sparepart['jumlahSparepart'].toString(),
-                      ])
-                  .toList(),
-            ),
-            pw.Paragraph(
-              text:
-                  'Jumlah Total Pendapatan: Rp ${formatCurrency(jumlahTotalPendapatan)}',
-            ),
-            pw.Paragraph(
-              text: 'Total Diskon: Rp ${formatCurrency(totalDiskon)}',
-            ),
-            pw.Paragraph(
-              text:
-                  'Total Pendapatan Bersih: Rp ${formatCurrency(totalPendapatanBersih)}',
-            ),
-          ],
-        ),
-      ),
-    );
-
-    final output = await getTemporaryDirectory();
-    final file = File("${output.path}/transaction_report.pdf");
-    await file.writeAsBytes(await pdf.save());
-
-    // Open the saved PDF file
-    OpenFile.open(file.path);
-
-    // Show a SnackBar to inform the user that the PDF has been saved.
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('The transaction report PDF is saved successfully.'),
-        action: SnackBarAction(
-          label: 'OK',
-          onPressed: () {
-            ScaffoldMessenger.of(context).hideCurrentSnackBar();
-          },
-        ),
       ),
     );
   }

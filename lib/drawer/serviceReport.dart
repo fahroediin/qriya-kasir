@@ -52,16 +52,22 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
       if (snapshot.exists) {
         int count = (snapshot.value as Map<dynamic, dynamic>).length;
         int totalBiayaServis = 0;
-        Map<String, int> nopolCountMap = {};
+        Map<String, int> merkSpmCountMap = {};
 
         (snapshot.value as Map<dynamic, dynamic>).forEach((key, value) {
           totalBiayaServis += (value['biayaServis'] ?? 0) as int;
           String nopol = value['nopol'];
           String namaPelanggan = value['namaPelanggan'];
+          String merkSpm = value['merkSpm'];
+          String tipeSpm = value['tipeSpm']; // Tambahkan tipeSpm
+
           int jumlah = value['jumlah'] ?? 0;
           // Simpan data nama pelanggan dan jumlah ke dalam map
           namaPelangganMap[nopol] = namaPelanggan;
           jumlahMap[nopol] = (jumlahMap[nopol] ?? 0) + 1;
+          // Simpan data merk sepeda motor dan jumlah ke dalam map
+          String merkSpmKey = '$merkSpm - $tipeSpm';
+          merkSpmCountMap[merkSpmKey] = (merkSpmCountMap[merkSpmKey] ?? 0) + 1;
         });
 
         List<MapEntry<String, int>> nopolCountList = jumlahMap.entries.toList();
@@ -73,7 +79,20 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
                   'jumlah': entry.value.toString(),
                 })
             .toList();
-
+        // Mengambil merk sepeda motor dari transaksi servis
+        List<MapEntry<String, int>> merkSpmCountList =
+            merkSpmCountMap.entries.toList();
+        merkSpmCountList.sort((a, b) => b.value.compareTo(a.value));
+        merkSpmRanking = merkSpmCountList
+            .take(10)
+            .map((entry) => {
+                  'merkSpm':
+                      entry.key.split(' - ')[0], // Ambil merkSpm dari key
+                  'tipeSpm':
+                      entry.key.split(' - ')[1], // Ambil tipeSpm dari key
+                  'jumlah': entry.value.toString(),
+                })
+            .toList();
         setState(() {
           countDataServis = count;
           jumlahServis = countDataServis;
@@ -156,6 +175,25 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
                       (entry.key + 1).toString(),
                       entry.value['nopol'],
                       namaPelangganMap[entry.value['nopol']] ?? '',
+                      entry.value['jumlah'],
+                    ],
+                  )
+                  .toList(),
+            ),
+            pdfWidgets.Header(
+              level: 2,
+              child: pdfWidgets.Text('Merk Sepeda Motor Ranking'),
+            ),
+            pdfWidgets.Table.fromTextArray(
+              headers: ['No.', 'Merk', 'Tipe', 'Jumlah'],
+              data: merkSpmRanking
+                  .asMap()
+                  .entries
+                  .map(
+                    (entry) => [
+                      (entry.key + 1).toString(),
+                      entry.value['merkSpm'],
+                      entry.value['tipeSpm'],
                       entry.value['jumlah'],
                     ],
                   )
@@ -363,6 +401,89 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 2),
                       child: Text(nama),
+                    ),
+                  ),
+                  DataCell(
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20),
+                      child: Text(jumlah.toString()),
+                    ),
+                  ),
+                ],
+              );
+            }).toList(),
+          ),
+          Divider(
+            color: Colors.grey,
+            thickness: 1.5,
+          ),
+          SizedBox(height: 20),
+          Text(
+            'Merk Sepeda Motor Ranking',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Divider(
+            color: Colors.grey,
+            thickness: 1.5,
+          ),
+          DataTable(
+            dataRowHeight: 40,
+            columns: [
+              DataColumn(
+                label: Text(
+                  'No.',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              DataColumn(
+                label: Text(
+                  'Merk',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              DataColumn(
+                label: Text(
+                  'Tipe',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              DataColumn(
+                label: Text(
+                  'Jumlah',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+            rows: merkSpmRanking.asMap().entries.map((entry) {
+              int index = entry.key + 1;
+              Map<String, dynamic> merkSpm = entry.value;
+              String merk = merkSpm['merkSpm'];
+              String tipe = merkSpm['tipeSpm'];
+              int jumlah = int.parse(merkSpm['jumlah']);
+
+              return DataRow(
+                cells: [
+                  DataCell(
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 2),
+                      child: Text(
+                        index.toString(),
+                      ),
+                    ),
+                  ),
+                  DataCell(
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 2),
+                      child: Text(merk),
+                    ),
+                  ),
+                  DataCell(
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 2),
+                      child: Text(tipe),
                     ),
                   ),
                   DataCell(
