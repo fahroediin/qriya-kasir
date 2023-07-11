@@ -26,8 +26,9 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
   int jumlahTotalPendapatan = 0; // Menyimpan jumlah total pendapatan
   int totalDiskon = 0; // Menyimpan total diskon yang diberikan
   int totalPendapatanBersih = 0; // Menyimpan total pendapatan bersih
-  List<Map<String, dynamic>> rankingSparepart =
-      []; // Menyimpan ranking sparepart
+
+  List<SparepartRanking> sparepartRankings =
+      []; // List untuk menyimpan data SparepartRanking
 
   Future<void> fetchDataPenjualan() async {
     String formattedMonth = DateFormat('MM/yyyy')
@@ -51,48 +52,50 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
         int totalHarga = 0;
         int totalDiskonPenjualan = 0;
 
-        Map<String, int> sparepartCountMap = {};
-
         Map<dynamic, dynamic>? snapshotValue =
             snapshot.value as Map<dynamic, dynamic>?;
         snapshotValue?.forEach((key, value) {
           if (value is Map<dynamic, dynamic>) {
-            String? idSparepart = value['idSparepart'] as String?;
             int? jumlahItem = int.tryParse(value['jumlahItem'].toString());
             int? hargaAkhir = int.tryParse(value['hargaAkhir'].toString());
             int? diskon = int.tryParse(value['totalDiskon'].toString());
 
-            if (idSparepart != null && jumlahItem != null) {
-              if (sparepartCountMap.containsKey(idSparepart)) {
-                sparepartCountMap[idSparepart] =
-                    (sparepartCountMap[idSparepart] ?? 0) + jumlahItem;
-              } else {
-                sparepartCountMap[idSparepart] = jumlahItem;
-              }
-            }
-
             totalJumlahItemTerjual += jumlahItem ?? 0;
             totalHarga += hargaAkhir ?? 0;
             totalDiskonPenjualan += diskon ?? 0;
+
+            // Menambahkan data SparepartRanking berdasarkan idSparepart
+            List<dynamic>? items = value['items'] as List<dynamic>?;
+            if (items != null) {
+              items.forEach((item) {
+                String idSparepart = item['idSparepart'].toString();
+                String namaSparepart = item['namaSparepart'].toString();
+                String merkSparepart = item['merkSparepart'].toString();
+
+                bool sparepartExist = false;
+                for (int i = 0; i < sparepartRankings.length; i++) {
+                  if (sparepartRankings[i].idSparepart == idSparepart) {
+                    sparepartExist = true;
+                    sparepartRankings[i].jumlah += jumlahItem ?? 0;
+                    break;
+                  }
+                }
+
+                if (!sparepartExist) {
+                  sparepartRankings.add(SparepartRanking(
+                    idSparepart: idSparepart,
+                    namaSparepart: namaSparepart,
+                    merkSparepart: merkSparepart,
+                    jumlah: jumlahItem ?? 0,
+                  ));
+                }
+              });
+            }
           }
         });
 
-        List<Map<String, dynamic>> rankingSparepartList =
-            sparepartCountMap.entries.map((entry) {
-          String idSparepart = entry.key;
-          int jumlahSparepart = entry.value;
-          String namaSparepart = ''; // Ganti dengan nama sparepart yang sesuai
-          String merkSparepart = ''; // Ganti dengan merk sparepart yang sesuai
-
-          return {
-            'idSparepart': idSparepart,
-            'namaSparepart': namaSparepart,
-            'merkSparepart': merkSparepart,
-            'jumlahSparepart': jumlahSparepart,
-          };
-        }).toList();
-        rankingSparepartList.sort(
-            (a, b) => b['jumlahSparepart'].compareTo(a['jumlahSparepart']));
+        // Urutkan sparepartRankings berdasarkan jumlah secara descending
+        sparepartRankings.sort((a, b) => b.jumlah.compareTo(a.jumlah));
 
         setState(() {
           jumlahTransaksi = snapshot.children.length;
@@ -100,12 +103,11 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
           jumlahTotalPendapatan = totalHarga;
           totalDiskon = totalDiskonPenjualan;
           totalPendapatanBersih = totalHarga - totalDiskonPenjualan;
-          rankingSparepart = rankingSparepartList;
         });
       } else {
         // Jika snapshot tidak ada atau data kosong
         setState(() {
-          rankingSparepart = []; // Hapus data yang ada
+          []; // Hapus data yang ada
         });
       }
     }
@@ -157,26 +159,6 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
             pw.Paragraph(
               text: 'Jumlah Item Terjual: ${jumlahItemTerjual.toString()}',
             ),
-            pw.Header(
-              level: 2,
-              child: pw.Text('Ranking Sparepart'),
-            ),
-            pw.Table.fromTextArray(
-              headers: [
-                'ID Sparepart',
-                'Nama Sparepart',
-                'Merk Sparepart',
-                'Jumlah Sparepart',
-              ],
-              data: rankingSparepart
-                  .map((sparepart) => [
-                        sparepart['idSparepart'],
-                        sparepart['namaSparepart'],
-                        sparepart['merkSparepart'],
-                        sparepart['jumlahSparepart'].toString(),
-                      ])
-                  .toList(),
-            ),
             pw.Paragraph(
               text:
                   'Jumlah Total Pendapatan: Rp ${formatCurrency(jumlahTotalPendapatan)}',
@@ -188,6 +170,29 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
               text:
                   'Total Pendapatan Bersih: Rp ${formatCurrency(totalPendapatanBersih)}',
             ),
+            pw.Header(
+              level: 1,
+              child: pw.Text('Sparepart Ranking'),
+            ),
+            if (sparepartRankings.isNotEmpty)
+              pw.Table.fromTextArray(
+                headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                headers: ['No.', 'ID', 'Nama Sparepart', 'Merk', 'Jumlah'],
+                data: List<List<String>>.generate(
+                  sparepartRankings.length > 10 ? 10 : sparepartRankings.length,
+                  (index) => [
+                    (index + 1).toString(),
+                    sparepartRankings[index].idSparepart,
+                    sparepartRankings[index].namaSparepart,
+                    sparepartRankings[index].merkSparepart,
+                    sparepartRankings[index].jumlah.toString(),
+                  ],
+                ),
+              )
+            else
+              pw.Paragraph(
+                text: 'Tidak ada data sparepart ranking',
+              ),
           ],
         ),
       ),
@@ -196,10 +201,10 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
     final file = File("${output.path}/transaction_report.pdf");
     await file.writeAsBytes(await pdf.save());
 
-// Open the saved PDF file
+    // Open the saved PDF file
     OpenFile.open(file.path);
 
-// Show a SnackBar to inform the user that the PDF has been saved.
+    // Show a SnackBar to inform the user that the PDF has been saved.
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('The transaction report PDF is saved successfully.'),
@@ -353,37 +358,133 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
                     ),
                   ),
                 ),
-                Expanded(
-                  child: rankingSparepart.isEmpty
-                      ? Center(
-                          child: Text('Data tidak ada'),
-                        )
-                      : DataTable(
-                          columns: [
-                            DataColumn(label: Text('ID Sparepart')),
-                            DataColumn(label: Text('Nama Sparepart')),
-                            DataColumn(label: Text('Merk Sparepart')),
-                            DataColumn(label: Text('Jumlah Sparepart')),
-                          ],
-                          rows: rankingSparepart.asMap().entries.map((entry) {
-                            int index = entry.key + 1;
-                            Map<String, dynamic> sparepart = entry.value;
-                            String idSparepart = sparepart['idSparepart'];
-                            String namaSparepart = sparepart['namaSparepart'];
-                            String merkSparepart = sparepart['merkSparepart'];
-                            int jumlahSparepart = sparepart['jumlahSparepart'];
-
-                            return DataRow(
-                              cells: [
-                                DataCell(Text('$index')),
-                                DataCell(Text(idSparepart)),
-                                DataCell(Text(namaSparepart)),
-                                DataCell(Text(merkSparepart)),
-                                DataCell(Text(jumlahSparepart.toString())),
-                              ],
-                            );
-                          }).toList(),
+                SizedBox(height: 20),
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Column(
+                      children: [
+                        Text(
+                          'Sparepart Ranking',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
+                        SizedBox(height: 10),
+                        if (sparepartRankings.isNotEmpty)
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: DataTable(
+                              columnSpacing:
+                                  16.0, // Menambahkan jarak antara kolom
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                    color: Colors
+                                        .grey), // Menambahkan border pada tabel
+                              ),
+                              columns: [
+                                DataColumn(
+                                  label: Container(
+                                    child: Text(
+                                      'No.',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ),
+                                DataColumn(
+                                  label: Text(
+                                    'ID',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                DataColumn(
+                                  label: Text(
+                                    'Nama',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                DataColumn(
+                                  label: Text(
+                                    'Merk',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                DataColumn(
+                                  label: Text(
+                                    'Jumlah',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ],
+                              rows: List<DataRow>.generate(
+                                sparepartRankings.length > 10
+                                    ? 10
+                                    : sparepartRankings.length,
+                                (index) => DataRow(
+                                  cells: [
+                                    DataCell(
+                                      Container(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 4.0),
+                                        decoration: BoxDecoration(),
+                                        child: Text((index + 1).toString()),
+                                      ),
+                                    ),
+                                    DataCell(
+                                      Container(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 4.0),
+                                        decoration: BoxDecoration(),
+                                        child: Text(sparepartRankings[index]
+                                            .idSparepart),
+                                      ),
+                                    ),
+                                    DataCell(
+                                      Container(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 2.0),
+                                        decoration: BoxDecoration(),
+                                        child: Text(sparepartRankings[index]
+                                            .namaSparepart),
+                                      ),
+                                    ),
+                                    DataCell(
+                                      Container(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 4.0),
+                                        decoration: BoxDecoration(),
+                                        child: Text(sparepartRankings[index]
+                                            .merkSparepart),
+                                      ),
+                                    ),
+                                    DataCell(
+                                      Container(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 20.0),
+                                        child: Text(sparepartRankings[index]
+                                            .jumlah
+                                            .toString()),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          )
+                        else
+                          Text(
+                            'Tidak ada data sparepart ranking',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                      ],
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -463,4 +564,18 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
       ),
     );
   }
+}
+
+class SparepartRanking {
+  final String idSparepart;
+  final String namaSparepart;
+  final String merkSparepart;
+  int jumlah;
+
+  SparepartRanking({
+    required this.idSparepart,
+    required this.namaSparepart,
+    required this.merkSparepart,
+    required this.jumlah,
+  });
 }

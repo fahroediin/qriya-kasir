@@ -3,7 +3,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:pdf/widgets.dart' as pdfWidgets;
+import 'package:pdf/widgets.dart' as pw;
 import 'package:open_file/open_file.dart';
 
 class ReceiptTransactionPage extends StatefulWidget {
@@ -13,6 +13,7 @@ class ReceiptTransactionPage extends StatefulWidget {
 
 class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
   late Future<Map<String, dynamic>> _lastTransactionFuture;
+  late String _pdfPath;
 
   @override
   void initState() {
@@ -22,7 +23,6 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
 
   Future<Map<String, dynamic>> fetchLastTransaction() async {
     final DatabaseReference databaseRef =
-        // ignore: deprecated_member_use
         FirebaseDatabase.instance.reference().child('transaksiPenjualan');
 
     final DataSnapshot snapshot =
@@ -48,75 +48,196 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
     return format.format(value);
   }
 
-  Future<void> _saveAsPdf(
-      BuildContext context, Map<String, dynamic> lastTransactionData) async {
-    final pdf = pdfWidgets.Document();
+  Future<void> savePdf(
+      BuildContext context, Map<String, dynamic> transactionData) async {
+    final pdf = pw.Document();
 
+    // Build the PDF content
     pdf.addPage(
-      pdfWidgets.Page(
-        build: (context) {
-          return pdfWidgets.Container(
-            padding: pdfWidgets.EdgeInsets.all(16.0),
-            child: pdfWidgets.Column(
-              crossAxisAlignment: pdfWidgets.CrossAxisAlignment.start,
+      pw.Page(
+        build: (pw.Context context) {
+          return pw.Padding(
+            padding: pw.EdgeInsets.all(16),
+            child: pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
-                pdfWidgets.Text(
-                  'ID Transaksi: ${lastTransactionData['idPenjualan']}',
-                  style: pdfWidgets.TextStyle(
-                      fontSize: 18, fontWeight: pdfWidgets.FontWeight.bold),
+                pw.Text(
+                  'ID Transaksi: ${transactionData['idPenjualan']}',
+                  style: pw.TextStyle(
+                    fontSize: 20,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
                 ),
-                pdfWidgets.SizedBox(height: 10),
-                pdfWidgets.Text(
-                  'Tanggal dan Waktu: ${lastTransactionData['formattedDateTime']}',
-                  style: pdfWidgets.TextStyle(fontSize: 14),
+                pw.SizedBox(height: 10),
+                pw.Text(
+                  'Tanggal dan Waktu: ${transactionData['dateTime']}',
                 ),
-                pdfWidgets.SizedBox(height: 10),
-                pdfWidgets.Text(
-                  'Nama Pembeli: ${lastTransactionData['namaPembeli']}',
-                  style: pdfWidgets.TextStyle(fontSize: 14),
+                pw.SizedBox(height: 10),
+                pw.Text(
+                  'Nama Pembeli: ${transactionData['namaPembeli']}',
                 ),
-                pdfWidgets.SizedBox(height: 20),
-                pdfWidgets.Text(
-                  'Daftar Barang:',
-                  style: pdfWidgets.TextStyle(
-                      fontSize: 16, fontWeight: pdfWidgets.FontWeight.bold),
+                pw.SizedBox(height: 10),
+                pw.Text(
+                  'List Item:',
+                  style: pw.TextStyle(
+                    fontSize: 16,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
                 ),
-                pdfWidgets.SizedBox(height: 10),
-                pdfWidgets.Table.fromTextArray(
-                  headers: [
-                    'ID Sparepart',
-                    'Nama Sparepart',
-                    'Harga',
-                    'Jumlah'
+                pw.SizedBox(height: 5),
+                pw.Table.fromTextArray(
+                  headers: ['ID', 'Name', 'Price', 'Qty'],
+                  data: [
+                    ...transactionData['items'].map<List<String>>(
+                      (item) => [
+                        item['idSparepart'].toString(),
+                        item['namaSparepart'].toString(),
+                        'Rp ${formatCurrency(item['hargaSparepart'])}',
+                        item['jumlahSparepart'].toString(),
+                      ],
+                    ),
                   ],
-                  cellAlignment: pdfWidgets.Alignment.centerLeft,
-                  headerStyle: pdfWidgets.TextStyle(
-                      fontWeight: pdfWidgets.FontWeight.bold),
-                  data: (lastTransactionData['items'] ?? [])
-                      .map<List<dynamic>>((item) {
-                    return [
-                      item['idSparepart'],
-                      item['namaSparepart'],
-                      formatCurrency(item['hargaSparepart']),
-                      item['jumlahSparepart'].toString(),
-                    ].cast<dynamic>().toList();
-                  }).toList(),
                 ),
-                pdfWidgets.SizedBox(height: 20),
-                pdfWidgets.Text(
-                  'Total Harga: ${formatCurrency(lastTransactionData['totalHarga'])}',
-                  style: pdfWidgets.TextStyle(
-                      fontSize: 16, fontWeight: pdfWidgets.FontWeight.bold),
+                pw.SizedBox(height: 5),
+                pw.SizedBox(height: 5),
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.Text(
+                      'Jumlah Item',
+                      style: pw.TextStyle(
+                        fontSize: 16,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                    pw.Text(
+                      '${transactionData['jumlahItem']}',
+                      style: pw.TextStyle(
+                        fontSize: 16,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
-                pdfWidgets.Text(
-                  'Diskon: ${lastTransactionData['diskon']}',
-                  style: pdfWidgets.TextStyle(
-                      fontSize: 16, fontWeight: pdfWidgets.FontWeight.bold),
+                pw.SizedBox(height: 5),
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.Text(
+                      'Subtotal Sparepart',
+                      style: pw.TextStyle(
+                        fontSize: 16,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                    pw.Text(
+                      'Rp ${formatCurrency(transactionData['totalHarga'])}',
+                      style: pw.TextStyle(
+                        fontSize: 16,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
-                pdfWidgets.Text(
-                  'Harga Akhir: ${formatCurrency(lastTransactionData['hargaAkhir'])}',
-                  style: pdfWidgets.TextStyle(
-                      fontSize: 16, fontWeight: pdfWidgets.FontWeight.bold),
+                pw.SizedBox(height: 5),
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.Text(
+                      'Diskon',
+                      style: pw.TextStyle(
+                        fontSize: 16,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                    pw.Text(
+                      '${transactionData['diskon']}%',
+                      style: pw.TextStyle(
+                        fontSize: 16,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                pw.SizedBox(height: 10),
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.Text(
+                      'Total Diskon',
+                      style: pw.TextStyle(
+                        fontSize: 16,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                    pw.Text(
+                      'Rp ${formatCurrency(transactionData['totalDiskon'])}',
+                      style: pw.TextStyle(
+                        fontSize: 16,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                pw.SizedBox(height: 5),
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.Text(
+                      'Total',
+                      style: pw.TextStyle(
+                        fontSize: 16,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                    pw.Text(
+                      'Rp ${formatCurrency(transactionData['hargaAkhir'])}',
+                      style: pw.TextStyle(
+                        fontSize: 16,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                pw.SizedBox(height: 5),
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.Text(
+                      'Bayar',
+                      style: pw.TextStyle(
+                        fontSize: 16,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                    pw.Text(
+                      'Rp ${formatCurrency(transactionData['bayar'])}',
+                      style: pw.TextStyle(
+                        fontSize: 16,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                pw.SizedBox(height: 5),
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.Text(
+                      'Kembalian',
+                      style: pw.TextStyle(
+                        fontSize: 16,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                    pw.Text(
+                      'Rp ${formatCurrency(transactionData['kembalian'])}',
+                      style: pw.TextStyle(
+                        fontSize: 16,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -125,18 +246,18 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
       ),
     );
 
-    // Get the document directory path
-    final output = await getApplicationDocumentsDirectory();
-    final file = File("${output.path}/transaction_receipt.pdf");
+    // Save the PDF to a temporary file
+    final output = await getTemporaryDirectory();
+    final file = File("${output.path}/receipt.pdf");
     await file.writeAsBytes(await pdf.save());
 
     // Open the saved PDF file
     OpenFile.open(file.path);
 
-    // Show a SnackBar to inform the user that the PDF has been saved.
+    // Show a SnackBar to inform the user that the PDF has been saved
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Receipt Transaction Has Been Saved'),
+        content: Text('The receipt PDF is saved successfully.'),
         action: SnackBarAction(
           label: 'OK',
           onPressed: () {
@@ -500,8 +621,8 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
             Map<String, dynamic> lastTransactionData = snapshot.data!
                 .cast<String, dynamic>(); // Use cast to enforce type
             return FloatingActionButton(
-              onPressed: () {
-                _saveAsPdf(context, lastTransactionData);
+              onPressed: () async {
+                await savePdf(context, lastTransactionData);
               },
               child: Icon(Icons.save),
               backgroundColor: Color.fromARGB(255, 219, 42, 15),

@@ -3,8 +3,10 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:pdf/widgets.dart' as pdfWidgets;
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
 import 'package:blue_thermal_printer/blue_thermal_printer.dart';
+import 'package:open_file/open_file.dart';
 
 class ReceiptServisPage extends StatefulWidget {
   @override
@@ -52,6 +54,293 @@ class _ReceiptServisPageState extends State<ReceiptServisPage> {
   String formatCurrency(int value) {
     final format = NumberFormat("#,###");
     return format.format(value);
+  }
+
+  Future<void> _saveAsPdf(
+      BuildContext context, Map<String, dynamic> transactionData) async {
+    final pdf = pw.Document();
+
+    // Build the PDF content
+    pdf.addPage(
+      pw.Page(
+        build: (pw.Context context) {
+          return pw.Padding(
+            padding: pw.EdgeInsets.all(16),
+            child: pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Text(
+                  'ID Servis: ${transactionData['idServis']}',
+                  style: pw.TextStyle(
+                    fontSize: 20,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                ),
+                pw.SizedBox(height: 10),
+                pw.Text(
+                  'Tanggal dan Waktu: ${transactionData['dateTime']}',
+                ),
+                pw.SizedBox(height: 10),
+                pw.Text(
+                  'ID Mekanik: ${transactionData['idMekanik']}',
+                ),
+                pw.SizedBox(height: 10),
+                pw.Text(
+                  'Nama Mekanik: ${transactionData['namaMekanik']}',
+                ),
+                pw.SizedBox(height: 10),
+                pw.Text(
+                  'Nomor Polisi: ${transactionData['nopol']}',
+                ),
+                pw.SizedBox(height: 10),
+                pw.Text(
+                  'Nama Pelanggan: ${transactionData['namaPelanggan']}',
+                ),
+                pw.SizedBox(height: 10),
+                pw.Text(
+                  'Merk: ${transactionData['merkSpm']}',
+                ),
+                pw.SizedBox(height: 10),
+                pw.Text(
+                  'Tipe: ${transactionData['tipeSpm']}',
+                ),
+                pw.SizedBox(height: 10),
+                pw.Text(
+                  'Keluhan: ${transactionData['keluhan']}',
+                ),
+                pw.SizedBox(height: 20),
+                pw.Text(
+                  'List Item:',
+                  style: pw.TextStyle(
+                    fontSize: 16,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                ),
+                pw.SizedBox(height: 5),
+                pw.Table.fromTextArray(
+                  headers: ['ID', 'Name', 'Price', 'Qty'],
+                  data: [
+                    ...transactionData['items'].map<List<String>>(
+                      (item) => [
+                        item['idSparepart'].toString(),
+                        item['namaSparepart'].toString(),
+                        'Rp ${formatCurrency(item['hargaSparepart'])}',
+                        item['jumlahSparepart'].toString(),
+                      ],
+                    ),
+                  ],
+                ),
+                pw.SizedBox(height: 5),
+                pw.SizedBox(height: 20),
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.Text(
+                      'Jumlah Item',
+                      style: pw.TextStyle(
+                        fontSize: 16,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                    pw.Text(
+                      '${transactionData['jumlahItem']}',
+                      style: pw.TextStyle(
+                        fontSize: 16,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                pw.SizedBox(height: 5),
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.Text(
+                      'Subtotal Sparepart',
+                      style: pw.TextStyle(
+                        fontSize: 16,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                    pw.Text(
+                      'Rp ${formatCurrency(transactionData['totalHargaSparepart'])}',
+                      style: pw.TextStyle(
+                        fontSize: 16,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                pw.SizedBox(height: 5),
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.Text(
+                      'Diskon',
+                      style: pw.TextStyle(
+                        fontSize: 16,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                    pw.Text(
+                      '${transactionData['diskon']}%',
+                      style: pw.TextStyle(
+                        fontSize: 16,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                pw.SizedBox(height: 20),
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.Text(
+                      'Total Diskon',
+                      style: pw.TextStyle(
+                        fontSize: 16,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                    pw.Text(
+                      'Rp ${formatCurrency(transactionData['totalDiskon'])}',
+                      style: pw.TextStyle(
+                        fontSize: 16,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                pw.SizedBox(height: 5),
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.Text(
+                      'Total',
+                      style: pw.TextStyle(
+                        fontSize: 16,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                    pw.Text(
+                      'Rp ${formatCurrency(transactionData['hargaAkhir'])}',
+                      style: pw.TextStyle(
+                        fontSize: 16,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                pw.SizedBox(height: 5),
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.Text(
+                      'Biaya Servis',
+                      style: pw.TextStyle(
+                        fontSize: 16,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                    pw.Text(
+                      'Rp ${formatCurrency(transactionData['biayaServis'])}',
+                      style: pw.TextStyle(
+                        fontSize: 16,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                pw.SizedBox(height: 5),
+                pw.Divider(
+                  thickness: 1.5,
+                ),
+                pw.SizedBox(height: 5),
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.Text(
+                      'Total',
+                      style: pw.TextStyle(
+                        fontSize: 16,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                    pw.Text(
+                      'Rp ${formatCurrency(transactionData['totalAkhir'])}',
+                      style: pw.TextStyle(
+                        fontSize: 16,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                pw.SizedBox(height: 5),
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.Text(
+                      'Bayar',
+                      style: pw.TextStyle(
+                        fontSize: 16,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                    pw.Text(
+                      'Rp ${formatCurrency(transactionData['bayar'])}',
+                      style: pw.TextStyle(
+                        fontSize: 16,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                pw.SizedBox(height: 5),
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.Text(
+                      'Kembalian',
+                      style: pw.TextStyle(
+                        fontSize: 16,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                    pw.Text(
+                      'Rp ${formatCurrency(transactionData['kembalian'])}',
+                      style: pw.TextStyle(
+                        fontSize: 16,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+
+    final output = await getTemporaryDirectory();
+    final file = File("${output.path}/transaction_service.pdf");
+    await file.writeAsBytes(await pdf.save());
+
+    // Open the saved PDF file
+    OpenFile.open(file.path);
+
+    // Show a SnackBar with a success message
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('The transaction report PDF is saved successfully.'),
+        action: SnackBarAction(
+          label: 'OK',
+          onPressed: () {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          },
+        ),
+      ),
+    );
   }
 
   @override
@@ -507,8 +796,4 @@ class _ReceiptServisPageState extends State<ReceiptServisPage> {
       ),
     );
   }
-}
-
-class _saveAsPdf {
-  _saveAsPdf(BuildContext context, Map<String, dynamic> lastTransactionData);
 }
