@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:blue_thermal_printer/blue_thermal_printer.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:project_s/pages/ReceiptService.dart';
+import 'package:project_s/pages/receiptService.dart';
 import 'package:project_s/pages/servis.dart';
 
 class ServisSuccessPage extends StatefulWidget {
