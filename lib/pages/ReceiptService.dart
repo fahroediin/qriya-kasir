@@ -384,7 +384,7 @@ class _ReceiptServisPageState extends State<ReceiptServisPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'ID Transaksi: ${lastTransactionData['idServis']}',
+                              'ID Servis: ${lastTransactionData['idServis']}',
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
