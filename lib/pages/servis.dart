@@ -69,10 +69,10 @@ class _ServisPageState extends State<ServisPage> {
       6,
       (_) => Random().nextInt(10),
     );
-    final idPenjualan = '$formattedDateTime-${randomNumbers.join('')}';
+    final idServis = '$formattedDateTime-${randomNumbers.join('')}';
 
     setState(() {
-      _idServis = idPenjualan;
+      _idServis = idServis;
     });
   }
 

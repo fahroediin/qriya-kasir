@@ -191,7 +191,7 @@ class _ReceiptServisPageState extends State<ReceiptServisPage> {
                     ),
                   ],
                 ),
-                pw.SizedBox(height: 20),
+                pw.SizedBox(height: 5),
                 pw.Row(
                   mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                   children: [
