@@ -147,7 +147,7 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
           children: [
             pw.Header(
               level: 0,
-              child: pw.Text('Laporan Transaksi'),
+              child: pw.Text('Laporan Penjualan'),
             ),
             pw.Header(
               level: 1,
@@ -234,14 +234,15 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Card(
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment
+                          .spaceBetween, // Menambahkan MainAxisAlignment.spaceBetween
                       children: [
                         Text(
                           'Laporan Bulan:',
