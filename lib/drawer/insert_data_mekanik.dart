@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/services.dart';
 import 'package:project_s/pages/home_page.dart';
 import 'mekanik.dart';
 import 'dart:math';
@@ -152,14 +153,26 @@ class _AddMekanikPageState extends State<AddMekanikPage> {
               ),
             ),
             SizedBox(height: 10),
-            TextField(
+            TextFormField(
               controller: _namaMekanikController,
-              keyboardType: TextInputType.name,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 border: OutlineInputBorder(),
-                labelText: 'Nama Mekanik',
-                hintText: '',
+                hintText: 'Nama',
               ),
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9 ]')),
+                LengthLimitingTextInputFormatter(255),
+              ],
+              textCapitalization: TextCapitalization.characters,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Wajib diisi';
+                }
+                if (value.length < 3) {
+                  return 'Minimal terdiri dari 3 karakter';
+                }
+                return null;
+              },
             ),
             SizedBox(height: 10),
             TextFormField(

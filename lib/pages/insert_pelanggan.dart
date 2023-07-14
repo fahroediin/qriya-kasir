@@ -28,15 +28,15 @@ class _InputPelangganPageState extends State<InputPelangganPage>
   final databaseReference = FirebaseDatabase.instance.reference();
 
   List<String> merkSepedaMotor = [
-    'Honda',
-    'Yamaha',
-    'Suzuki',
-    'Kawasaki',
+    'HONDA',
+    'YAMAHA',
+    'SUZUKI',
+    'KAWASAKI',
     'TVS',
-    'Bajaj',
+    'BAJAJ',
     'KTM',
-    'Vespa',
-    'Kymco',
+    'VESPA',
+    'KYMCO',
   ];
   String? selectedMerkSepedaMotor;
 
