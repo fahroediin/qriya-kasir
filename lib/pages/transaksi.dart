@@ -519,7 +519,7 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
           return AlertDialog(
             title: Text('Kesalahan'),
             content:
-                Text('Jumlah item tidak valid atau melebihi stok sparepart.'),
+                Text('Jumlah item lebih banyak / kurang dari stok yang ada'),
             actions: [
               TextButton(
                 onPressed: () {

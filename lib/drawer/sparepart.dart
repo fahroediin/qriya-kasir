@@ -36,6 +36,11 @@ class _SparepartPageState extends State<SparepartPage> {
   }
 
   Widget listItem({required Map sparepart}) {
+    Color stockColor = Colors.black; // Warna default
+
+    if (sparepart['stokSparepart'] <= 5) {
+      stockColor = Colors.red; // Warna merah jika stok <= 5
+    }
     return Container(
       height: 220, // Atur tinggi sesuai kebutuhan Anda
       width: 400, // Atur lebar sesuai kebutuhan Anda
@@ -100,7 +105,8 @@ class _SparepartPageState extends State<SparepartPage> {
             'Stok: ${sparepart['stokSparepart']}',
             style: TextStyle(
               fontSize: 18,
-              fontWeight: FontWeight.w400,
+              fontWeight: FontWeight.bold,
+              color: stockColor,
             ),
           ),
           Spacer(),
