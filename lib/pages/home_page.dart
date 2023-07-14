@@ -453,25 +453,17 @@ class _HomePageState extends State<HomePage> {
         child: ListView(
           children: [
             InkWell(
-                onTap: () {
-                  // Navigasi ke halaman pengguna di sini
-                  // Misalnya, menggunakan Navigator.push()
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => UserPage()),
-                  );
-                },
                 child: UserAccountsDrawerHeader(
-                  accountName: Text(nameController),
-                  accountEmail: Text(_user?.email ?? ''),
-                  currentAccountPicture: CircleAvatar(
-                    backgroundColor: Colors.white,
-                    backgroundImage: AssetImage('assets/kasir.png'),
-                  ),
-                  decoration: BoxDecoration(
-                    color: Color.fromARGB(255, 219, 42, 15),
-                  ),
-                )),
+              accountName: Text(nameController),
+              accountEmail: Text(_user?.email ?? ''),
+              currentAccountPicture: CircleAvatar(
+                backgroundColor: Colors.white,
+                backgroundImage: AssetImage('assets/kasir.png'),
+              ),
+              decoration: BoxDecoration(
+                color: Color.fromARGB(255, 219, 42, 15),
+              ),
+            )),
             ListTile(
               onTap: () {
                 Navigator.push(

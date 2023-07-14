@@ -8,7 +8,7 @@ class AboutPage extends StatelessWidget {
   Future<void> _launchGithubUrl() async {
     const url = 'https://github.com/fahroediin';
     if (await canLaunch(url)) {
-      await launch(url, forceWebView: true, enableJavaScript: true);
+      await launch(url, forceSafariVC: false);
     } else {
       throw 'Could not launch $url';
     }

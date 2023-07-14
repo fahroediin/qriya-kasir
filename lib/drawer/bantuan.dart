@@ -52,67 +52,203 @@ class HelpPage extends StatelessWidget {
       body: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
           return SingleChildScrollView(
-            padding: EdgeInsets.all(16),
+            padding: EdgeInsets.all(30),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Action Menu Servis',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                  ),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  'Menu ini digunakan untuk melakukan transaksi perbaikan kendaraan pelanggan. Anda dapat menambahkan informasi kendaraan pelanggan, memilih jenis layanan perbaikan yang dibutuhkan, memilih mekanik yang akan mengerjakan, dan melihat daftar transaksi servis yang sudah dilakukan.',
-                  style: TextStyle(
-                    fontSize: 16,
+                Align(
+                  alignment: Alignment.topCenter,
+                  child: Text(
+                    'Fitur Utama',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 60,
+                    ),
                   ),
                 ),
                 SizedBox(height: 16),
-                Text(
-                  'Menu Penjualan',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                  ),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  'Menu ini digunakan untuk melakukan aktifitas penjualan suku cadang non servis. Anda dapat menambahkan produk, menghapus produk, dan melihat daftar produk yang sudah dijual.',
-                  style: TextStyle(
-                    fontSize: 16,
+                Card(
+                  child: Padding(
+                    padding: EdgeInsets.all(8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Image.asset(
+                              'assets/trans.png',
+                              width: 24,
+                              height: 24,
+                            ),
+                            SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Transaksi Servis',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Digunakan untuk transaksi servis, sebelum masuk ke halaman transaksi servis, pastikan data pelanggan telah didaftarkan pada menu Input Pelanggan di Homepage',
+                          style: TextStyle(
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 SizedBox(height: 16),
-                Text(
-                  'Menu Sparepart',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                  ),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  'Menu ini berisi data suku cadang yang sudah tersedia di aplikasi. Anda dapat melihat daftar suku cadang yang sudah diinput ke dalam database aplikasi.',
-                  style: TextStyle(
-                    fontSize: 16,
+                Card(
+                  child: Padding(
+                    padding: EdgeInsets.all(8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Image.asset(
+                              'assets/selling.png',
+                              width: 24,
+                              height: 24,
+                            ),
+                            SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Transaksi Penjualan',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Digunakan untuk transaksi penjualan non servis, terdapat penambahan data sparepart, lalu dapat menambahkan diskon di dalam transaksi, dan juga dapat mencetak kuitansi',
+                          style: TextStyle(
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 SizedBox(height: 16),
-                Text(
-                  'Menu Kalkulator',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
+                Card(
+                  child: Padding(
+                    padding: EdgeInsets.all(8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Image.asset(
+                              'assets/receipt.png',
+                              width: 24,
+                              height: 24,
+                            ),
+                            SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Cetak Kuitansi',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Dapat mencetak kuitansi pada transaksi penjualan dan servis, lalu dapat mencetak kuitansi pada halaman histori penjualan dan servis, untuk mencetak ulang kuitansi',
+                          style: TextStyle(
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                SizedBox(height: 8),
-                Text(
-                  'Menu ini adalah fitur tambahan aplikasi yang diberikan oleh developer. Anda dapat menggunakan kalkulator untuk melakukan perhitungan dalam proses penjualan atau servis kendaraan.',
-                  style: TextStyle(
-                    fontSize: 16,
+                SizedBox(height: 16),
+                Card(
+                  child: Padding(
+                    padding: EdgeInsets.all(8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Image.asset(
+                              'assets/receipt.png',
+                              width: 24,
+                              height: 24,
+                            ),
+                            SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Laporan',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Terdapat laporan servis dan transaksi penjualan, dapat menampilkan total pendapatan dan total penjualan sparepart, dan memiliki ranking untuk memudahkan pemilik dalam menentukan penambahan barang',
+                          style: TextStyle(
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: 16),
+                Card(
+                  child: Padding(
+                    padding: EdgeInsets.all(8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Image.asset(
+                              'assets/report.png',
+                              width: 24,
+                              height: 24,
+                            ),
+                            SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Stok Barang',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Anda dapat melihat daftar sparepart yang terdaftar dalam sistem pada Homepage, untuk menambah data sparepart, ke Drawer dan pilih Data Sparepart',
+                          style: TextStyle(
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 SizedBox(height: 32),

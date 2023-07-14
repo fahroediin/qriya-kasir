@@ -223,7 +223,7 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color.fromARGB(255, 219, 42, 15),
-        title: Text('Laporan Transaksi'),
+        title: Text('Laporan Penjualan'),
         actions: [
           IconButton(
             icon: Icon(Icons.save),
