@@ -350,10 +350,10 @@ class _HomePageState extends State<HomePage> {
                           PageRouteBuilder(
                             pageBuilder:
                                 (context, animation, secondaryAnimation) =>
-                                    ListSparepartPage(),
+                                    const ListSparepartPage(),
                             transitionsBuilder: (context, animation,
                                 secondaryAnimation, child) {
-                              var begin = Offset(1.0, 0.0);
+                              var begin = const Offset(1.0, 0.0);
                               var end = Offset.zero;
                               var curve = Curves.ease;
 

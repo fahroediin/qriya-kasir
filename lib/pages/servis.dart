@@ -92,6 +92,7 @@ class _ServisPageState extends State<ServisPage> {
 
   void saveServisData() {
     DatabaseReference reference =
+        // ignore: deprecated_member_use
         FirebaseDatabase.instance.reference().child('transaksiServis');
 
     List<Map<String, dynamic>> items = _items.map((item) {
@@ -243,6 +244,7 @@ class _ServisPageState extends State<ServisPage> {
 
   void getPelangganList() {
     FirebaseDatabase.instance
+        // ignore: deprecated_member_use
         .reference()
         .child('daftarPelanggan')
         .onValue

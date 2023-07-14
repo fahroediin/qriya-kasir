@@ -231,336 +231,324 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: Column(
-              children: [
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Laporan Bulan:',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(width: 10),
-                            DropdownButton<String>(
-                              value: selectedMonth,
-                              onChanged: (String? newValue) {
-                                setState(() {
-                                  selectedMonth = newValue!;
-                                });
-                                fetchDataPenjualan();
-                              },
-                              items: monthList.map((String value) {
-                                return DropdownMenuItem<String>(
-                                  value: value,
-                                  child: Text(
-                                    value,
-                                    style: TextStyle(fontSize: 18),
-                                  ),
-                                );
-                              }).toList(),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 20),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Bulan',
-                                    style: TextStyle(fontSize: 18),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.only(left: 20),
-                                    child: Text(
-                                      selectedMonth,
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 18),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 5),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Jumlah Transaksi',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.normal,
-                                        fontSize: 18),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.only(left: 20),
-                                    child: Text(
-                                      jumlahTransaksi.toString(),
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 18),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 5),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Jumlah Item Terjual',
-                                    style: TextStyle(fontSize: 18),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.only(left: 20),
-                                    child: Text(
-                                      jumlahItemTerjual.toString(),
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 18),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10),
-                      ],
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20),
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Column(
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Card(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Sparepart Ranking',
+                          'Laporan Bulan:',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(height: 10),
-                        if (sparepartRankings.isNotEmpty)
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: DataTable(
-                              columnSpacing:
-                                  16.0, // Menambahkan jarak antara kolom
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                    color: Colors
-                                        .grey), // Menambahkan border pada tabel
+                        SizedBox(width: 10),
+                        DropdownButton<String>(
+                          value: selectedMonth,
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              selectedMonth = newValue!;
+                            });
+                            fetchDataPenjualan();
+                          },
+                          items: monthList.map((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(
+                                value,
+                                style: TextStyle(fontSize: 18),
                               ),
-                              columns: [
-                                DataColumn(
-                                  label: Container(
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Bulan',
+                                style: TextStyle(fontSize: 18),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(left: 20),
+                                child: Text(
+                                  selectedMonth,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 5),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Jumlah Transaksi',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: 18),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(left: 20),
+                                child: Text(
+                                  jumlahTransaksi.toString(),
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 5),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Jumlah Item Terjual',
+                                style: TextStyle(fontSize: 18),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(left: 20),
+                                child: Text(
+                                  jumlahItemTerjual.toString(),
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Card(
+                child: Column(
+                  children: [
+                    Text(
+                      'Sparepart Ranking',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    if (sparepartRankings.isNotEmpty)
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: DataTable(
+                          columnSpacing: 16.0, // Menambahkan jarak antara kolom
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                                color: Colors
+                                    .grey), // Menambahkan border pada tabel
+                          ),
+                          columns: [
+                            DataColumn(
+                              label: Container(
+                                child: Text(
+                                  'No.',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+                            DataColumn(
+                              label: Text(
+                                'ID',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            DataColumn(
+                              label: Text(
+                                'Nama',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            DataColumn(
+                              label: Text(
+                                'Merk',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            DataColumn(
+                              label: Text(
+                                'Jumlah',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ],
+                          rows: List<DataRow>.generate(
+                            sparepartRankings.length > 10
+                                ? 10
+                                : sparepartRankings.length,
+                            (index) => DataRow(
+                              cells: [
+                                DataCell(
+                                  Container(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 4.0),
+                                    decoration: BoxDecoration(),
+                                    child: Text((index + 1).toString()),
+                                  ),
+                                ),
+                                DataCell(
+                                  Container(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 4.0),
+                                    decoration: BoxDecoration(),
                                     child: Text(
-                                      'No.',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    ),
+                                        sparepartRankings[index].idSparepart),
                                   ),
                                 ),
-                                DataColumn(
-                                  label: Text(
-                                    'ID',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
+                                DataCell(
+                                  Container(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 2.0),
+                                    decoration: BoxDecoration(),
+                                    child: Text(
+                                        sparepartRankings[index].namaSparepart),
                                   ),
                                 ),
-                                DataColumn(
-                                  label: Text(
-                                    'Nama',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
+                                DataCell(
+                                  Container(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 4.0),
+                                    decoration: BoxDecoration(),
+                                    child: Text(
+                                        sparepartRankings[index].merkSparepart),
                                   ),
                                 ),
-                                DataColumn(
-                                  label: Text(
-                                    'Merk',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                                DataColumn(
-                                  label: Text(
-                                    'Jumlah',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
+                                DataCell(
+                                  Container(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 20.0),
+                                    child: Text(sparepartRankings[index]
+                                        .jumlah
+                                        .toString()),
                                   ),
                                 ),
                               ],
-                              rows: List<DataRow>.generate(
-                                sparepartRankings.length > 10
-                                    ? 10
-                                    : sparepartRankings.length,
-                                (index) => DataRow(
-                                  cells: [
-                                    DataCell(
-                                      Container(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 4.0),
-                                        decoration: BoxDecoration(),
-                                        child: Text((index + 1).toString()),
-                                      ),
-                                    ),
-                                    DataCell(
-                                      Container(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 4.0),
-                                        decoration: BoxDecoration(),
-                                        child: Text(sparepartRankings[index]
-                                            .idSparepart),
-                                      ),
-                                    ),
-                                    DataCell(
-                                      Container(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 2.0),
-                                        decoration: BoxDecoration(),
-                                        child: Text(sparepartRankings[index]
-                                            .namaSparepart),
-                                      ),
-                                    ),
-                                    DataCell(
-                                      Container(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 4.0),
-                                        decoration: BoxDecoration(),
-                                        child: Text(sparepartRankings[index]
-                                            .merkSparepart),
-                                      ),
-                                    ),
-                                    DataCell(
-                                      Container(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 20.0),
-                                        child: Text(sparepartRankings[index]
-                                            .jumlah
-                                            .toString()),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
                             ),
-                          )
-                        else
-                          Text(
-                            'Tidak ada data sparepart ranking',
-                            style: TextStyle(fontSize: 16),
                           ),
-                      ],
-                    ),
-                  ),
+                        ),
+                      )
+                    else
+                      Text(
+                        'Tidak ada data sparepart ranking',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                  ],
                 ),
-              ],
-            ),
-          ),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Jumlah Total Pendapatan',
-                              style: TextStyle(fontSize: 18),
-                            ),
-                            Text(
-                              'Rp ' + formatCurrency(jumlahTotalPendapatan),
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 18),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 5),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Total Diskon',
-                              style: TextStyle(fontSize: 18),
-                            ),
-                            Text(
-                              'Rp ' + formatCurrency(totalDiskon),
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 18),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 5),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Total Pendapatan Bersih',
-                              style: TextStyle(fontSize: 18),
-                            ),
-                            Text(
-                              'Rp ' + formatCurrency(totalPendapatanBersih),
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 18),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
               ),
             ),
-          ),
-        ],
+            SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Card(
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Jumlah Total Pendapatan',
+                                style: TextStyle(fontSize: 18),
+                              ),
+                              Text(
+                                'Rp ' + formatCurrency(jumlahTotalPendapatan),
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 18),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 5),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Total Diskon',
+                                style: TextStyle(fontSize: 18),
+                              ),
+                              Text(
+                                'Rp ' + formatCurrency(totalDiskon),
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 18),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 5),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Total Pendapatan Bersih',
+                                style: TextStyle(fontSize: 18),
+                              ),
+                              Text(
+                                'Rp ' + formatCurrency(totalPendapatanBersih),
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 18),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

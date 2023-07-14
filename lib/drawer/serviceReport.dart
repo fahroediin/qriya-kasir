@@ -144,7 +144,7 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
 
     pdf.addPage(
       pdfWidgets.Page(
-        build: (pdfWidgets.Context context) => pdfWidgets.Column(
+        build: (context) => pdfWidgets.Column(
           children: [
             pdfWidgets.Header(
               level: 0,
@@ -238,303 +238,258 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment
-                        .spaceBetween, // Menambahkan MainAxisAlignment.spaceBetween
-                    children: [
-                      Text(
-                        'Laporan Bulan:',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment
+                          .spaceBetween, // Menambahkan MainAxisAlignment.spaceBetween
+                      children: [
+                        Text(
+                          'Laporan Bulan:',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                      SizedBox(width: 10),
-                      DropdownButton<String>(
-                        value: selectedMonth,
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            selectedMonth = newValue!;
-                          });
-                          fetchDataServis(selectedMonth);
-                        },
-                        items: monthList.map((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(
-                              value,
-                              style: TextStyle(fontSize: 18),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment
-                        .spaceBetween, // Menambahkan MainAxisAlignment.spaceBetween
-                    children: [
-                      Text(
-                        'Bulan:',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      SizedBox(width: 10),
-                      Text(
-                        '$selectedMonth',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 18),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment
-                        .spaceBetween, // Menambahkan MainAxisAlignment.spaceBetween
-                    children: [
-                      Text(
-                        'Jumlah Servis:',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      SizedBox(width: 10),
-                      Text(
-                        jumlahServis.toString(),
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 18),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment
-                        .spaceBetween, // Menambahkan MainAxisAlignment.spaceBetween
-                    children: [
-                      Text(
-                        'Total Pendapatan Servis:',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      SizedBox(width: 10),
-                      Text(
-                        'Rp ${NumberFormat.decimalPattern('id_ID').format(totalPendapatan)}',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 18),
-                      ),
-                    ],
-                  ),
-                ],
+                        SizedBox(width: 10),
+                        DropdownButton<String>(
+                          value: selectedMonth,
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              selectedMonth = newValue!;
+                            });
+                            fetchDataServis(selectedMonth);
+                          },
+                          items: monthList.map((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(
+                                value,
+                                style: TextStyle(fontSize: 18),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment
+                          .spaceBetween, // Menambahkan MainAxisAlignment.spaceBetween
+                      children: [
+                        Text(
+                          'Bulan:',
+                          style: TextStyle(fontSize: 18),
+                        ),
+                        SizedBox(width: 10),
+                        Text(
+                          '$selectedMonth',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 18),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment
+                          .spaceBetween, // Menambahkan MainAxisAlignment.spaceBetween
+                      children: [
+                        Text(
+                          'Jumlah Servis:',
+                          style: TextStyle(fontSize: 18),
+                        ),
+                        SizedBox(width: 10),
+                        Text(
+                          jumlahServis.toString(),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 18),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment
+                          .spaceBetween, // Menambahkan MainAxisAlignment.spaceBetween
+                      children: [
+                        Text(
+                          'Total Pendapatan Servis:',
+                          style: TextStyle(fontSize: 18),
+                        ),
+                        SizedBox(width: 10),
+                        Text(
+                          'Rp ${NumberFormat.decimalPattern('id_ID').format(totalPendapatan)}',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 18),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-          SizedBox(height: 10),
-          Text(
-            'Pelanggan Ranking',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+            SizedBox(height: 10),
+            Text(
+              'Pelanggan Ranking',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-          Divider(
-            color: Colors.grey,
-            thickness: 1.5,
-          ),
-          DataTable(
-            dataRowHeight: 40,
-            columnSpacing: 30,
-            columns: [
-              DataColumn(
-                label: Container(
-                  width: 40,
-                  child: Text(
+            Divider(
+              color: Colors.grey,
+              thickness: 1.5,
+            ),
+            DataTable(
+              columnSpacing: 30,
+              columns: [
+                DataColumn(
+                  label: Text(
                     'No.',
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Nopol',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Nama',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-              DataColumn(
-                label: Expanded(
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'Jumlah',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
+                DataColumn(
+                  label: Text(
+                    'Nopol',
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
-              ),
-            ],
-            rows: pelangganRanking.asMap().entries.map((entry) {
-              int index = entry.key + 1;
-              Map<String, dynamic> pelanggan = entry.value;
-              String nopol = pelanggan['nopol'];
+                DataColumn(
+                  label: Text(
+                    'Nama',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                DataColumn(
+                  label: Text(
+                    'Jumlah',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+              rows: pelangganRanking.asMap().entries.map((entry) {
+                int index = entry.key + 1;
+                Map<String, dynamic> pelanggan = entry.value;
+                String nopol = pelanggan['nopol'];
 
-              String nama = namaPelangganMap[nopol] ?? '';
-              int jumlah = jumlahMap[nopol] ?? 0;
+                String nama = namaPelangganMap[nopol] ?? '';
+                int jumlah = jumlahMap[nopol] ?? 0;
 
-              return DataRow(
-                cells: [
-                  DataCell(
-                    Container(
-                      width: 40,
-                      alignment: Alignment.centerLeft,
-                      child: Text(
+                return DataRow(
+                  cells: [
+                    DataCell(
+                      Text(
                         index.toString(),
                       ),
                     ),
-                  ),
-                  DataCell(
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 2),
-                      child: Text(nopol),
+                    DataCell(
+                      Text(nopol),
                     ),
-                  ),
-                  DataCell(
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 2),
-                      child: Text(nama),
+                    DataCell(
+                      Text(nama),
                     ),
-                  ),
-                  DataCell(
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 20),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            jumlah.toString(),
-                          ),
+                    DataCell(
+                      Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          jumlah.toString(),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              );
-            }).toList(),
-            dividerThickness: 1.5,
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey),
+                  ],
+                );
+              }).toList(),
+              dividerThickness: 1.5,
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey),
+              ),
             ),
-          ),
-          SizedBox(height: 20),
-          Text(
-            'Merk Sepeda Motor Ranking',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+            SizedBox(height: 20),
+            Text(
+              'Merk Sepeda Motor Ranking',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-          Divider(
-            color: Colors.grey,
-            thickness: 1.5,
-          ),
-          DataTable(
-            dataRowHeight: 40,
-            columnSpacing: 30,
-            columns: [
-              DataColumn(
-                label: Container(
-                  width: 40,
-                  child: Text(
+            Divider(
+              color: Colors.grey,
+              thickness: 1.5,
+            ),
+            DataTable(
+              columnSpacing: 30,
+              columns: [
+                DataColumn(
+                  label: Text(
                     'No.',
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Merk',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Tipe',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-              DataColumn(
-                label: Expanded(
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'Jumlah',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
+                DataColumn(
+                  label: Text(
+                    'Merk',
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
-              ),
-            ],
-            rows: merkSpmRanking.asMap().entries.map((entry) {
-              int index = entry.key + 1;
-              Map<String, dynamic> merkSpm = entry.value;
-              String merk = merkSpm['merkSpm'];
-              String tipe = merkSpm['tipeSpm'];
-              int jumlah = int.parse(merkSpm['jumlah']);
+                DataColumn(
+                  label: Text(
+                    'Tipe',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                DataColumn(
+                  label: Text(
+                    'Jumlah',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+              rows: merkSpmRanking.asMap().entries.map((entry) {
+                int index = entry.key + 1;
+                Map<String, dynamic> merkSpm = entry.value;
+                String merk = merkSpm['merkSpm'];
+                String tipe = merkSpm['tipeSpm'];
+                int jumlah = int.parse(merkSpm['jumlah']);
 
-              return DataRow(
-                cells: [
-                  DataCell(
-                    Container(
-                      width: 40,
-                      alignment: Alignment.centerLeft,
-                      child: Text(
+                return DataRow(
+                  cells: [
+                    DataCell(
+                      Text(
                         index.toString(),
                       ),
                     ),
-                  ),
-                  DataCell(
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 2),
-                      child: Text(merk),
+                    DataCell(
+                      Text(merk),
                     ),
-                  ),
-                  DataCell(
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 2),
-                      child: Text(tipe),
+                    DataCell(
+                      Text(tipe),
                     ),
-                  ),
-                  DataCell(
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 20),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            jumlah.toString(),
-                          ),
+                    DataCell(
+                      Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          jumlah.toString(),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              );
-            }).toList(),
-            dividerThickness: 1.5,
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey),
+                  ],
+                );
+              }).toList(),
+              dividerThickness: 1.5,
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey),
+              ),
             ),
-          ),
-        ],
+            SizedBox(height: 40),
+          ],
+        ),
       ),
     );
   }
