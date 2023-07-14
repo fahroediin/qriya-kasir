@@ -64,7 +64,7 @@ class _PelangganState extends State<Pelanggan> {
           },
         ),
         title: Text(
-          'Daftar Pelanggan',
+          'Data Pelanggan',
           style: TextStyle(
             fontFamily: 'Roboto',
             fontSize: 20,

@@ -1,5 +1,6 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class UpdateRecord extends StatefulWidget {
   const UpdateRecord({Key? key, required this.mekanikKey}) : super(key: key);
@@ -14,7 +15,7 @@ class _UpdateRecordState extends State<UpdateRecord> {
   final TextEditingController namaMekanikController = TextEditingController();
   final TextEditingController alamatController = TextEditingController();
   final TextEditingController noHpController = TextEditingController();
-
+  bool _isNoHpValid = true;
   late DatabaseReference dbRef;
 
   @override
@@ -48,38 +49,75 @@ class _UpdateRecordState extends State<UpdateRecord> {
               const SizedBox(
                 height: 20,
               ),
-              TextField(
+              TextFormField(
                 controller: namaMekanikController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   border: OutlineInputBorder(),
-                  labelText: 'Nama Mekanik',
-                  hintText: 'Masukkan Nama Mekanik',
+                  hintText: 'Nama',
                 ),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9 ]')),
+                  LengthLimitingTextInputFormatter(255),
+                ],
+                textCapitalization: TextCapitalization.characters,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Wajib diisi';
+                  }
+                  if (value.length < 3) {
+                    return 'Minimal terdiri dari 3 karakter';
+                  }
+                  return null;
+                },
               ),
               const SizedBox(
                 height: 30,
               ),
-              TextField(
+              TextFormField(
                 controller: alamatController,
-                keyboardType: TextInputType.phone,
-                decoration: const InputDecoration(
+                keyboardType: TextInputType.text,
+                decoration: InputDecoration(
                   border: OutlineInputBorder(),
                   labelText: 'Alamat',
-                  hintText: 'Masukkan alamat',
+                  hintText: '',
                 ),
+                textCapitalization: TextCapitalization.characters,
               ),
               const SizedBox(
                 height: 30,
               ),
               TextField(
                 controller: noHpController,
-                keyboardType: TextInputType.phone,
+                keyboardType: TextInputType.number,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
-                  labelText: 'No HP',
-                  hintText: 'Masukkan nomer hp',
+                  labelText: 'Nomer HP',
+                  hintText: '',
                 ),
+                onChanged: (value) {
+                  if (value.length > 13) {
+                    // Jika panjang digit lebih dari 13
+                    // Potong nilai input menjadi 13 karakter
+                    value = value.substring(0, 13);
+
+                    setState(() {
+                      noHpController.text = value;
+                      noHpController.selection = TextSelection.fromPosition(
+                        TextPosition(offset: value.length),
+                      );
+                    });
+                  }
+
+                  if (value.length < 10 || value.length > 13) {
+                    setState(() {
+                      _isNoHpValid = false;
+                    });
+                  } else {
+                    setState(() {
+                      _isNoHpValid = true;
+                    });
+                  }
+                },
               ),
               SizedBox(height: 10),
               MaterialButton(
