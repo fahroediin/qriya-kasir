@@ -174,7 +174,7 @@ class HelpPage extends StatelessWidget {
                         Row(
                           children: [
                             Image.asset(
-                              'assets/receipt.png',
+                              'assets/report.png',
                               width: 24,
                               height: 24,
                             ),
@@ -211,7 +211,7 @@ class HelpPage extends StatelessWidget {
                         Row(
                           children: [
                             Image.asset(
-                              'assets/report.png',
+                              'assets/listSparepart.png',
                               width: 24,
                               height: 24,
                             ),
@@ -266,7 +266,7 @@ class HelpPage extends StatelessWidget {
                         ),
                         SizedBox(height: 8),
                         Text(
-                          'Histori berisi data transaksi penjualan dan servis yang telah dilakukan, dibatasi 50 transaksi terakhir dan disediakan fungsi pencarian, serta memiliki bisa melakukan hapus transaksi dan cetak kuitansi',
+                          'Histori berisi data transaksi penjualan dan servis yang telah dilakukan, dibatasi 50 transaksi terakhir dan disediakan fungsi pencarian, serta bisa melakukan hapus transaksi dan cetak kuitansi',
                           style: TextStyle(
                             fontSize: 16,
                           ),

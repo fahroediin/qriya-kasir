@@ -214,7 +214,7 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
     // Show a SnackBar to inform the user that the PDF has been saved.
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('The service report PDF is saved successfully.'),
+        content: Text('Laporan servis dalam bentuk PDF berhasil disimpan.'),
         action: SnackBarAction(
           label: 'OK',
           onPressed: () {
@@ -248,8 +248,7 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment
-                          .spaceBetween, // Menambahkan MainAxisAlignment.spaceBetween
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
                           'Laporan Bulan:',
@@ -258,7 +257,6 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(width: 10),
                         DropdownButton<String>(
                           value: selectedMonth,
                           onChanged: (String? newValue) {
@@ -281,14 +279,12 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
                     ),
                     SizedBox(height: 10),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment
-                          .spaceBetween, // Menambahkan MainAxisAlignment.spaceBetween
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
                           'Bulan:',
                           style: TextStyle(fontSize: 18),
                         ),
-                        SizedBox(width: 10),
                         Text(
                           '$selectedMonth',
                           style: TextStyle(
@@ -298,14 +294,12 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
                     ),
                     SizedBox(height: 10),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment
-                          .spaceBetween, // Menambahkan MainAxisAlignment.spaceBetween
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
                           'Jumlah Servis:',
                           style: TextStyle(fontSize: 18),
                         ),
-                        SizedBox(width: 10),
                         Text(
                           jumlahServis.toString(),
                           style: TextStyle(
@@ -315,14 +309,12 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
                     ),
                     SizedBox(height: 10),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment
-                          .spaceBetween, // Menambahkan MainAxisAlignment.spaceBetween
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
                           'Total Pendapatan Servis:',
                           style: TextStyle(fontSize: 18),
                         ),
-                        SizedBox(width: 10),
                         Text(
                           'Rp ${NumberFormat.decimalPattern('id_ID').format(totalPendapatan)}',
                           style: TextStyle(
