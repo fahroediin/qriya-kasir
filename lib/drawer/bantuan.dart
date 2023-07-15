@@ -5,23 +5,8 @@ import 'package:project_s/pages/home_page.dart';
 class HelpPage extends StatelessWidget {
   const HelpPage({Key? key}) : super(key: key);
 
-  Future<void> _launchWhatsApp(BuildContext context) async {
-    const phoneNumber = '081568218009';
-    final uri = 'whatsapp://send?phone=$phoneNumber&text=';
-    final text =
-        'Halo, saya mengalami kendala di aplikasi Qriya. Bisa dibantu?';
-    final encodedText = Uri.encodeFull(text);
-    final url = uri + encodedText;
-
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Tidak dapat membuka WhatsApp'),
-        ),
-      );
-    }
+  Future<void> _launchWhatsApp(String phoneNumber) async {
+    await launch('tel:$phoneNumber');
   }
 
   @override
@@ -254,7 +239,9 @@ class HelpPage extends StatelessWidget {
                 SizedBox(height: 32),
                 Center(
                   child: ElevatedButton(
-                    onPressed: () => _launchWhatsApp(context),
+                    onPressed: () async {
+                      await _launchWhatsApp('081568218009');
+                    },
                     child: Text('Hubungi Kami'),
                     style: ElevatedButton.styleFrom(
                       primary: Color.fromARGB(255, 219, 42, 15),

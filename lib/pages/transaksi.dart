@@ -23,11 +23,14 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
   double _totalHarga = 0;
   double _bayar = 0;
   double _kembalian = 0;
+  double harga = 0;
   final List<Map<String, dynamic>> _items = [];
   List<Map<String, dynamic>> selectedSpareparts = [];
   TextEditingController diskonController = TextEditingController();
   Query dbRef = FirebaseDatabase.instance.reference().child('daftarSparepart');
   TextEditingController searchController = TextEditingController();
+  TextEditingController bayarController = TextEditingController();
+
   List<Map> searchResultList = [];
   List<Map> sparepartList = [];
   List<Map> filteredList = [];
@@ -119,6 +122,16 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
+      // Check if there are any selected spareparts
+      if (_items.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Pilih sparepart terlebih dahulu'),
+          ),
+        );
+        return; // Exit the method if there are no selected spareparts
+      }
+
       // Update the stock of spare parts
       for (var sparepart in selectedSpareparts) {
         DatabaseReference sparepartRef = FirebaseDatabase.instance
@@ -156,7 +169,7 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
   void _calculateKembalian(double jumlahBayar) {
     double kembalian = jumlahBayar - _totalHarga;
     setState(() {
-      _kembalian = kembalian;
+      _kembalian = max(0, kembalian);
     });
   }
 
@@ -431,8 +444,8 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
                                                       builder: (BuildContext
                                                           context) {
                                                         return AlertDialog(
-                                                          title: Text(
-                                                              'Input Invalid'),
+                                                          title:
+                                                              Text('Kesalahan'),
                                                           content: Text(
                                                               'Jumlah item lebih banyak / kurang dari stok yang ada'),
                                                           actions: [
@@ -720,7 +733,7 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
               ),
               SizedBox(height: 10),
               Text(
-                'Total: Rp ${_totalHarga.toStringAsFixed(0)}',
+                'Total : Rp ${formatCurrency(_totalHarga.toInt())}',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 10),
@@ -742,16 +755,16 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
               ),
               SizedBox(height: 10),
               TextFormField(
+                controller: bayarController,
                 decoration: InputDecoration(labelText: 'Bayar'),
                 keyboardType: TextInputType.number,
                 inputFormatters: <TextInputFormatter>[
                   FilteringTextInputFormatter.digitsOnly
                 ],
                 onChanged: (value) {
-                  _bayar = double.parse(value);
-                  double kembalian = _bayar - _totalHarga;
                   setState(() {
-                    _kembalian = max(0, kembalian);
+                    _bayar = double.parse(value);
+                    _calculateKembalian(_bayar);
                   });
                 },
                 validator: (value) {
@@ -763,7 +776,7 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
               ),
               SizedBox(height: 10),
               Text(
-                'Kembalian: Rp ${_kembalian.toStringAsFixed(0)}',
+                'Kembalian : Rp ${formatCurrency(_kembalian.toInt())}',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 16),

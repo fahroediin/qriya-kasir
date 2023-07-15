@@ -5,13 +5,10 @@ import 'package:project_s/pages/home_page.dart';
 class AboutPage extends StatelessWidget {
   const AboutPage({Key? key}) : super(key: key);
 
-  Future<void> _launchGithubUrl() async {
-    const url = 'https://github.com/fahroediin';
-    if (await canLaunch(url)) {
-      await launch(url, forceSafariVC: false);
-    } else {
-      throw 'Could not launch $url';
-    }
+  Future<void> _launchGithubUrl(String url,
+      {bool forceWebView = false, bool enableJavaScript = false}) async {
+    await launch(url,
+        forceWebView: forceWebView, enableJavaScript: enableJavaScript);
   }
 
   void _showDeveloperModal(BuildContext context) {
@@ -103,7 +100,9 @@ class AboutPage extends StatelessWidget {
             ),
             SizedBox(height: 16),
             ElevatedButton(
-              onPressed: _launchGithubUrl,
+              onPressed: () async {
+                await _launchGithubUrl('https://github.com/fahroediin');
+              },
               child: Text('Kenali Developer'),
               style: ElevatedButton.styleFrom(
                 primary: Color.fromARGB(255, 219, 42, 15),

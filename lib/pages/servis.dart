@@ -496,7 +496,7 @@ class _ServisPageState extends State<ServisPage> {
                                                           title:
                                                               Text('Kesalahan'),
                                                           content: Text(
-                                                              'Jumlah item tidak valid atau melebihi stok sparepart.'),
+                                                              'Jumlah item lebih banyak / kurang dari stok yang ada'),
                                                           actions: [
                                                             TextButton(
                                                               onPressed: () {
@@ -578,7 +578,7 @@ class _ServisPageState extends State<ServisPage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Input Invalid'),
+            title: Text('Kesalahan'),
             content:
                 Text('Jumlah item lebih banyak / kurang dari stok yang ada'),
             actions: [
@@ -882,8 +882,8 @@ class _ServisPageState extends State<ServisPage> {
               ),
               SizedBox(height: 16.0),
               Text(
-                'Total Harga (Sparepart) : Rp ${_totalBayar.toStringAsFixed(0)}',
-                style: TextStyle(fontWeight: FontWeight.bold),
+                'Total Harga (Sparepart) : Rp ${formatCurrency(_totalBayar.toInt())}',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 8.0),
               TextFormField(
@@ -935,13 +935,13 @@ class _ServisPageState extends State<ServisPage> {
               ),
               SizedBox(height: 10),
               Text(
-                'Total Biaya : Rp ${(_totalBayar + _biayaServis).toStringAsFixed(0)}',
-                style: TextStyle(fontWeight: FontWeight.bold),
+                'Total Biaya : Rp ${formatCurrency((_totalBayar + _biayaServis).toInt())}',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 10),
               Text(
-                'Kembalian : Rp ${_kembalian.toStringAsFixed(0)}',
-                style: TextStyle(fontWeight: FontWeight.bold),
+                'Kembalian : Rp ${formatCurrency(_kembalian.toInt())}',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 16.0),
               ElevatedButton(

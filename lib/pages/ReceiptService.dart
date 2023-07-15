@@ -120,12 +120,14 @@ class _ReceiptServisPageState extends State<ReceiptServisPage> {
                 pw.Table.fromTextArray(
                   headers: ['ID', 'Name', 'Price', 'Qty'],
                   data: [
-                    ...transactionData['items'].map<List<String>>(
+                    ...(transactionData['items'] ?? []).map<List<String>>(
                       (item) => [
-                        item['idSparepart'].toString(),
-                        item['namaSparepart'].toString(),
-                        'Rp ${formatCurrency(item['hargaSparepart'])}',
-                        item['jumlahSparepart'].toString(),
+                        item['idSparepart']?.toString() ?? '',
+                        item['namaSparepart']?.toString() ?? '',
+                        item['hargaSparepart'] != null
+                            ? 'Rp ${formatCurrency(item['hargaSparepart'])}'
+                            : '',
+                        item['jumlahSparepart']?.toString() ?? '',
                       ],
                     ),
                   ],
@@ -518,29 +520,29 @@ class _ReceiptServisPageState extends State<ReceiptServisPage> {
                                     ),
                                   ],
                                 ),
-                                ...lastTransactionData['items']
+                                ...(lastTransactionData['items'] ?? [])
                                     .map<TableRow>(
                                       (item) => TableRow(
                                         children: [
                                           TableCell(
                                             child: Text(
-                                              item['idSparepart'],
+                                              item['idSparepart'] ?? '',
                                               style: TextStyle(
                                                   color: Colors.black),
                                             ),
                                           ),
                                           TableCell(
                                             child: Text(
-                                              item['namaSparepart'],
+                                              item['namaSparepart'] ?? '',
                                               style: TextStyle(
                                                   color: Colors.black),
                                             ),
                                           ),
                                           TableCell(
                                             child: Text(
-                                              'Rp' +
-                                                  formatCurrency(
-                                                      item['hargaSparepart']),
+                                              item['hargaSparepart'] != null
+                                                  ? 'Rp ${formatCurrency(item['hargaSparepart'])}'
+                                                  : '',
                                               style: TextStyle(
                                                   color: Colors.black),
                                             ),
@@ -548,8 +550,9 @@ class _ReceiptServisPageState extends State<ReceiptServisPage> {
                                           TableCell(
                                             child: Text(
                                               item['jumlahSparepart']
-                                                  .toString()
-                                                  .padLeft(3),
+                                                      ?.toString()
+                                                      .padLeft(3) ??
+                                                  '',
                                               style: TextStyle(
                                                   color: Colors.black),
                                             ),
@@ -626,6 +629,7 @@ class _ReceiptServisPageState extends State<ReceiptServisPage> {
                                 ),
                               ],
                             ),
+                            SizedBox(height: 5),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [

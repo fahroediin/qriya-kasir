@@ -248,7 +248,7 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
 
     // Save the PDF to a temporary file
     final output = await getTemporaryDirectory();
-    final file = File("${output.path}/receipt.pdf");
+    final file = File("${output.path}/receipt_selling.pdf");
     await file.writeAsBytes(await pdf.save());
 
     // Open the saved PDF file
