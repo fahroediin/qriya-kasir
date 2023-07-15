@@ -260,12 +260,24 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
       context: context,
       builder: (BuildContext context) {
         List<Map<String, dynamic>> selectedSpareparts = [];
-
         List<Map<dynamic, dynamic>> sparepartList = [];
         List<Map<dynamic, dynamic>> filteredSparepartList = [];
         TextEditingController jumlahItemController = TextEditingController();
         TextEditingController searchController =
             TextEditingController(); // Tambahkan controller untuk TextField pencarian
+
+        // Fungsi untuk memperbarui daftar sparepart berdasarkan pencarian
+        void updateFilteredSparepartList() {
+          filteredSparepartList = sparepartList.where((sparepart) {
+            String namaSparepart =
+                sparepart['namaSparepart'].toString().toLowerCase();
+            String specSparepart =
+                sparepart['specSparepart'].toString().toLowerCase();
+            String searchKeyword = searchController.text.toLowerCase();
+            return namaSparepart.contains(searchKeyword) ||
+                specSparepart.contains(searchKeyword);
+          }).toList();
+        }
 
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
@@ -282,18 +294,7 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
                         labelText: 'Cari Sparepart',
                       ),
                       onChanged: (value) {
-                        filteredSparepartList =
-                            sparepartList.where((sparepart) {
-                          String namaSparepart = sparepart['namaSparepart']
-                              .toString()
-                              .toLowerCase();
-                          String specSparepart = sparepart['specSparepart']
-                              .toString()
-                              .toLowerCase();
-                          String searchKeyword = value.toLowerCase();
-                          return namaSparepart.contains(searchKeyword) ||
-                              specSparepart.contains(searchKeyword);
-                        }).toList();
+                        updateFilteredSparepartList();
                         setState(() {});
                       },
                     ),
@@ -323,7 +324,7 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
                                 sparepartList
                                     .add(Map<dynamic, dynamic>.from(value));
                               });
-                              filteredSparepartList = sparepartList;
+                              updateFilteredSparepartList(); // Perbarui daftar sparepart berdasarkan data terbaru
                             }
 
                             if (filteredSparepartList.isEmpty) {
