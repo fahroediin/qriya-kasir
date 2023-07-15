@@ -477,7 +477,7 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Total Transaksi: $itemCount',
+                  'Total Transaksi : $itemCount',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -487,7 +487,7 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
             ),
           ),
           Container(
-            padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+            padding: EdgeInsets.symmetric(horizontal: 16),
             child: TextField(
               controller: searchController,
               onChanged: (value) {
@@ -513,6 +513,7 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
               ),
             ),
           ),
+          SizedBox(height: 10),
           Expanded(
             child: FirebaseAnimatedList(
               query: dbRef,

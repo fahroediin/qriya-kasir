@@ -13,10 +13,37 @@ class Pelanggan extends StatefulWidget {
 }
 
 class _PelangganState extends State<Pelanggan> {
-  Query dbRef = FirebaseDatabase.instance
-      .reference()
-      .child('daftarPelanggan')
-      .orderByChild('merkSpm');
+  Query dbRef = FirebaseDatabase.instance.reference().child('daftarPelanggan');
+  int itemCount = 0;
+  TextEditingController searchController = TextEditingController();
+  bool isSearching = false;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  Future<void> fetchData() async {
+    Query query = dbRef;
+
+    if (isSearching) {
+      query = dbRef.orderByChild('nopol').equalTo(searchController.text);
+    }
+
+    DataSnapshot snapshot = await query.get();
+
+    if (snapshot.exists) {
+      setState(() {
+        itemCount = snapshot.children.length;
+      });
+    }
+  }
+
+  void searchList(String query) {
+    searchController.text = query;
+    fetchData();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,36 +79,79 @@ class _PelangganState extends State<Pelanggan> {
       ),
       body: Container(
         height: MediaQuery.of(context).size.height,
-        child: FirebaseAnimatedList(
-          query: dbRef,
-          itemBuilder: (BuildContext context, DataSnapshot snapshot,
-              Animation<double> animation, int index) {
-            Map daftarPelanggan = snapshot.value as Map;
-            daftarPelanggan['key'] = snapshot.key;
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Total Pelanggan : $itemCount',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  TextField(
+                    controller: searchController,
+                    onChanged: (value) {
+                      searchList(value);
+                    },
+                    decoration: InputDecoration(
+                      labelText: 'Search by Nopol',
+                      border: OutlineInputBorder(),
+                      suffixIcon: IconButton(
+                        icon: Icon(Icons.clear),
+                        onPressed: () {
+                          searchController.clear();
+                          searchList('');
+                        },
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                ],
+              ),
+            ),
+            Expanded(
+              child: FirebaseAnimatedList(
+                query: dbRef,
+                itemBuilder: (BuildContext context, DataSnapshot snapshot,
+                    Animation<double> animation, int index) {
+                  Map daftarPelanggan = snapshot.value as Map;
+                  daftarPelanggan['key'] = snapshot.key;
 
-            return Column(
-              children: [
-                listItem(
-                  daftarPelanggan: daftarPelanggan,
-                  nopol: daftarPelanggan['nopol'],
-                  merkSpm: daftarPelanggan['merkSpm'],
-                  tipeSpm: daftarPelanggan['tipeSpm'],
-                  namaPelanggan: daftarPelanggan['namaPelanggan'],
-                  alamat: daftarPelanggan['alamat'],
-                  noHp: daftarPelanggan['noHp'],
-                  snapshot: snapshot,
-                ),
-                SizedBox(height: 8),
-                Divider(color: Colors.grey[400]),
-              ],
-            );
-          },
+                  return Column(
+                    children: [
+                      buildListItem(
+                        daftarPelanggan: daftarPelanggan,
+                        nopol: daftarPelanggan['nopol'],
+                        merkSpm: daftarPelanggan['merkSpm'],
+                        tipeSpm: daftarPelanggan['tipeSpm'],
+                        namaPelanggan: daftarPelanggan['namaPelanggan'],
+                        alamat: daftarPelanggan['alamat'],
+                        noHp: daftarPelanggan['noHp'],
+                        snapshot: snapshot,
+                      ),
+                      SizedBox(height: 8),
+                      Divider(color: Colors.grey[400]),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget listItem({
+  Widget buildListItem({
     required Map daftarPelanggan,
     required String nopol,
     required String merkSpm,
@@ -91,6 +161,9 @@ class _PelangganState extends State<Pelanggan> {
     required String noHp,
     required DataSnapshot? snapshot,
   }) {
+    if (isSearching && nopol != searchController.text.toUpperCase()) {
+      return SizedBox(); // Skip this item if it doesn't match the search query
+    }
     return Container(
       margin: const EdgeInsets.all(10),
       padding: const EdgeInsets.all(10),
