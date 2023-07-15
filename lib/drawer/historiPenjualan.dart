@@ -109,7 +109,7 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
                     }).toList(),
                   ),
                 if (items == null || items.isEmpty)
-                  Text('Tidak ada data items'),
+                  const Text('Tidak ada data items'),
                 Text('Harga: Rp $totalBayar'),
                 Text('Diskon: $diskon%'),
                 Text('Harga Akhir: Rp $hargaAkhir'),

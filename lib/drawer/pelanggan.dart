@@ -13,33 +13,10 @@ class Pelanggan extends StatefulWidget {
 }
 
 class _PelangganState extends State<Pelanggan> {
-  TextEditingController searchController = TextEditingController();
   Query dbRef = FirebaseDatabase.instance
       .reference()
       .child('daftarPelanggan')
       .orderByChild('merkSpm');
-
-  late List<Map> filteredList;
-  bool isSearching = false;
-
-  @override
-  void initState() {
-    super.initState();
-    filteredList = [];
-  }
-
-  void searchList(String query) {
-    if (query.isNotEmpty) {
-      setState(() {
-        isSearching = true;
-        filteredList = filteredList
-            .where((daftarPelanggan) => daftarPelanggan['nopol']
-                .toLowerCase()
-                .contains(query.toLowerCase()))
-            .toList();
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,73 +52,30 @@ class _PelangganState extends State<Pelanggan> {
       ),
       body: Container(
         height: MediaQuery.of(context).size.height,
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: TextField(
-                controller: searchController,
-                onChanged: searchList,
-                decoration: InputDecoration(
-                  labelText: 'Cari Nomor Polisi',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                ),
-              ),
-            ),
-            Expanded(
-              child: isSearching
-                  ? SingleChildScrollView(
-                      child: Column(
-                        children: filteredList.map((daftarPelanggan) {
-                          return Column(
-                            children: [
-                              listItem(
-                                daftarPelanggan: daftarPelanggan,
-                                nopol: daftarPelanggan['nopol'],
-                                merkSpm: daftarPelanggan['merkSpm'],
-                                tipeSpm: daftarPelanggan['tipeSpm'],
-                                namaPelanggan: daftarPelanggan['namaPelanggan'],
-                                alamat: daftarPelanggan['alamat'],
-                                noHp: daftarPelanggan['noHp'],
-                                snapshot:
-                                    null, // Tidak digunakan pada pencarian
-                              ),
-                              SizedBox(height: 8),
-                              Divider(color: Colors.grey[400]),
-                            ],
-                          );
-                        }).toList(),
-                      ),
-                    )
-                  : FirebaseAnimatedList(
-                      query: dbRef,
-                      itemBuilder: (BuildContext context, DataSnapshot snapshot,
-                          Animation<double> animation, int index) {
-                        Map daftarPelanggan = snapshot.value as Map;
-                        daftarPelanggan['key'] = snapshot.key;
+        child: FirebaseAnimatedList(
+          query: dbRef,
+          itemBuilder: (BuildContext context, DataSnapshot snapshot,
+              Animation<double> animation, int index) {
+            Map daftarPelanggan = snapshot.value as Map;
+            daftarPelanggan['key'] = snapshot.key;
 
-                        return Column(
-                          children: [
-                            listItem(
-                              daftarPelanggan: daftarPelanggan,
-                              nopol: daftarPelanggan['nopol'],
-                              merkSpm: daftarPelanggan['merkSpm'],
-                              tipeSpm: daftarPelanggan['tipeSpm'],
-                              namaPelanggan: daftarPelanggan['namaPelanggan'],
-                              alamat: daftarPelanggan['alamat'],
-                              noHp: daftarPelanggan['noHp'],
-                              snapshot: snapshot,
-                            ),
-                            SizedBox(height: 8),
-                            Divider(color: Colors.grey[400]),
-                          ],
-                        );
-                      },
-                    ),
-            ),
-          ],
+            return Column(
+              children: [
+                listItem(
+                  daftarPelanggan: daftarPelanggan,
+                  nopol: daftarPelanggan['nopol'],
+                  merkSpm: daftarPelanggan['merkSpm'],
+                  tipeSpm: daftarPelanggan['tipeSpm'],
+                  namaPelanggan: daftarPelanggan['namaPelanggan'],
+                  alamat: daftarPelanggan['alamat'],
+                  noHp: daftarPelanggan['noHp'],
+                  snapshot: snapshot,
+                ),
+                SizedBox(height: 8),
+                Divider(color: Colors.grey[400]),
+              ],
+            );
+          },
         ),
       ),
     );

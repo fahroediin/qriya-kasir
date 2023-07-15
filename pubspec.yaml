@@ -90,6 +90,7 @@ flutter:
  assets:
   - assets/headerprint.png
   - assets/receipt.png
+  - assets/history.png
   #Splash Screen
   - assets/qriya-logo.png
   #Login asset

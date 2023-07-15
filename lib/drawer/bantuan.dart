@@ -229,7 +229,44 @@ class HelpPage extends StatelessWidget {
                         ),
                         SizedBox(height: 8),
                         Text(
-                          'Anda dapat melihat daftar sparepart yang terdaftar dalam sistem pada Homepage, untuk menambah data sparepart, ke Drawer dan pilih Data Sparepart',
+                          'Dapat melihat daftar sparepart yang terdaftar dalam sistem, untuk menambah atau menghapus dan mengedit data sparepart, ke Drawer dan pilih Data Sparepart',
+                          style: TextStyle(
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: 16),
+                Card(
+                  child: Padding(
+                    padding: EdgeInsets.all(8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Image.asset(
+                              'assets/history.png', // Gambar assets/history.png
+                              width: 24,
+                              height: 24,
+                            ),
+                            SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Histori',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Histori berisi data transaksi penjualan dan servis yang telah dilakukan, dibatasi 50 transaksi terakhir dan disediakan fungsi pencarian, serta memiliki bisa melakukan hapus transaksi dan cetak kuitansi',
                           style: TextStyle(
                             fontSize: 16,
                           ),
