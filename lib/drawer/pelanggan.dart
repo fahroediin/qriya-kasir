@@ -28,7 +28,9 @@ class _PelangganState extends State<Pelanggan> {
     Query query = dbRef;
 
     if (isSearching) {
-      query = dbRef.orderByChild('nopol').equalTo(searchController.text);
+      query = dbRef
+          .orderByChild('nopol')
+          .equalTo(searchController.text.toUpperCase());
     }
 
     DataSnapshot snapshot = await query.get();
@@ -41,7 +43,10 @@ class _PelangganState extends State<Pelanggan> {
   }
 
   void searchList(String query) {
-    searchController.text = query;
+    setState(() {
+      isSearching = query.isNotEmpty;
+    });
+    searchController.text = query.toUpperCase();
     fetchData();
   }
 
@@ -97,20 +102,26 @@ class _PelangganState extends State<Pelanggan> {
                     ),
                   ),
                   SizedBox(height: 20),
-                  TextField(
-                    controller: searchController,
-                    onChanged: (value) {
-                      searchList(value);
-                    },
-                    decoration: InputDecoration(
-                      labelText: 'Search by Nopol',
-                      border: OutlineInputBorder(),
-                      suffixIcon: IconButton(
-                        icon: Icon(Icons.clear),
-                        onPressed: () {
-                          searchController.clear();
-                          searchList('');
-                        },
+                  Container(
+                    child: TextField(
+                      controller: searchController,
+                      onChanged: (value) {
+                        searchList(value);
+                        searchController.selection = TextSelection.fromPosition(
+                          TextPosition(offset: searchController.text.length),
+                        );
+                      },
+                      textCapitalization: TextCapitalization.characters,
+                      decoration: InputDecoration(
+                        labelText: 'Cari Nopol',
+                        border: OutlineInputBorder(),
+                        suffixIcon: IconButton(
+                          icon: Icon(Icons.clear),
+                          onPressed: () {
+                            searchController.clear();
+                            searchList('');
+                          },
+                        ),
                       ),
                     ),
                   ),
@@ -125,6 +136,12 @@ class _PelangganState extends State<Pelanggan> {
                     Animation<double> animation, int index) {
                   Map daftarPelanggan = snapshot.value as Map;
                   daftarPelanggan['key'] = snapshot.key;
+
+                  if (isSearching &&
+                      daftarPelanggan['nopol'] !=
+                          searchController.text.toUpperCase()) {
+                    return SizedBox(); // Skip this item if it doesn't match the search query
+                  }
 
                   return Column(
                     children: [
@@ -161,9 +178,6 @@ class _PelangganState extends State<Pelanggan> {
     required String noHp,
     required DataSnapshot? snapshot,
   }) {
-    if (isSearching && nopol != searchController.text.toUpperCase()) {
-      return SizedBox(); // Skip this item if it doesn't match the search query
-    }
     return Container(
       margin: const EdgeInsets.all(10),
       padding: const EdgeInsets.all(10),
