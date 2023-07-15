@@ -14,18 +14,13 @@ class HistoriServisPage extends StatefulWidget {
 }
 
 class _HistoriServisPageState extends State<HistoriServisPage> {
-  Query dbRef = FirebaseDatabase.instance
-      .reference()
-      .child('transaksiServis')
-      .orderByKey()
-      .limitToLast(50);
+  Query dbRef = FirebaseDatabase.instance.reference().child('transaksiServis');
   int itemCount = 0;
-  TextEditingController searchController = TextEditingController();
-  String searchQuery = '';
-  Query? searchRef;
   List<BluetoothDevice> devices = [];
   BluetoothDevice? selectedDevice;
   BlueThermalPrinter printer = BlueThermalPrinter.instance;
+  TextEditingController searchController = TextEditingController();
+  bool isSearching = false;
 
   @override
   void initState() {
@@ -35,30 +30,26 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
   }
 
   Future<void> fetchData() async {
-    Query newSearchRef;
+    Query query = dbRef;
 
-    if (searchQuery.isNotEmpty) {
-      newSearchRef = FirebaseDatabase.instance
-          .reference()
-          .child('transaksiServis')
-          .orderByChild('namaPelanggan')
-          .startAt(searchQuery.toLowerCase())
-          .endAt(searchQuery.toLowerCase() + '\uf8ff');
+    if (isSearching) {
+      query = dbRef.orderByChild('nopol').equalTo(searchController.text);
     } else {
-      newSearchRef = dbRef;
+      query = dbRef.orderByKey().limitToLast(50);
     }
 
-    DataSnapshot snapshot = await newSearchRef.get();
+    DataSnapshot snapshot = await query.get();
+
     if (snapshot.exists) {
       setState(() {
         itemCount = snapshot.children.length;
-        searchRef = newSearchRef;
       });
     }
   }
 
   Widget buildListItem(DataSnapshot snapshot) {
     Map<dynamic, dynamic> transaksi = snapshot.value as Map<dynamic, dynamic>;
+
     String idServis = transaksi['idServis'] ?? '';
     String dateTime = transaksi['dateTime'] ?? '';
     String idMekanik = transaksi['idMekanik'] ?? '';
@@ -76,6 +67,9 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
     int bayar = transaksi['bayar'] ?? 0;
     int kembalian = transaksi['kembalian'] ?? 0;
 
+    if (isSearching && nopol != searchController.text) {
+      return SizedBox(); // Skip this item if it doesn't match the search query
+    }
     return Card(
       child: Stack(
         children: [
@@ -180,15 +174,27 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
   }
 
   Widget buildNoDataWidget() {
-    return Center(
-      child: Text(
-        'Data tidak ada',
-        style: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
+    if (isSearching) {
+      return Center(
+        child: Text(
+          'Tidak ada hasil pencarian',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
         ),
-      ),
-    );
+      );
+    } else {
+      return Center(
+        child: Text(
+          'Data tidak ada',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      );
+    }
   }
 
   String formatCurrency(int value) {
@@ -235,6 +241,22 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
 
       printReceipt(selectedDevice, transaksi, items);
     }
+  }
+
+  void searchList(String query) {
+    searchController.text = query; // Update the search controller's text
+
+    if (query.isNotEmpty) {
+      setState(() {
+        isSearching = true;
+      });
+    } else {
+      setState(() {
+        isSearching = false;
+      });
+    }
+
+    fetchData(); // Fetch data based on the search query
   }
 
   void printReceipt(BluetoothDevice selectedDevice,
@@ -454,44 +476,23 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: searchController,
-                        onChanged: (value) {
-                          setState(() {
-                            searchQuery = value;
-                          });
-                        },
-                        decoration: InputDecoration(
-                          labelText: 'Cari Data Servis [Nopol]',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 16),
-                    IconButton(
-                      onPressed: () {
-                        searchController.clear();
-                        setState(() {
-                          searchQuery = '';
-                        });
-                        fetchData();
-                      },
-                      icon: Icon(Icons.clear),
-                    ),
-                  ],
-                ),
               ],
+            ),
+          ),
+          TextField(
+            controller: searchController,
+            onChanged: searchList,
+            textCapitalization: TextCapitalization.characters,
+            decoration: InputDecoration(
+              labelText: 'Cari Nopol',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(5),
+              ),
             ),
           ),
           Expanded(
             child: FirebaseAnimatedList(
-              query: searchRef ?? dbRef,
+              query: dbRef,
               itemBuilder: (BuildContext context, DataSnapshot snapshot,
                   Animation<double> animation, int index) {
                 return buildListItem(snapshot);

@@ -487,7 +487,7 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
                 border: Border.all(color: Colors.grey),
               ),
             ),
-            SizedBox(height: 40),
+            SizedBox(height: 20),
           ],
         ),
       ),
