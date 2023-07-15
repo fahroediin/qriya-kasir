@@ -35,6 +35,39 @@ class _SparepartPageState extends State<SparepartPage> {
     return format.format(value);
   }
 
+  void searchList(String query) {
+    searchResultList.clear();
+
+    if (query.isNotEmpty) {
+      List<Map> searchResult = sparepartList
+          .where((sparepart) =>
+              sparepart['namaSparepart']
+                  .toString()
+                  .toLowerCase()
+                  .contains(query.toLowerCase()) ||
+              sparepart['specSparepart']
+                  .toString()
+                  .toLowerCase()
+                  .contains(query.toLowerCase()))
+          .toList();
+
+      if (searchResult.isNotEmpty) {
+        setState(() {
+          isSearching = true;
+          searchResultList.addAll(searchResult);
+        });
+      } else {
+        setState(() {
+          isSearching = false;
+        });
+      }
+    } else {
+      setState(() {
+        isSearching = false;
+      });
+    }
+  }
+
   Widget listItem({required Map sparepart}) {
     Color stockColor = Colors.black; // Warna default
 
@@ -171,37 +204,6 @@ class _SparepartPageState extends State<SparepartPage> {
     );
   }
 
-  void searchList(String query) {
-    searchResultList.clear();
-
-    if (query.isNotEmpty) {
-      List<Map> searchResult = sparepartList
-          .where((sparepart) =>
-              sparepart['namaSparepart']
-                  .toLowerCase()
-                  .contains(query.toLowerCase()) ||
-              sparepart['specSparepart']
-                  .toLowerCase()
-                  .contains(query.toLowerCase()))
-          .toList();
-
-      if (searchResult.isNotEmpty) {
-        setState(() {
-          isSearching = true;
-          searchResultList.addAll(searchResult);
-        });
-      } else {
-        setState(() {
-          isSearching = false;
-        });
-      }
-    } else {
-      setState(() {
-        isSearching = false;
-      });
-    }
-  }
-
   Widget _floatingActionButton() {
     return Align(
       alignment: Alignment.bottomCenter,
@@ -261,7 +263,13 @@ class _SparepartPageState extends State<SparepartPage> {
               padding: const EdgeInsets.all(10.0),
               child: TextField(
                 controller: searchController,
-                onChanged: searchList,
+                onChanged: (query) {
+                  setState(() {
+                    searchController.text = query;
+                    isSearching = query.isNotEmpty;
+                    searchList(query);
+                  });
+                },
                 decoration: InputDecoration(
                   labelText: 'Cari Sparepart [ID/Nama/Spec]',
                   border: OutlineInputBorder(

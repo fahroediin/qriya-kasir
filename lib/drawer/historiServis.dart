@@ -75,6 +75,7 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
     int hargaAkhir = transaksi['hargaAkhir'] ?? 0;
     int bayar = transaksi['bayar'] ?? 0;
     int kembalian = transaksi['kembalian'] ?? 0;
+
     return Card(
       child: Stack(
         children: [
@@ -92,30 +93,30 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
                 Text('Tipe SPM: $tipeSpm'),
                 Text('Keluhan: $kerusakan'),
                 Text('Items:'),
-                Column(
-                  children: items?.map((item) {
-                        String idSparepart = item['idSparepart'] ?? '';
-                        String namaSparepart = item['namaSparepart'] ?? '';
-                        String merkSparepart = item['merkSparepart'] ?? '';
-                        String specSparepart = item['specSparepart'] ?? '';
-                        int hargaSparepart =
-                            item['hargaSparepart'] as int? ?? 0;
-                        int jumlahItem = item['jumlahSparepart'] ?? 0;
-                        return Padding(
-                          padding: EdgeInsets.only(left: 16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('ID Sparepart: $idSparepart'),
-                              Text('Nama Sparepart: $namaSparepart'),
-                              Text('Harga Sparepart: Rp ${hargaSparepart}'),
-                              Text('Jumlah Item: $jumlahItem'),
-                            ],
-                          ),
-                        );
-                      }).toList() ??
-                      [],
-                ),
+                if (items != null && items.isNotEmpty)
+                  Column(
+                    children: items.map((item) {
+                      String idSparepart = item['idSparepart'] ?? '';
+                      String namaSparepart = item['namaSparepart'] ?? '';
+                      int hargaSparepart = item['hargaSparepart'] as int? ?? 0;
+                      int jumlahItem = item['jumlahSparepart'] ?? 0;
+
+                      return Padding(
+                        padding: EdgeInsets.only(left: 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('ID Sparepart: $idSparepart'),
+                            Text('Nama Sparepart: $namaSparepart'),
+                            Text('Harga Sparepart: Rp ${hargaSparepart}'),
+                            Text('Jumlah Item: $jumlahItem'),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                if (items == null || items.isEmpty)
+                  Text('Tidak ada data items'),
                 Text('Subtotal Sparepart: Rp $totalHargaSparepart'),
                 Text('Diskon: $diskon%'),
                 Text('Biaya Servis: Rp $biayaServis'),
@@ -166,7 +167,7 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
                 ),
                 IconButton(
                   onPressed: () {
-                    _selectPrinter(transaksi);
+                    _selectPrinter(transaksi, items);
                   },
                   icon: Icon(Icons.print),
                 ),
@@ -200,7 +201,7 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
     setState(() {});
   }
 
-  void _selectPrinter(Map<dynamic, dynamic> transaksi) async {
+  void _selectPrinter(Map<dynamic, dynamic> transaksi, List<Map>? items) async {
     if (devices.isEmpty) {
       return;
     }
@@ -232,12 +233,12 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
         this.selectedDevice = selectedDevice;
       });
 
-      printReceipt(selectedDevice, transaksi);
+      printReceipt(selectedDevice, transaksi, items);
     }
   }
 
-  void printReceipt(
-      BluetoothDevice selectedDevice, Map<dynamic, dynamic> transaksi) {
+  void printReceipt(BluetoothDevice selectedDevice,
+      Map<dynamic, dynamic> transaksi, List<Map>? items) {
     try {
       printer.connect(selectedDevice).then((_) {
         printer.paperCut();
@@ -288,20 +289,22 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
         printer.printNewLine();
         printer.printCustom('--------------------------------', 0, 0);
         printer.printCustom('Items               Qty   Price', 0, 0);
-        for (var item in transaksi['items']) {
-          String itemName = item['namaSparepart'];
-          int quantity = item['jumlahSparepart'];
-          int price = item['hargaSparepart'];
+        if (items != null && items.isNotEmpty) {
+          for (var item in items) {
+            String itemName = item['namaSparepart'] ?? '';
+            int quantity = item['jumlahSparepart'] ?? 0;
+            int price = item['hargaSparepart'] ?? 0;
 
-          // Pad the strings to align the columns
-          String paddedItemName = itemName.padRight(18);
-          String paddedQuantity = quantity.toString().padLeft(4);
-          String paddedPrice = formatCurrency(price).padLeft(9);
+            // Pad the strings to align the columns
+            String paddedItemName = itemName.padRight(18);
+            String paddedQuantity = quantity.toString().padLeft(4);
+            String paddedPrice = formatCurrency(price).padLeft(9);
 
-          // Create the final formatted line
-          String formattedLine = '$paddedItemName$paddedQuantity$paddedPrice';
+            // Create the final formatted line
+            String formattedLine = '$paddedItemName$paddedQuantity$paddedPrice';
 
-          printer.printCustom(formattedLine, 1, 0);
+            printer.printCustom(formattedLine, 1, 0);
+          }
         }
         printer.printNewLine();
         printer.printCustom('--------------------------------', 0, 0);
@@ -314,10 +317,13 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
         String diskon = '${transaksi['diskon'].toStringAsFixed(0)}%';
         int jumlahItem = 0;
 
-        for (var item in transaksi['items']) {
-          int quantity = item['jumlahSparepart'];
-          jumlahItem += quantity;
+        if (items != null && items.isNotEmpty) {
+          for (var item in transaksi['items']) {
+            int quantity = item['jumlahSparepart'] ?? 0;
+            jumlahItem += quantity;
+          }
         }
+
         String potonganHarga = 'Total Diskon'.padRight(20) +
             'Rp ${formatCurrency(totalDiskon.toInt())}';
 
