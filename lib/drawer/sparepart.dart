@@ -15,20 +15,9 @@ class SparepartPage extends StatefulWidget {
 
 class _SparepartPageState extends State<SparepartPage> {
   Query dbRef = FirebaseDatabase.instance.reference().child('daftarSparepart');
-  DatabaseReference reference =
-      FirebaseDatabase.instance.reference().child('daftarSparepart');
-
+  int itemCount = 0;
   TextEditingController searchController = TextEditingController();
-  List<Map> searchResultList = [];
-  List<Map> sparepartList = [];
-  List<Map> filteredList = [];
   bool isSearching = false;
-
-  @override
-  void initState() {
-    super.initState();
-    filteredList = [];
-  }
 
   String formatCurrency(int value) {
     final format = NumberFormat("#,###");
@@ -36,49 +25,47 @@ class _SparepartPageState extends State<SparepartPage> {
   }
 
   void searchList(String query) {
-    searchResultList.clear();
+    setState(() {
+      isSearching = query.isNotEmpty;
+    });
+  }
 
-    if (query.isNotEmpty) {
-      List<Map> searchResult = sparepartList
-          .where((sparepart) =>
-              sparepart['namaSparepart']
-                  .toString()
-                  .toLowerCase()
-                  .contains(query.toLowerCase()) ||
-              sparepart['specSparepart']
-                  .toString()
-                  .toLowerCase()
-                  .contains(query.toLowerCase()))
-          .toList();
+  Future<void> fetchData() async {
+    Query query = dbRef;
 
-      if (searchResult.isNotEmpty) {
-        setState(() {
-          isSearching = true;
-          searchResultList.addAll(searchResult);
-        });
-      } else {
-        setState(() {
-          isSearching = false;
-        });
-      }
-    } else {
+    if (isSearching) {
+      query = dbRef.orderByChild('namaSparepart');
+    }
+
+    DataSnapshot snapshot = await query.get();
+
+    if (snapshot.value != null) {
       setState(() {
-        isSearching = false;
+        itemCount = snapshot.children.length;
       });
     }
   }
 
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
   Widget listItem({required Map sparepart}) {
     Color stockColor = Colors.black; // Warna default
+    String stockText =
+        'Stok: ${sparepart['stokSparepart']}'; // Teks stok default
 
     if (sparepart['stokSparepart'] <= 5) {
       stockColor = Colors.red; // Warna merah jika stok <= 5
+      stockText =
+          'Stok: ${sparepart['stokSparepart']}  !! Harap restock !!'; // Teks stok dengan tambahan "Harap restock"
     }
     return Container(
-      height: 220, // Atur tinggi sesuai kebutuhan Anda
-      width: 400, // Atur lebar sesuai kebutuhan Anda
       margin: const EdgeInsets.all(10),
       padding: const EdgeInsets.all(10),
+      height: 220, // Atur tinggi sesuai kebutuhan Anda
       decoration: BoxDecoration(
         color: Color.fromARGB(255, 232, 192, 145),
         borderRadius: BorderRadius.circular(10),
@@ -135,7 +122,7 @@ class _SparepartPageState extends State<SparepartPage> {
           ),
           SizedBox(height: 4),
           Text(
-            'Stok: ${sparepart['stokSparepart']}',
+            stockText,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -182,7 +169,11 @@ class _SparepartPageState extends State<SparepartPage> {
                           TextButton(
                             onPressed: () {
                               // Hapus data
-                              reference.child(sparepart['key']).remove();
+                              FirebaseDatabase.instance
+                                  .reference()
+                                  .child('daftarSparepart')
+                                  .child(sparepart['key'])
+                                  .remove();
                               Navigator.of(context).pop(); // Tutup dialog
                             },
                             child: const Text('Yes'),
@@ -205,22 +196,16 @@ class _SparepartPageState extends State<SparepartPage> {
   }
 
   Widget _floatingActionButton() {
-    return Align(
-      alignment: Alignment.bottomCenter,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 10),
-        child: FloatingActionButton(
-          onPressed: () {
-            // Implementasi navigasi ke halaman InsertDataSparepart
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => InputSparepartPage()),
-            );
-          },
-          child: Icon(Icons.add),
-          backgroundColor: Color.fromARGB(255, 219, 42, 15),
-        ),
-      ),
+    return FloatingActionButton(
+      onPressed: () {
+        // Implementasi navigasi ke halaman InsertDataSparepart
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => InputSparepartPage()),
+        );
+      },
+      child: Icon(Icons.add),
+      backgroundColor: Color.fromARGB(255, 219, 42, 15),
     );
   }
 
@@ -255,69 +240,84 @@ class _SparepartPageState extends State<SparepartPage> {
         ),
         backgroundColor: Color.fromARGB(255, 219, 42, 15),
       ),
-      body: Container(
-        padding: EdgeInsets.all(16),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: TextField(
-                controller: searchController,
-                onChanged: (query) {
-                  setState(() {
-                    searchController.text = query;
-                    isSearching = query.isNotEmpty;
-                    searchList(query);
-                  });
-                },
-                decoration: InputDecoration(
-                  labelText: 'Cari Sparepart [ID/Nama/Spec]',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5),
-                  ),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Total Sparepart : $itemCount',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
+            SizedBox(height: 20),
+            TextField(
+              controller: searchController,
+              onChanged: (value) {
+                searchList(value);
+              },
+              decoration: InputDecoration(
+                labelText: 'Cari Nama atau Spesifikasi',
+                border: OutlineInputBorder(),
+                suffixIcon: IconButton(
+                  icon: Icon(Icons.clear),
+                  onPressed: () {
+                    searchController.clear();
+                    searchList('');
+                  },
+                ),
+              ),
+            ),
+            SizedBox(height: 10),
             Expanded(
-              child: isSearching
-                  ? ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: searchResultList.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        Map sparepart = searchResultList[index];
-                        return Column(
-                          children: [
-                            listItem(sparepart: sparepart),
-                            SizedBox(height: 8),
-                            Divider(color: Colors.grey[400]),
-                          ],
-                        );
-                      },
-                    )
-                  : FirebaseAnimatedList(
-                      shrinkWrap: true,
-                      physics: ClampingScrollPhysics(),
-                      query: dbRef,
-                      itemBuilder: (BuildContext context, DataSnapshot snapshot,
-                          Animation<double> animation, int index) {
-                        Map sparepart = snapshot.value as Map;
-                        sparepart['key'] = snapshot.key;
+              child: FirebaseAnimatedList(
+                query: dbRef,
+                itemBuilder: (BuildContext context, DataSnapshot snapshot,
+                    Animation<double> animation, int index) {
+                  Map sparepart = snapshot.value as Map;
+                  sparepart['key'] = snapshot.key;
 
-                        return Column(
-                          children: [
-                            listItem(sparepart: sparepart),
-                            SizedBox(height: 8),
-                            Divider(color: Colors.grey[400]),
-                          ],
-                        );
-                      },
-                    ),
+                  if (isSearching &&
+                      (sparepart['namaSparepart']
+                              .toLowerCase()
+                              .contains(searchController.text.toLowerCase()) ||
+                          sparepart['specSparepart']
+                              .toLowerCase()
+                              .contains(searchController.text.toLowerCase()))) {
+                    return Column(
+                      children: [
+                        listItem(sparepart: sparepart),
+                        SizedBox(height: 8),
+                        Divider(color: Colors.grey[400]),
+                      ],
+                    );
+                  } else if (!isSearching) {
+                    return Column(
+                      children: [
+                        listItem(sparepart: sparepart),
+                        SizedBox(height: 8),
+                        Divider(color: Colors.grey[400]),
+                      ],
+                    );
+                  } else {
+                    return SizedBox();
+                  }
+                },
+              ),
             ),
           ],
         ),
       ),
       floatingActionButton: _floatingActionButton(),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      bottomNavigationBar: BottomAppBar(
+        shape: CircularNotchedRectangle(),
+      ),
     );
   }
 }

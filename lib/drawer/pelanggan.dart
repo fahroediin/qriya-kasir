@@ -75,7 +75,6 @@ class _PelangganState extends State<Pelanggan> {
         title: Text(
           'Data Pelanggan',
           style: TextStyle(
-            fontFamily: 'Roboto',
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -113,7 +112,7 @@ class _PelangganState extends State<Pelanggan> {
                       },
                       textCapitalization: TextCapitalization.characters,
                       decoration: InputDecoration(
-                        labelText: 'Cari Nopol',
+                        labelText: 'Cari Nomor Polisi',
                         border: OutlineInputBorder(),
                         suffixIcon: IconButton(
                           icon: Icon(Icons.clear),
@@ -125,7 +124,7 @@ class _PelangganState extends State<Pelanggan> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 8),
+                  SizedBox(height: 10),
                 ],
               ),
             ),
@@ -272,7 +271,7 @@ class _PelangganState extends State<Pelanggan> {
                     context: context,
                     builder: (BuildContext context) {
                       return AlertDialog(
-                        title: Text('Confirm'),
+                        title: Text('Konfirmasi'),
                         content: Text('Hapus data pelanggan?'),
                         actions: [
                           TextButton(
