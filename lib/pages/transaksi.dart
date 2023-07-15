@@ -732,9 +732,19 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
                 ),
               ),
               SizedBox(height: 10),
-              Text(
-                'Total : Rp ${formatCurrency(_totalHarga.toInt())}',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Total',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  Spacer(),
+                  Text(
+                    'Rp ${formatCurrency(_totalHarga.toInt())}',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ],
               ),
               SizedBox(height: 10),
               TextFormField(
@@ -775,9 +785,19 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
                 },
               ),
               SizedBox(height: 10),
-              Text(
-                'Kembalian : Rp ${formatCurrency(_kembalian.toInt())}',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Kembalian',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  Spacer(),
+                  Text(
+                    'Rp ${formatCurrency(_kembalian.toInt())}',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ],
               ),
               SizedBox(height: 16),
               ElevatedButton(

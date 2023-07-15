@@ -881,10 +881,21 @@ class _ServisPageState extends State<ServisPage> {
                 ),
               ),
               SizedBox(height: 16.0),
-              Text(
-                'Total Harga (Sparepart) : Rp ${formatCurrency(_totalBayar.toInt())}',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Total Harga (Sparepart)',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  Spacer(),
+                  Text(
+                    'Rp ${formatCurrency(_totalBayar.toInt())}',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ],
               ),
+
               SizedBox(height: 8.0),
               TextFormField(
                 decoration: InputDecoration(labelText: 'Biaya Servis'),
@@ -934,14 +945,34 @@ class _ServisPageState extends State<ServisPage> {
                 },
               ),
               SizedBox(height: 10),
-              Text(
-                'Total Biaya : Rp ${formatCurrency((_totalBayar + _biayaServis).toInt())}',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Total Biaya',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    'Rp ${formatCurrency((_totalBayar + _biayaServis).toInt())}',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ],
               ),
+
               SizedBox(height: 10),
-              Text(
-                'Kembalian : Rp ${formatCurrency(_kembalian.toInt())}',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Kembalian',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  Spacer(),
+                  Text(
+                    'Rp ${formatCurrency(_kembalian.toInt())}',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ],
               ),
               SizedBox(height: 16.0),
               ElevatedButton(

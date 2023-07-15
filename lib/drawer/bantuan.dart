@@ -5,8 +5,10 @@ import 'package:project_s/pages/home_page.dart';
 class HelpPage extends StatelessWidget {
   const HelpPage({Key? key}) : super(key: key);
 
-  Future<void> _launchWhatsApp(String phoneNumber) async {
-    await launch('tel:$phoneNumber');
+  Future<void> _launchWhatsApp(String url,
+      {bool forceWebView = false, bool enableJavaScript = false}) async {
+    await launch(url,
+        forceWebView: forceWebView, enableJavaScript: enableJavaScript);
   }
 
   @override
@@ -240,7 +242,7 @@ class HelpPage extends StatelessWidget {
                 Center(
                   child: ElevatedButton(
                     onPressed: () async {
-                      await _launchWhatsApp('081568218009');
+                      await _launchWhatsApp('https://wa.me/6281568218009');
                     },
                     child: Text('Hubungi Kami'),
                     style: ElevatedButton.styleFrom(
