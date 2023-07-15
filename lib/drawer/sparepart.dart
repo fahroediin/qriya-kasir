@@ -198,10 +198,18 @@ class _SparepartPageState extends State<SparepartPage> {
   Widget _floatingActionButton() {
     return FloatingActionButton(
       onPressed: () {
-        // Implementasi navigasi ke halaman InsertDataSparepart
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => InputSparepartPage()),
+          PageRouteBuilder(
+            transitionDuration: Duration(milliseconds: 500),
+            pageBuilder: (_, __, ___) => InputSparepartPage(),
+            transitionsBuilder: (_, animation, __, child) {
+              return FadeTransition(
+                opacity: animation,
+                child: child,
+              );
+            },
+          ),
         );
       },
       child: Icon(Icons.add),

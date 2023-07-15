@@ -15,20 +15,174 @@ class MekanikPage extends StatefulWidget {
 
 class _MekanikPageState extends State<MekanikPage> {
   Query dbRef = FirebaseDatabase.instance.ref().child('mekanik');
-  DatabaseReference reference =
-      FirebaseDatabase.instance.ref().child('mekanik');
 
+  int itemCount = 0;
   TextEditingController searchController = TextEditingController();
-  late List<Map> filteredList;
   bool isSearching = false;
 
   @override
   void initState() {
     super.initState();
-    filteredList = [];
+    fetchData();
   }
 
-  Widget listItem({required Map mekanik}) {
+  Future<void> fetchData() async {
+    Query query = dbRef;
+
+    if (isSearching) {
+      query = dbRef.orderByChild('namaMekanik').equalTo(searchController.text);
+    }
+
+    DataSnapshot snapshot = await query.get();
+
+    if (snapshot.exists) {
+      setState(() {
+        itemCount = snapshot.children.length;
+      });
+    }
+  }
+
+  void searchList(String query) {
+    setState(() {
+      isSearching = query.isNotEmpty;
+    });
+    fetchData();
+  }
+
+  Widget _floatingActionButton() {
+    return FloatingActionButton(
+      onPressed: () {
+        Navigator.push(
+          context,
+          PageRouteBuilder(
+            transitionDuration: Duration(milliseconds: 200),
+            pageBuilder: (_, __, ___) => AddMekanikPage(),
+            transitionsBuilder: (_, animation, __, child) {
+              return FadeTransition(
+                opacity: animation,
+                child: child,
+              );
+            },
+          ),
+        );
+      },
+      child: Icon(Icons.add),
+      backgroundColor: Color.fromARGB(255, 219, 42, 15),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.push(
+              context,
+              PageRouteBuilder(
+                transitionDuration: Duration(milliseconds: 200),
+                pageBuilder: (_, __, ___) => HomePage(),
+                transitionsBuilder: (_, animation, __, child) {
+                  return FadeTransition(
+                    opacity: animation,
+                    child: child,
+                  );
+                },
+              ),
+            );
+          },
+        ),
+        title: Text(
+          'Data Mekanik',
+          style: TextStyle(
+            fontFamily: 'Roboto',
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: Color.fromARGB(255, 219, 42, 15),
+      ),
+      body: Container(
+        height: MediaQuery.of(context).size.height,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Total Mekanik: $itemCount',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  Container(
+                    child: TextField(
+                      controller: searchController,
+                      onChanged: (value) {
+                        searchList(value);
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'Cari Mekanik',
+                        border: OutlineInputBorder(),
+                        suffixIcon: IconButton(
+                          icon: Icon(Icons.clear),
+                          onPressed: () {
+                            searchController.clear();
+                            searchList('');
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                ],
+              ),
+            ),
+            Expanded(
+              child: FirebaseAnimatedList(
+                query: dbRef,
+                itemBuilder: (BuildContext context, DataSnapshot snapshot,
+                    Animation<double> animation, int index) {
+                  Map mekanik = snapshot.value as Map;
+                  mekanik['key'] = snapshot.key;
+
+                  if (isSearching &&
+                      !mekanik['namaMekanik']
+                          .toLowerCase()
+                          .contains(searchController.text.toLowerCase())) {
+                    return SizedBox(); // Skip this item if it doesn't match the search query
+                  }
+
+                  return Column(
+                    children: [
+                      listItem(mekanik: mekanik, snapshot: snapshot),
+                      SizedBox(height: 8),
+                      Divider(color: Colors.grey[400]),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: _floatingActionButton(),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      bottomNavigationBar: BottomAppBar(
+        shape: CircularNotchedRectangle(),
+      ),
+    );
+  }
+
+  Widget listItem({required Map mekanik, required DataSnapshot snapshot}) {
     return Container(
       margin: const EdgeInsets.all(10),
       padding: const EdgeInsets.all(10),
@@ -118,7 +272,11 @@ class _MekanikPageState extends State<MekanikPage> {
                           TextButton(
                             onPressed: () {
                               // Hapus data
-                              reference.child(mekanik['key']).remove();
+                              FirebaseDatabase.instance
+                                  .reference()
+                                  .child('mekanik')
+                                  .child(mekanik['key'])
+                                  .remove();
                               Navigator.of(context).pop(); // Tutup dialog
                             },
                             child: Text('Yes'),
@@ -137,129 +295,6 @@ class _MekanikPageState extends State<MekanikPage> {
           ),
         ],
       ),
-    );
-  }
-
-  void searchList(String query) {
-    if (query.isNotEmpty) {
-      setState(() {
-        isSearching = true;
-        filteredList = filteredList
-            .where((mekanik) => mekanik['namaMekanik']
-                .toLowerCase()
-                .contains(query.toLowerCase()))
-            .toList();
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.push(
-              context,
-              PageRouteBuilder(
-                transitionDuration: Duration(milliseconds: 200),
-                pageBuilder: (_, __, ___) => HomePage(),
-                transitionsBuilder: (_, animation, __, child) {
-                  return FadeTransition(
-                    opacity: animation,
-                    child: child,
-                  );
-                },
-              ),
-            );
-          },
-        ),
-        title: Text(
-          'Data Mekanik',
-          style: TextStyle(
-            fontFamily: 'Roboto',
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        backgroundColor: Color.fromARGB(255, 219, 42, 15),
-      ),
-      body: Container(
-        height: MediaQuery.of(context).size.height,
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: TextField(
-                controller: searchController,
-                onChanged: searchList,
-                decoration: InputDecoration(
-                  labelText: 'Cari Mekanik [ID/Nama]',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                ),
-              ),
-            ),
-            Expanded(
-              child: isSearching
-                  ? SingleChildScrollView(
-                      child: Column(
-                        children: filteredList.map((mekanik) {
-                          return Column(
-                            children: [
-                              listItem(mekanik: mekanik),
-                              SizedBox(height: 8),
-                              Divider(color: Colors.grey[400]),
-                            ],
-                          );
-                        }).toList(),
-                      ),
-                    )
-                  : FirebaseAnimatedList(
-                      query: dbRef,
-                      itemBuilder: (BuildContext context, DataSnapshot snapshot,
-                          Animation<double> animation, int index) {
-                        Map mekanik = snapshot.value as Map;
-                        mekanik['key'] = snapshot.key;
-
-                        return Column(
-                          children: [
-                            listItem(mekanik: mekanik),
-                            SizedBox(height: 8),
-                            Divider(color: Colors.grey[400]),
-                          ],
-                        );
-                      },
-                    ),
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: Container(
-        margin: EdgeInsets.only(bottom: 25),
-        child: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              PageRouteBuilder(
-                transitionDuration: Duration(milliseconds: 200),
-                pageBuilder: (_, __, ___) => AddMekanikPage(),
-                transitionsBuilder: (_, animation, __, child) {
-                  return FadeTransition(
-                    opacity: animation,
-                    child: child,
-                  );
-                },
-              ),
-            );
-          },
-          child: Icon(Icons.add),
-          backgroundColor: Color.fromARGB(255, 219, 42, 15),
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }

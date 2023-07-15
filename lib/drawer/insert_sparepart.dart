@@ -129,7 +129,19 @@ class _InputSparepartPageState extends State<InputSparepartPage>
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => SparepartPage()),
+              PageRouteBuilder(
+                transitionDuration: Duration(milliseconds: 500),
+                pageBuilder: (_, __, ___) => SparepartPage(),
+                transitionsBuilder: (_, animation, __, child) {
+                  return SlideTransition(
+                    position: Tween<Offset>(
+                      begin: const Offset(1.0, 0.0),
+                      end: Offset.zero,
+                    ).animate(animation),
+                    child: child,
+                  );
+                },
+              ),
             );
           },
         ),
