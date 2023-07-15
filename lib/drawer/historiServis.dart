@@ -110,7 +110,7 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
                     }).toList(),
                   ),
                 if (items == null || items.isEmpty)
-                  Text('Tidak ada data items'),
+                  const Text('Tidak ada data items'),
                 Text('Subtotal Sparepart: Rp $totalHargaSparepart'),
                 Text('Diskon: $diskon%'),
                 Text('Biaya Servis: Rp $biayaServis'),

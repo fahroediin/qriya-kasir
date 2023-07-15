@@ -43,10 +43,7 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
     Query query = dbRef;
 
     if (isSearching) {
-      query = dbRef
-          .orderByChild('idPenjualan')
-          .startAt(searchController.text)
-          .endAt(searchController.text + '\uf8ff');
+      query = dbRef.orderByChild('idPenjualan').equalTo(searchController.text);
     } else {
       query = dbRef.orderByKey().limitToLast(50);
     }
@@ -112,7 +109,8 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
                     }).toList(),
                   ),
                 if (items == null || items.isEmpty)
-                  Text('Harga: Rp $totalBayar'),
+                  Text('Tidak ada data items'),
+                Text('Harga: Rp $totalBayar'),
                 Text('Diskon: $diskon%'),
                 Text('Harga Akhir: Rp $hargaAkhir'),
                 Text('Bayar: Rp $bayar'),
@@ -498,7 +496,8 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
                   TextPosition(offset: searchController.text.length),
                 );
               },
-              textCapitalization: TextCapitalization.characters,
+              textCapitalization: TextCapitalization
+                  .words, // Membuat input kapital otomatis di awal kata
               decoration: InputDecoration(
                 labelText: 'Cari ID Penjualan atau Nama Pembeli',
                 border: OutlineInputBorder(
