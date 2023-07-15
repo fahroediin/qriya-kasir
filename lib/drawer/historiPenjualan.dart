@@ -4,7 +4,6 @@ import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:intl/intl.dart';
 import 'package:project_s/pages/home_page.dart';
 import 'package:blue_thermal_printer/blue_thermal_printer.dart';
-import 'package:blue_thermal_printer/blue_thermal_printer.dart';
 import 'package:flutter/services.dart';
 
 class HistoriPenjualanPage extends StatefulWidget {
@@ -15,18 +14,12 @@ class HistoriPenjualanPage extends StatefulWidget {
 }
 
 class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
-  Query dbRef = FirebaseDatabase.instance
-      .reference()
-      .child('transaksiPenjualan')
-      .orderByKey()
-      .limitToLast(50);
+  Query dbRef =
+      FirebaseDatabase.instance.reference().child('transaksiPenjualan');
   BluetoothDevice? selectedDevice;
   BlueThermalPrinter printer = BlueThermalPrinter.instance;
   List<BluetoothDevice> devices = [];
   int itemCount = 0;
-  TextEditingController searchController = TextEditingController();
-  String searchQuery = '';
-  Query? searchRef;
   String _idPenjualan = '';
   String _tanggalTransaksi = '';
   String _namaPembeli = '';
@@ -36,18 +29,55 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
   int _kembalian = 0;
   int _diskon = 0;
   int _hargaAkhir = 0;
+  TextEditingController searchController = TextEditingController();
+  bool isSearching = false;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+    getDevices();
+  }
+
+  Future<void> fetchData() async {
+    Query query = dbRef;
+
+    if (isSearching) {
+      query = dbRef
+          .orderByChild('idPenjualan')
+          .startAt(searchController.text)
+          .endAt(searchController.text + '\uf8ff');
+    } else {
+      query = dbRef.orderByKey().limitToLast(50);
+    }
+
+    DataSnapshot snapshot = await query.get();
+
+    if (snapshot.exists) {
+      setState(() {
+        itemCount = snapshot.children.length;
+      });
+    }
+  }
 
   Widget buildListItem(DataSnapshot snapshot) {
-    Map? transaksi = snapshot.value as Map?;
-    String idPenjualan = transaksi?['idPenjualan'] ?? '';
-    String dateTime = transaksi?['dateTime'] ?? '';
-    String namaPembeli = transaksi?['namaPembeli'] ?? '';
-    List<Map>? items = (transaksi?['items'] as List<dynamic>?)?.cast<Map>();
-    int totalBayar = transaksi?['totalHarga'] ?? 0;
-    int bayar = transaksi?['bayar'] ?? 0;
-    int kembalian = transaksi?['kembalian'] ?? 0;
-    int diskon = transaksi?['diskon'] ?? 0;
+    Map<dynamic, dynamic> transaksi = snapshot.value as Map<dynamic, dynamic>;
+
+    String idPenjualan = transaksi['idPenjualan'] ?? '';
+    String dateTime = transaksi['dateTime'] ?? '';
+    String namaPembeli = transaksi['namaPembeli'] ?? '';
+    List<Map>? items = (transaksi['items'] as List<dynamic>?)?.cast<Map>();
+    int totalBayar = transaksi['totalHarga'] ?? 0;
+    int bayar = transaksi['bayar'] ?? 0;
+    int kembalian = transaksi['kembalian'] ?? 0;
+    int diskon = transaksi['diskon'] ?? 0;
     int hargaAkhir = totalBayar - (totalBayar * diskon ~/ 100);
+
+    if (isSearching &&
+        idPenjualan != searchController.text &&
+        namaPembeli != searchController.text) {
+      return SizedBox(); // Skip this item if it doesn't match the search query
+    }
 
     return Card(
       child: Stack(
@@ -60,29 +90,29 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
                 Text('Tanggal dan Waktu: $dateTime'),
                 Text('Nama Pembeli: $namaPembeli'),
                 Text('Items:'),
-                Column(
-                  children: items?.map((item) {
-                        String idSparepart = item['idSparepart'] ?? '';
-                        String namaSparepart = item['namaSparepart'] ?? '';
-                        int hargaSparepart =
-                            item['hargaSparepart'] as int? ?? 0;
-                        int jumlahItem = item['jumlahSparepart'] ?? 0;
-                        return Padding(
-                          padding: EdgeInsets.only(left: 16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('ID Sparepart: $idSparepart'),
-                              Text('Nama Sparepart: $namaSparepart'),
-                              Text('Harga Sparepart: Rp $hargaSparepart'),
-                              Text('Jumlah Item: $jumlahItem'),
-                            ],
-                          ),
-                        );
-                      }).toList() ??
-                      [],
-                ),
-                Text('Harga: Rp $totalBayar'),
+                if (items != null && items.isNotEmpty)
+                  Column(
+                    children: items.map((item) {
+                      String idSparepart = item['idSparepart'] ?? '';
+                      String namaSparepart = item['namaSparepart'] ?? '';
+                      int hargaSparepart = item['hargaSparepart'] as int? ?? 0;
+                      int jumlahItem = item['jumlahSparepart'] ?? 0;
+                      return Padding(
+                        padding: EdgeInsets.only(left: 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('ID Sparepart: $idSparepart'),
+                            Text('Nama Sparepart: $namaSparepart'),
+                            Text('Harga Sparepart: Rp $hargaSparepart'),
+                            Text('Jumlah Item: $jumlahItem'),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                if (items == null || items.isEmpty)
+                  Text('Harga: Rp $totalBayar'),
                 Text('Diskon: $diskon%'),
                 Text('Harga Akhir: Rp $hargaAkhir'),
                 Text('Bayar: Rp $bayar'),
@@ -132,8 +162,17 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
                 ),
                 IconButton(
                   onPressed: () {
-                    _selectPrinter(idPenjualan, dateTime, namaPembeli, items,
-                        totalBayar, bayar, kembalian, diskon, hargaAkhir);
+                    _selectPrinter(
+                      idPenjualan,
+                      dateTime,
+                      namaPembeli,
+                      items,
+                      totalBayar,
+                      bayar,
+                      kembalian,
+                      diskon,
+                      hargaAkhir,
+                    );
                   },
                   icon: Icon(Icons.print),
                 ),
@@ -146,22 +185,43 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
   }
 
   Widget buildNoDataWidget() {
-    return Center(
-      child: Text(
-        'Data tidak ada',
-        style: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
+    if (isSearching) {
+      return Center(
+        child: Text(
+          'Tidak ada hasil pencarian',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
         ),
-      ),
-    );
+      );
+    } else {
+      return Center(
+        child: Text(
+          'Data tidak ada',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      );
+    }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    fetchData();
-    getDevices();
+  void searchList(String query) {
+    searchController.text = query; // Update the search controller's text
+
+    if (query.isNotEmpty) {
+      setState(() {
+        isSearching = true;
+      });
+    } else {
+      setState(() {
+        isSearching = false;
+      });
+    }
+
+    fetchData(); // Fetch data based on the search query
   }
 
   String formatCurrency(int value) {
@@ -373,27 +433,6 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
     }
   }
 
-  Future<void> fetchData() async {
-    if (searchQuery.isNotEmpty) {
-      searchRef = FirebaseDatabase.instance
-          .reference()
-          .child('transaksiPenjualan')
-          .orderByChild('namaPembeli')
-          .startAt(searchQuery.toLowerCase())
-          .endAt(searchQuery.toLowerCase() + '\uf8ff');
-    } else {
-      searchRef = dbRef;
-    }
-
-    DataSnapshot snapshot = await searchRef!.get();
-
-    if (snapshot.exists) {
-      setState(() {
-        itemCount = snapshot.children.length;
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -446,45 +485,38 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: searchController,
-                        onChanged: (value) {
-                          setState(() {
-                            searchQuery = value;
-                            fetchData(); // Tambahkan baris ini
-                          });
-                        },
-                        decoration: InputDecoration(
-                          labelText: 'Cari Data Transaksi [Nama Pembeli]',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 16),
-                    IconButton(
-                      onPressed: () {
-                        searchController.clear();
-                        setState(() {
-                          searchQuery = '';
-                        });
-                        fetchData();
-                      },
-                      icon: Icon(Icons.clear),
-                    ),
-                  ],
-                ),
               ],
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+            child: TextField(
+              controller: searchController,
+              onChanged: (value) {
+                searchList(value);
+                searchController.selection = TextSelection.fromPosition(
+                  TextPosition(offset: searchController.text.length),
+                );
+              },
+              textCapitalization: TextCapitalization.characters,
+              decoration: InputDecoration(
+                labelText: 'Cari ID Penjualan atau Nama Pembeli',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                suffixIcon: IconButton(
+                  icon: Icon(Icons.clear),
+                  onPressed: () {
+                    searchController.clear();
+                    searchList('');
+                  },
+                ),
+              ),
             ),
           ),
           Expanded(
             child: FirebaseAnimatedList(
-              query: searchRef ?? dbRef,
+              query: dbRef,
               itemBuilder: (BuildContext context, DataSnapshot snapshot,
                   Animation<double> animation, int index) {
                 return buildListItem(snapshot);

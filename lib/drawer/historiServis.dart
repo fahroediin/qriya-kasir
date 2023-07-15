@@ -479,14 +479,29 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
               ],
             ),
           ),
-          TextField(
-            controller: searchController,
-            onChanged: searchList,
-            textCapitalization: TextCapitalization.characters,
-            decoration: InputDecoration(
-              labelText: 'Cari Nopol',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(5),
+          Container(
+            padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+            child: TextField(
+              controller: searchController,
+              onChanged: (value) {
+                searchList(value);
+                searchController.selection = TextSelection.fromPosition(
+                  TextPosition(offset: searchController.text.length),
+                );
+              },
+              textCapitalization: TextCapitalization.characters,
+              decoration: InputDecoration(
+                labelText: 'Cari Nopol',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                suffixIcon: IconButton(
+                  icon: Icon(Icons.clear),
+                  onPressed: () {
+                    searchController.clear();
+                    searchList('');
+                  },
+                ),
               ),
             ),
           ),
