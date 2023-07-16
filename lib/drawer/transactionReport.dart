@@ -21,14 +21,13 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
   DatabaseReference dbRefPenjualan =
       FirebaseDatabase.instance.reference().child('transaksiPenjualan');
   int countDataPenjualan = 0;
-  int jumlahTransaksi = 0; // Menyimpan jumlah transaksi
-  int jumlahItemTerjual = 0; // Menyimpan jumlah item terjual
-  int jumlahTotalPendapatan = 0; // Menyimpan jumlah total pendapatan
-  int totalDiskon = 0; // Menyimpan total diskon yang diberikan
-  int totalPendapatanBersih = 0; // Menyimpan total pendapatan bersih
+  int jumlahTransaksi = 0;
+  int jumlahItemTerjual = 0;
+  int jumlahTotalPendapatan = 0;
+  int totalDiskon = 0;
+  int totalPendapatanBersih = 0;
 
-  List<SparepartRanking> sparepartRankings =
-      []; // List untuk menyimpan data SparepartRanking
+  List<SparepartRanking> sparepartRankings = [];
 
   Future<void> fetchDataPenjualan() async {
     String formattedMonth = DateFormat('MM/yyyy')
@@ -41,16 +40,17 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
         DateFormat('dd/MM/yyyy').format(firstDayOfMonth);
     String formattedLastDayOfMonth =
         DateFormat('dd/MM/yyyy').format(lastDayOfMonth);
-    DataSnapshot snapshot = await dbRefPenjualan
-        .orderByChild('dateTime')
-        .startAt(formattedFirstDayOfMonth)
-        .endAt(formattedLastDayOfMonth + '\u{f8ff}')
-        .get();
+    DataSnapshot snapshot =
+        await dbRefPenjualan.orderByChild('bulan').equalTo(selectedMonth).get();
+
     if (mounted) {
       if (snapshot.value != null) {
         int totalJumlahItemTerjual = 0;
         int totalHarga = 0;
         int totalDiskonPenjualan = 0;
+
+        // Reset sparepart rankings
+        sparepartRankings = [];
 
         Map<dynamic, dynamic>? snapshotValue =
             snapshot.value as Map<dynamic, dynamic>?;
@@ -64,7 +64,6 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
             totalHarga += hargaAkhir ?? 0;
             totalDiskonPenjualan += diskon ?? 0;
 
-            // Menambahkan data SparepartRanking berdasarkan idSparepart
             List<dynamic>? items = value['items'] as List<dynamic>?;
             if (items != null) {
               items.forEach((item) {
@@ -94,7 +93,6 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
           }
         });
 
-        // Urutkan sparepartRankings berdasarkan jumlah secara descending
         sparepartRankings.sort((a, b) => b.jumlah.compareTo(a.jumlah));
 
         setState(() {
@@ -105,11 +103,40 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
           totalPendapatanBersih = totalHarga - totalDiskonPenjualan;
         });
       } else {
-        // Jika snapshot tidak ada atau data kosong
         setState(() {
-          []; // Hapus data yang ada
+          sparepartRankings = [];
         });
       }
+    }
+  }
+
+  Future<void> initializeMonthList() async {
+    DataSnapshot snapshot = await dbRefPenjualan.get();
+    if (snapshot.value != null) {
+      Set<String> uniqueMonths = {};
+      Map<dynamic, dynamic>? snapshotValue =
+          snapshot.value as Map<dynamic, dynamic>?;
+      snapshotValue?.forEach((key, value) {
+        if (value is Map<dynamic, dynamic>) {
+          String? bulan = value['bulan'].toString();
+          if (bulan != null) {
+            uniqueMonths.add(bulan);
+          }
+        }
+      });
+
+      setState(() {
+        monthList = uniqueMonths.toList();
+        monthList.sort((a, b) {
+          DateTime aDate = DateFormat('MMMM yyyy', 'id_ID').parse(a);
+          DateTime bDate = DateFormat('MMMM yyyy', 'id_ID').parse(b);
+          return bDate.compareTo(aDate);
+        });
+
+        if (monthList.isNotEmpty) {
+          selectedMonth = monthList[0];
+        }
+      });
     }
   }
 
@@ -121,21 +148,11 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
   @override
   void initState() {
     super.initState();
-    initializeDateFormatting(
-        'id_ID', null); // Inisialisasi locale bahasa Indonesia
+    initializeDateFormatting('id_ID', null);
 
-    // Generate list of months
-    DateTime now = DateTime.now();
-    for (int i = 0; i < 12; i++) {
-      DateTime month = DateTime(now.year, now.month - i, 1);
-      String monthName = DateFormat('MMMM yyyy', 'id_ID').format(month);
-      monthList.add(monthName);
-    }
-
-    if (monthList.isNotEmpty) {
-      selectedMonth = monthList[0]; // Set the initial selected month
-    }
-    fetchDataPenjualan();
+    initializeMonthList().then((_) {
+      fetchDataPenjualan();
+    });
   }
 
   Future<void> savePdf() async {
@@ -207,7 +224,7 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
     // Show a SnackBar to inform the user that the PDF has been saved.
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('The transaction report PDF is saved successfully.'),
+        content: Text('Laporan penjualan PDF berhasil disimpan.'),
         action: SnackBarAction(
           label: 'OK',
           onPressed: () {
@@ -241,8 +258,7 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment
-                          .spaceBetween, // Menambahkan MainAxisAlignment.spaceBetween
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
                           'Laporan Bulan:',
@@ -257,8 +273,8 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
                           onChanged: (String? newValue) {
                             setState(() {
                               selectedMonth = newValue!;
+                              fetchDataPenjualan();
                             });
-                            fetchDataPenjualan();
                           },
                           items: monthList.map((String value) {
                             return DropdownMenuItem<String>(
@@ -354,7 +370,6 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
                 ),
               ),
             ),
-            SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.all(10.0),
               child: Card(
@@ -372,11 +387,9 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
                       SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: DataTable(
-                          columnSpacing: 16.0, // Menambahkan jarak antara kolom
+                          columnSpacing: 16.0,
                           decoration: BoxDecoration(
-                            border: Border.all(
-                                color: Colors
-                                    .grey), // Menambahkan border pada tabel
+                            border: Border.all(color: Colors.grey),
                           ),
                           columns: [
                             DataColumn(
@@ -476,75 +489,74 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 5),
             Padding(
               padding: const EdgeInsets.all(10.0),
               child: Card(
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Jumlah Total Pendapatan',
-                                style: TextStyle(fontSize: 18),
-                              ),
-                              Text(
-                                'Rp ' + formatCurrency(jumlahTotalPendapatan),
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 18),
-                              ),
-                            ],
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Jumlah Total Pendapatan',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 5),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Total Diskon',
-                                style: TextStyle(fontSize: 18),
-                              ),
-                              Text(
-                                'Rp ' + formatCurrency(totalDiskon),
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 18),
-                              ),
-                            ],
+                          Text(
+                            'Rp ' + formatCurrency(jumlahTotalPendapatan),
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 5),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Total Pendapatan Bersih',
-                                style: TextStyle(fontSize: 18),
-                              ),
-                              Text(
-                                'Rp ' + formatCurrency(totalPendapatanBersih),
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 18),
-                              ),
-                            ],
+                        ],
+                      ),
+                      SizedBox(height: 5),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Total Diskon',
+                            style: TextStyle(
+                              fontSize: 18,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
+                          Text(
+                            'Rp ' + formatCurrency(totalDiskon),
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 5),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Total Pendapatan Bersih',
+                            style: TextStyle(
+                              fontSize: 18,
+                            ),
+                          ),
+                          Text(
+                            'Rp ' + formatCurrency(totalPendapatanBersih),
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
