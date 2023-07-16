@@ -40,7 +40,7 @@ class _InputPelangganPageState extends State<InputPelangganPage>
   ];
   String? selectedMerkSepedaMotor;
 
-  void saveData() {
+  Future<void> saveData() async {
     String nopolAwalan = _nopolAwalanController.text.trim();
     String nopolNomor = _nopolNomorController.text.trim();
     String nopolAkhiran = _nopolAkhiranController.text.trim();
@@ -58,46 +58,45 @@ class _InputPelangganPageState extends State<InputPelangganPage>
         selectedMerkSepedaMotor != null) {
       String nopol = nopolAwalan + nopolNomor + nopolAkhiran;
 
-      databaseReference.child('daftarPelanggan').child(nopol).set({
-        'namaPelanggan': namaPelanggan,
-        'nopol': nopol,
-        'merkSpm': selectedMerkSepedaMotor!,
-        'tipeSpm': tipeSpm,
-        'alamat': alamat,
-        'noHp': noHp,
-      }).then((_) {
-        final snackBar =
-            SnackBar(content: Text('Data pelanggan berhasil disimpan'));
-        ScaffoldMessenger.of(context).showSnackBar(
-          snackBar,
+      DatabaseReference pelangganRef =
+          _databaseReference.child('daftarPelanggan').child(nopol);
+      try {
+        DataSnapshot snapshot = await pelangganRef.get();
+        if (snapshot.value != null) {
+          // Data dengan nomor polisi tersebut telah terdaftar
+          final snackBar = SnackBar(
+            content: Text(
+                'Data pelanggan dengan nomor polisi tersebut sudah terdaftar'),
+            duration: Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
+          );
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        } else {
+          // Data belum terdaftar, simpan data baru ke database
+          await pelangganRef.set({
+            'namaPelanggan': namaPelanggan,
+            'nopol': nopol,
+            'merkSpm': selectedMerkSepedaMotor!,
+            'tipeSpm': tipeSpm,
+            'alamat': alamat,
+            'noHp': noHp,
+          });
+          final snackBar = SnackBar(
+            content: Text('Data pelanggan berhasil disimpan'),
+            duration: Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
+          );
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          _clearFields();
+        }
+      } catch (error) {
+        final snackBar = SnackBar(
+          content: Text('Gagal menyimpan data pelanggan: $error'),
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
         );
-        _clearFields();
-      }).catchError((error) {
-        final snackBar =
-            SnackBar(content: Text('Gagal menyimpan data pelanggan: $error'));
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: SlideTransition(
-              position: Tween<Offset>(
-                begin: Offset(0.0, 1.0),
-                end: Offset.zero,
-              ).animate(CurvedAnimation(
-                parent: AnimationController(
-                  vsync: this,
-                  duration: Duration(milliseconds: 500),
-                ),
-                curve: Curves.easeOut,
-              )),
-              child: snackBar,
-            ),
-          ),
-        );
-      });
-    } else {
-      final snackBar = SnackBar(content: Text('Mohon lengkapi semua field'));
-      ScaffoldMessenger.of(context).showSnackBar(
-        snackBar,
-      );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      }
     }
   }
 
