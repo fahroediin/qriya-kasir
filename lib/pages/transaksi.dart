@@ -122,14 +122,16 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
-      // Check if there are any selected spareparts
+      // Check if there are any selected spare parts
       if (_items.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Pilih sparepart terlebih dahulu'),
+            behavior: SnackBarBehavior.floating, // Set the behavior to floating
+            duration: Duration(seconds: 2), // Set the duration to 2 seconds
           ),
         );
-        return; // Exit the method if there are no selected spareparts
+        return; // Exit the method if there are no selected spare parts
       }
 
       // Update the stock of spare parts
