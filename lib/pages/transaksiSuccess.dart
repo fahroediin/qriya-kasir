@@ -108,10 +108,6 @@ class _TransaksiSuccessPageState extends State<TransaksiSuccessPage> {
   void printReceipt() {
     if (selectedDevice != null) {
       try {
-        // Size
-        // 0: Normal, 1: Normal - Bold, 2: Medium - Bold, 3: Large - Bold
-        // Align
-        // 0: left, 1: center, 2: right
         printer.connect(selectedDevice!).then((_) {
           printer.paperCut();
           printer.printNewLine();
@@ -157,25 +153,26 @@ class _TransaksiSuccessPageState extends State<TransaksiSuccessPage> {
             int quantity = item['jumlahSparepart'];
             int price = item['hargaSparepart'];
 
-            // Wrap the spare part name if it exceeds 18 characters
-            String wrappedItemName = wrapText(itemName, 18);
+            // Wrap the item name if it exceeds 18 characters
+            List<String> wrappedItemName = wrapText(itemName, 18);
 
-            // Pad the strings to align the columns
-            String paddedItemName = wrappedItemName.padRight(18);
-            String paddedQuantity = quantity.toString().padLeft(4);
-            String paddedPrice = price.toString().padLeft(9);
+            for (var i = 0; i < wrappedItemName.length; i++) {
+              String paddedItemName = wrappedItemName[i].padRight(18);
 
-            // Calculate the indentation for quantity and price
-            int quantityIndentation = (5 - paddedQuantity.length) ~/ 2;
-            int priceIndentation = (16 - paddedPrice.length) ~/ 2;
-
-            // Create the final formatted line
-            String formattedLine = '$paddedItemName';
-            formattedLine += '${' ' * quantityIndentation}$paddedQuantity';
-            formattedLine +=
-                '${' ' * priceIndentation}${formatCurrency(int.parse(paddedPrice))}';
-
-            printer.printCustom(formattedLine, 1, 0);
+              // For the first line, include quantity and price columns
+              if (i == 0) {
+                String paddedQuantity = quantity.toString().padLeft(4);
+                String paddedPrice = price.toString().padLeft(9);
+                int quantityIndentation = (5 - paddedQuantity.length) ~/ 2;
+                int priceIndentation = (16 - paddedPrice.length) ~/ 2;
+                String formattedLine =
+                    '$paddedItemName${' ' * quantityIndentation}$paddedQuantity${' ' * priceIndentation}${formatCurrency(price)}';
+                printer.printCustom(formattedLine, 1, 0);
+              } else {
+                // For subsequent lines, only include the item name
+                printer.printCustom(paddedItemName, 1, 0);
+              }
+            }
           }
 
           printer.printNewLine();
@@ -228,6 +225,7 @@ class _TransaksiSuccessPageState extends State<TransaksiSuccessPage> {
           printer.printCustom('Atas Kunjungan Anda', 1, 1);
           printer.printNewLine();
           printer.paperCut();
+
           Future.delayed(Duration(seconds: 5), () {
             printer.disconnect().then((_) {
               showDialog(
@@ -256,33 +254,18 @@ class _TransaksiSuccessPageState extends State<TransaksiSuccessPage> {
     }
   }
 
-  // Function to wrap the text into multiple lines with a specified line length
-  String wrapText(String text, int lineLength) {
-    if (text.length <= lineLength) {
-      return text;
-    }
-
-    String wrappedText = '';
-    int start = 0;
-    int end = lineLength;
-
-    while (end < text.length) {
-      while (end > start && !text[end].contains(' ')) {
-        end--;
+  List<String> wrapText(String text, int maxLength) {
+    List<String> lines = [];
+    while (text.length > maxLength) {
+      int spaceIndex = text.lastIndexOf(' ', maxLength);
+      if (spaceIndex == -1) {
+        spaceIndex = maxLength;
       }
-
-      if (end == start) {
-        end += lineLength;
-      }
-
-      wrappedText += text.substring(start, end) + '\n';
-      start = end + 1;
-      end += lineLength;
+      lines.add(text.substring(0, spaceIndex));
+      text = text.substring(spaceIndex + 1);
     }
-
-    wrappedText += text.substring(start);
-
-    return wrappedText;
+    lines.add(text);
+    return lines;
   }
 
   @override
