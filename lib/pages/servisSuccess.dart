@@ -133,7 +133,7 @@ class _ServisSuccessPageState extends State<ServisSuccessPage> {
             1,
           );
           printer.printCustom(
-            'Padangjaya, Majenang ',
+            'Padangjaya, Majenang',
             0,
             1,
           );
@@ -167,27 +167,29 @@ class _ServisSuccessPageState extends State<ServisSuccessPage> {
             int quantity = item['jumlahSparepart'];
             int price = item['hargaSparepart'];
 
-            // Pad the strings to align the columns
-            String paddedItemName = itemName.padRight(18);
-            String paddedQuantity = quantity.toString().padLeft(4);
-            String paddedPrice = price.toString().padLeft(9);
+            // Wrap nama sparepart if it exceeds 18 characters
+            List<String> wrappedItemName = wrapText(itemName, 18);
 
-            // Calculate the indentation for quantity and price
-            int quantityIndentation = (5 - paddedQuantity.length) ~/ 2;
-            int priceIndentation = (16 - paddedPrice.length) ~/ 2;
+            // Pad the strings to align the columns
+            String paddedItemName = wrappedItemName[0].padRight(18);
+            String paddedQuantity = quantity.toString().padLeft(4);
+            String paddedPrice = formatCurrency(price).padLeft(9);
 
             // Create the final formatted line
-            String formattedLine = '$paddedItemName';
-            formattedLine += '${' ' * quantityIndentation}$paddedQuantity';
-            formattedLine +=
-                '${' ' * priceIndentation}${formatCurrency(int.parse(paddedPrice))}';
+            String formattedLine = '$paddedItemName$paddedQuantity$paddedPrice';
 
             printer.printCustom(formattedLine, 1, 0);
+
+            // Print additional wrapped lines, if any
+            if (wrappedItemName.length > 1) {
+              for (int i = 1; i < wrappedItemName.length; i++) {
+                printer.printCustom(wrappedItemName[i].padRight(18), 1, 0);
+              }
+            }
           }
           printer.printNewLine();
           printer.printCustom('--------------------------------', 0, 0);
-          double totalDiskon = (widget.totalHarga * widget.diskon) /
-              100; // Calculate totalDiskon
+          double totalDiskon = (widget.totalHarga * widget.diskon) / 100;
 
           String harga = 'Rp ${widget.totalHarga.toStringAsFixed(0)}';
           String diskon = '${widget.diskon.toStringAsFixed(0)}%';
@@ -206,7 +208,7 @@ class _ServisSuccessPageState extends State<ServisSuccessPage> {
           String totalItemLabel = 'Total Item';
           String totalItemColumn = totalItemLabel.padRight(15);
           String hargaColumn =
-              'Rp ' + formatCurrency(widget.totalHarga.toInt()).padRight(2);
+              'Rp ${formatCurrency(widget.totalHarga.toInt())}'.padRight(2);
 
           printer.printCustom(
               '$totalItemColumn$formattedTotalItem  $hargaColumn', 1, 0);
@@ -271,6 +273,20 @@ class _ServisSuccessPageState extends State<ServisSuccessPage> {
         print(e.message);
       }
     }
+  }
+
+  List<String> wrapText(String text, int maxLength) {
+    List<String> lines = [];
+    while (text.length > maxLength) {
+      int spaceIndex = text.lastIndexOf(' ', maxLength);
+      if (spaceIndex == -1) {
+        spaceIndex = maxLength;
+      }
+      lines.add(text.substring(0, spaceIndex));
+      text = text.substring(spaceIndex + 1);
+    }
+    lines.add(text);
+    return lines;
   }
 
   @override

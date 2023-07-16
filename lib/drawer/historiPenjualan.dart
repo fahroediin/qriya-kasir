@@ -309,7 +309,7 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
             1,
           );
           printer.printCustom(
-            'Padangjaya, Majenang ',
+            'Padangjaya, Majenang',
             0,
             1,
           );

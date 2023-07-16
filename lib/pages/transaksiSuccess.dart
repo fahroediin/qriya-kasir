@@ -127,7 +127,7 @@ class _TransaksiSuccessPageState extends State<TransaksiSuccessPage> {
             1,
           );
           printer.printCustom(
-            'Padangjaya, Majenang ',
+            'Padangjaya, Majenang',
             0,
             1,
           );
