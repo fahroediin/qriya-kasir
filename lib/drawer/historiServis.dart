@@ -33,7 +33,8 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
     Query query = dbRef;
 
     if (isSearching) {
-      query = dbRef.orderByChild('nopol').equalTo(searchController.text);
+      query =
+          dbRef.orderByChild('nopol_idServis').equalTo(searchController.text);
     } else {
       query = dbRef.orderByKey().limitToLast(50);
     }
@@ -67,7 +68,8 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
     int bayar = transaksi['bayar'] ?? 0;
     int kembalian = transaksi['kembalian'] ?? 0;
 
-    if (isSearching && nopol != searchController.text) {
+    if (isSearching &&
+        (nopol != searchController.text && idServis != searchController.text)) {
       return SizedBox(); // Skip this item if it doesn't match the search query
     }
     return Card(
@@ -515,7 +517,7 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
               },
               textCapitalization: TextCapitalization.characters,
               decoration: InputDecoration(
-                labelText: 'Cari Nopol',
+                labelText: 'Cari ID Servis atau Nopol',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(5),
                 ),
