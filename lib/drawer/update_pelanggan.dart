@@ -227,6 +227,12 @@ class _UpdatePelangganState extends State<UpdatePelanggan> {
                             .child(widget.pelangganKey)
                             .update(pelanggan)
                             .then((_) {
+                          final snackBar = SnackBar(
+                            content: Text('Data berhasil diperbarui'),
+                            duration: Duration(seconds: 2),
+                            behavior: SnackBarBehavior.floating,
+                          );
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
                           Navigator.pop(context);
                         }).catchError((error) {
                           showDialog(
@@ -248,6 +254,13 @@ class _UpdatePelangganState extends State<UpdatePelanggan> {
                             },
                           );
                         });
+                      } else {
+                        final snackBar = SnackBar(
+                          content: Text('Mohon lengkapi semua field'),
+                          duration: Duration(seconds: 2),
+                          behavior: SnackBarBehavior.floating,
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
                       }
                     },
                     child: const Text('Update Data'),

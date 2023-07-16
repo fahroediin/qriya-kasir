@@ -98,7 +98,7 @@ class _SparepartPageState extends State<SparepartPage> {
           ),
           SizedBox(height: 4),
           Text(
-            'Merk: ${sparepart['merkSparepart']}',
+            'Spec: ${sparepart['specSparepart']}',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w400,
@@ -106,7 +106,7 @@ class _SparepartPageState extends State<SparepartPage> {
           ),
           SizedBox(height: 4),
           Text(
-            'Spec: ${sparepart['specSparepart']}',
+            'Merk: ${sparepart['merkSparepart']}',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w400,
@@ -290,21 +290,13 @@ class _SparepartPageState extends State<SparepartPage> {
                   Map sparepart = snapshot.value as Map;
                   sparepart['key'] = snapshot.key;
 
-                  if (isSearching &&
+                  if (!isSearching ||
                       (sparepart['namaSparepart']
                               .toLowerCase()
                               .contains(searchController.text.toLowerCase()) ||
                           sparepart['specSparepart']
                               .toLowerCase()
                               .contains(searchController.text.toLowerCase()))) {
-                    return Column(
-                      children: [
-                        listItem(sparepart: sparepart),
-                        SizedBox(height: 8),
-                        Divider(color: Colors.grey[400]),
-                      ],
-                    );
-                  } else if (!isSearching) {
                     return Column(
                       children: [
                         listItem(sparepart: sparepart),

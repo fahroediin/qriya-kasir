@@ -66,7 +66,6 @@ class _InputSparepartPageState extends State<InputSparepartPage>
     String specSparepart = _specSparepartController.text.trim();
     int hargaSparepart =
         int.tryParse(_hargaSparepartController.text.trim()) ?? 0;
-
     int stokSparepart = int.tryParse(_stokSparepartController.text.trim()) ?? 0;
 
     if (idSparepart.isNotEmpty &&
@@ -82,7 +81,11 @@ class _InputSparepartPageState extends State<InputSparepartPage>
         'hargaSparepart': hargaSparepart,
         'stokSparepart': stokSparepart,
       }).then((_) {
-        final snackBar = SnackBar(content: Text('Berhasil menyimpan data'));
+        final snackBar = SnackBar(
+          content: Text('Berhasil menyimpan data'),
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+        );
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
         _clearFields();
         Navigator.push(
@@ -90,12 +93,19 @@ class _InputSparepartPageState extends State<InputSparepartPage>
           MaterialPageRoute(builder: (context) => SparepartPage()),
         );
       }).catchError((error) {
-        final snackBar =
-            SnackBar(content: Text('Gagal menyimpan data suku cadang: $error'));
+        final snackBar = SnackBar(
+          content: Text('Gagal menyimpan data suku cadang: $error'),
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+        );
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
       });
     } else {
-      final snackBar = SnackBar(content: Text('Mohon lengkapi semua field'));
+      final snackBar = SnackBar(
+        content: Text('Mohon lengkapi semua field'),
+        duration: Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+      );
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
   }

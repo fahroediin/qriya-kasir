@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:intl/intl.dart';
 import 'package:project_s/pages/home_page.dart';
 
@@ -13,17 +12,27 @@ class ListSparepartPage extends StatefulWidget {
 
 class _ListSparepartPageState extends State<ListSparepartPage> {
   Query dbRef = FirebaseDatabase.instance.reference().child('daftarSparepart');
-  TextEditingController searchController = TextEditingController();
   String _formattedDateTime = '';
-  List<Map> searchResultList = [];
   List<Map> sparepartList = [];
-  List<Map> filteredList = [];
-  bool isSearching = false;
+  List<Map> filteredSparepartList = [];
+  TextEditingController searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    filteredList = [];
+    fetchData();
+  }
+
+  Future<void> fetchData() async {
+    DataSnapshot snapshot = await dbRef.get();
+
+    if (snapshot.value != null) {
+      setState(() {
+        sparepartList = List<Map>.from(
+            (snapshot.value as Map<dynamic, dynamic>).values.toList());
+        filteredSparepartList = sparepartList;
+      });
+    }
   }
 
   String formatCurrency(int value) {
@@ -31,71 +40,21 @@ class _ListSparepartPageState extends State<ListSparepartPage> {
     return format.format(value);
   }
 
-  Widget listItem({required Map sparepart}) {
-    return Card(
-      child: ListTile(
-        title: Text(
-          '${sparepart['namaSparepart']} (${sparepart['merkSparepart']} - ${sparepart['specSparepart']})',
-          style: TextStyle(
-              fontSize: 18), // Ubah ukuran font sesuai keinginan (contoh: 18)
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'ID: ${sparepart['idSparepart']}',
-              style: TextStyle(
-                  fontSize:
-                      16), // Ubah ukuran font sesuai keinginan (contoh: 16)
-            ),
-            Text(
-              'Harga: Rp ${formatCurrency(sparepart['hargaSparepart'])}',
-              style: TextStyle(
-                  fontSize:
-                      16), // Ubah ukuran font sesuai keinginan (contoh: 16)
-            ),
-            Text(
-              'Stok: ${sparepart['stokSparepart']}',
-              style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight
-                      .bold), // Ubah ukuran font sesuai keinginan (contoh: 16)
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   void searchList(String query) {
-    searchResultList.clear();
-
-    if (query.isNotEmpty) {
-      List<Map> searchResult = sparepartList
-          .where((sparepart) =>
-              sparepart['namaSparepart']
-                  .toLowerCase()
-                  .contains(query.toLowerCase()) ||
-              sparepart['specSparepart']
-                  .toLowerCase()
-                  .contains(query.toLowerCase()))
-          .toList();
-
-      if (searchResult.isNotEmpty) {
-        setState(() {
-          isSearching = true;
-          searchResultList.add(searchResult.first);
-        });
+    setState(() {
+      if (query.isEmpty) {
+        filteredSparepartList = sparepartList;
       } else {
-        setState(() {
-          isSearching = false;
-        });
+        filteredSparepartList = sparepartList.where((sparepart) {
+          String namaSparepart =
+              sparepart['namaSparepart'].toString().toLowerCase();
+          String specSparepart =
+              sparepart['specSparepart'].toString().toLowerCase();
+          return namaSparepart.contains(query.toLowerCase()) ||
+              specSparepart.contains(query.toLowerCase());
+        }).toList();
       }
-    } else {
-      setState(() {
-        isSearching = false;
-      });
-    }
+    });
   }
 
   Widget buildNoDataWidget() {
@@ -153,46 +112,31 @@ class _ListSparepartPageState extends State<ListSparepartPage> {
         padding: EdgeInsets.all(16),
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: TextField(
-                controller: searchController,
-                onChanged: searchList,
-                decoration: InputDecoration(
-                  labelText: 'Cari Sparepart',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5),
-                  ),
+            TextField(
+              controller: searchController,
+              onChanged: (value) {
+                searchList(value);
+              },
+              decoration: InputDecoration(
+                labelText: 'Cari Nama atau Spesifikasi',
+                border: OutlineInputBorder(),
+                suffixIcon: IconButton(
+                  icon: Icon(Icons.clear),
+                  onPressed: () {
+                    searchController.clear();
+                    searchList('');
+                  },
                 ),
               ),
             ),
+            SizedBox(height: 16),
             Expanded(
-              child: isSearching
-                  ? searchResultList.isNotEmpty
-                      ? ListView.builder(
-                          itemCount: searchResultList.length,
-                          itemBuilder: (context, index) {
-                            final sparepart = searchResultList[index];
-                            return Column(
-                              children: [
-                                listItem(sparepart: sparepart),
-                                SizedBox(height: 8),
-                                Divider(color: Colors.grey[400]),
-                              ],
-                            );
-                          },
-                        )
-                      : buildNoDataWidget()
-                  : FirebaseAnimatedList(
-                      shrinkWrap: true,
-                      physics: ClampingScrollPhysics(),
-                      query: dbRef,
-                      itemBuilder: (BuildContext context, DataSnapshot snapshot,
-                          Animation<double> animation, int index) {
-                        Map sparepart = snapshot.value as Map;
-                        sparepart['key'] = snapshot.key;
-                        sparepartList.add(sparepart); // Tambahkan ini
-
+              child: filteredSparepartList.isEmpty
+                  ? buildNoDataWidget()
+                  : ListView.builder(
+                      itemCount: filteredSparepartList.length,
+                      itemBuilder: (context, index) {
+                        Map sparepart = filteredSparepartList[index];
                         return Column(
                           children: [
                             listItem(sparepart: sparepart),
@@ -202,6 +146,93 @@ class _ListSparepartPageState extends State<ListSparepartPage> {
                         );
                       },
                     ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget listItem({required Map sparepart}) {
+    int stokSparepart = sparepart['stokSparepart'];
+    Color fontColor = stokSparepart <= 5 ? Colors.red : Colors.black;
+
+    return Card(
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                '${sparepart['namaSparepart']} (${sparepart['specSparepart']})',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            SizedBox(height: 5),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'ID: ${sparepart['idSparepart']}',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 5),
+                  Text(
+                    'Merk: ${sparepart['merkSparepart']}',
+                    style: TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
+                  SizedBox(height: 5),
+                  Text(
+                    'Harga: Rp ${formatCurrency(sparepart['hargaSparepart'])}',
+                    style: TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
+                  SizedBox(height: 5),
+                  Row(
+                    children: [
+                      Text(
+                        'Stok: ',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(
+                          '${sparepart['stokSparepart']}',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: fontColor,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (stokSparepart <= 5)
+                    Text(
+                      'Harap Restock',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: fontColor,
+                      ),
+                    ),
+                ],
+              ),
             ),
           ],
         ),

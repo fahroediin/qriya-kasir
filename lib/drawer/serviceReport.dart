@@ -26,70 +26,66 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
   Map<String, int> jumlahMap = {};
   List<Map<String, dynamic>> merkSpmRanking = [];
 
-  Future<void> fetchDataServis(String selectedMonth) async {
+  Future<void> fetchDataServis() async {
     String formattedMonth = DateFormat('MM/yyyy')
         .format(DateFormat('MMMM yyyy', 'id_ID').parse(selectedMonth));
-    DateTime firstDayOfMonth = DateTime(
-      int.parse(formattedMonth.split('/')[1]),
-      int.parse(formattedMonth.split('/')[0]),
-      1,
-    );
-    DateTime lastDayOfMonth = DateTime(
-      int.parse(formattedMonth.split('/')[1]),
-      int.parse(formattedMonth.split('/')[0]) + 1,
-      0,
-    );
+    DateTime firstDayOfMonth = DateTime(int.parse(formattedMonth.split('/')[1]),
+        int.parse(formattedMonth.split('/')[0]), 1);
+    DateTime lastDayOfMonth = DateTime(int.parse(formattedMonth.split('/')[1]),
+        int.parse(formattedMonth.split('/')[0]) + 1, 0);
     String formattedFirstDayOfMonth =
         DateFormat('dd/MM/yyyy').format(firstDayOfMonth);
     String formattedLastDayOfMonth =
         DateFormat('dd/MM/yyyy').format(lastDayOfMonth);
-    DataSnapshot snapshot = await dbRefServis
-        .orderByChild('dateTime')
-        .startAt(formattedFirstDayOfMonth)
-        .endAt(formattedLastDayOfMonth + '\u{f8ff}')
-        .get();
+    DataSnapshot snapshot =
+        await dbRefServis.orderByChild('bulan').equalTo(selectedMonth).get();
+
     if (mounted) {
       if (snapshot.exists) {
         int count = (snapshot.value as Map<dynamic, dynamic>).length;
         int totalBiayaServis = 0;
-        Map<String, int> merkSpmCountMap = {};
+        Map<String, int> nopolCountMap = {};
 
         (snapshot.value as Map<dynamic, dynamic>).forEach((key, value) {
           totalBiayaServis += (value['biayaServis'] ?? 0) as int;
           String nopol = value['nopol'];
           String namaPelanggan = value['namaPelanggan'];
-          String merkSpm = value['merkSpm'];
-          String tipeSpm = value['tipeSpm']; // Tambahkan tipeSpm
-
           int jumlah = value['jumlah'] ?? 0;
-          // Simpan data nama pelanggan dan jumlah ke dalam map
+
+          nopolCountMap[nopol] = (nopolCountMap[nopol] ?? 0) + 1;
+
           namaPelangganMap[nopol] = namaPelanggan;
-          jumlahMap[nopol] = (jumlahMap[nopol] ?? 0) + 1;
-          // Simpan data merk sepeda motor dan jumlah ke dalam map
-          String merkSpmKey = '$merkSpm - $tipeSpm';
-          merkSpmCountMap[merkSpmKey] = (merkSpmCountMap[merkSpmKey] ?? 0) + 1;
         });
 
-        List<MapEntry<String, int>> nopolCountList = jumlahMap.entries.toList();
+        List<MapEntry<String, int>> nopolCountList =
+            nopolCountMap.entries.toList();
         nopolCountList.sort((a, b) => b.value.compareTo(a.value));
         pelangganRanking = nopolCountList
             .take(10)
             .map((entry) => {
                   'nopol': entry.key,
                   'jumlah': entry.value.toString(),
+                  'nama': namaPelangganMap[entry.key] ?? '',
                 })
             .toList();
         // Mengambil merk sepeda motor dari transaksi servis
+        Map<String, int> merkSpmCountMap = {};
+        (snapshot.value as Map<dynamic, dynamic>).forEach((key, value) {
+          String merkSpm = value['merkSpm'];
+          String tipeSpm = value['tipeSpm'];
+          String merkSpmKey = '$merkSpm - $tipeSpm';
+
+          merkSpmCountMap[merkSpmKey] = (merkSpmCountMap[merkSpmKey] ?? 0) + 1;
+        });
+
         List<MapEntry<String, int>> merkSpmCountList =
             merkSpmCountMap.entries.toList();
         merkSpmCountList.sort((a, b) => b.value.compareTo(a.value));
         merkSpmRanking = merkSpmCountList
             .take(10)
             .map((entry) => {
-                  'merkSpm':
-                      entry.key.split(' - ')[0], // Ambil merkSpm dari key
-                  'tipeSpm':
-                      entry.key.split(' - ')[1], // Ambil tipeSpm dari key
+                  'merkSpm': entry.key.split(' - ')[0],
+                  'tipeSpm': entry.key.split(' - ')[1],
                   'jumlah': entry.value.toString(),
                 })
             .toList();
@@ -123,19 +119,40 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
   @override
   void initState() {
     super.initState();
-    initializeDateFormatting(
-        'id_ID', null); // Inisialisasi locale bahasa Indonesia
-    fetchDistinctMonths();
+    initializeDateFormatting('id_ID', null);
+
+    initializeMonthList().then((_) {
+      fetchDataServis();
+    });
   }
 
-  Future<void> fetchDistinctMonths() async {
-    List<String> months = await getDistinctMonths();
-    if (months.isNotEmpty) {
-      setState(() {
-        monthList = months;
-        selectedMonth = months[0];
+  Future<void> initializeMonthList() async {
+    DataSnapshot snapshot = await dbRefServis.get();
+    if (snapshot.value != null) {
+      Set<String> uniqueMonths = {};
+      Map<dynamic, dynamic>? snapshotValue =
+          snapshot.value as Map<dynamic, dynamic>?;
+      snapshotValue?.forEach((key, value) {
+        if (value is Map<dynamic, dynamic>) {
+          String? bulan = value['bulan'].toString();
+          if (bulan != null) {
+            uniqueMonths.add(bulan);
+          }
+        }
       });
-      fetchDataServis(selectedMonth);
+
+      setState(() {
+        monthList = uniqueMonths.toList();
+        monthList.sort((a, b) {
+          DateTime aDate = DateFormat('MMMM yyyy', 'id_ID').parse(a);
+          DateTime bDate = DateFormat('MMMM yyyy', 'id_ID').parse(b);
+          return bDate.compareTo(aDate);
+        });
+
+        if (monthList.isNotEmpty) {
+          selectedMonth = monthList[0];
+        }
+      });
     }
   }
 
@@ -262,8 +279,8 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
                           onChanged: (String? newValue) {
                             setState(() {
                               selectedMonth = newValue!;
+                              fetchDataServis();
                             });
-                            fetchDataServis(selectedMonth);
                           },
                           items: monthList.map((String value) {
                             return DropdownMenuItem<String>(
@@ -370,9 +387,8 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
                 int index = entry.key + 1;
                 Map<String, dynamic> pelanggan = entry.value;
                 String nopol = pelanggan['nopol'];
-
                 String nama = namaPelangganMap[nopol] ?? '';
-                int jumlah = jumlahMap[nopol] ?? 0;
+                int jumlah = int.parse(pelanggan['jumlah']);
 
                 return DataRow(
                   cells: [

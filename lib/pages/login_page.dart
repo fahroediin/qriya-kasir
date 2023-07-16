@@ -54,13 +54,12 @@ class _LoginPageState extends State<LoginPage>
   }
 
   void _showSnackBar(String message) {
-    _scaffoldMessengerState.showSnackBar(
-      SnackBar(
-        content: Text(
-          message,
-        ),
-      ),
+    final snackBar = SnackBar(
+      content: Text(message),
+      duration: Duration(seconds: 2), // Durasi muncul snackbar selama 2 detik
+      behavior: SnackBarBehavior.floating, // Mengatur snackbar menjadi floating
     );
+    _scaffoldMessengerState.showSnackBar(snackBar);
   }
 
   Future<void> _loadEmailHistory() async {
@@ -105,6 +104,7 @@ class _LoginPageState extends State<LoginPage>
         );
         _showSnackBar(
             'Login berhasil'); // Menampilkan snackbar "Login berhasil"
+
       } on FirebaseAuthException catch (e) {
         // Menyimpan data user yang sudah login agar tidak otomatis logout
         SharedPreferences prefs = await SharedPreferences.getInstance();

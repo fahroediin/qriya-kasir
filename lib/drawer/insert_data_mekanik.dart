@@ -47,6 +47,17 @@ class _AddMekanikPageState extends State<AddMekanikPage> {
     return id;
   }
 
+  void _showSnackBar(String message) {
+    final snackBar = SnackBar(
+      content: Text(message),
+      duration: Duration(seconds: 2), // Durasi tampil snackbar selama 2 detik
+      behavior: SnackBarBehavior
+          .floating, // Mengatur snackbar agar muncul selama durasi yang ditentukan
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   void saveData() {
     String idMekanik = _idMekanikController.text.trim();
     String namaMekanik = _namaMekanikController.text.trim();
@@ -63,8 +74,15 @@ class _AddMekanikPageState extends State<AddMekanikPage> {
         'alamat': alamat,
         'noHp': noHp,
       }).then((_) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Mekanik successfully added')));
+        final snackBar = SnackBar(
+          content: Text('Mekanik berhasil ditambahkan'),
+          duration:
+              Duration(seconds: 2), // Durasi tampil snackbar selama 2 detik
+          behavior: SnackBarBehavior
+              .floating, // Mengatur snackbar agar muncul selama durasi yang ditentukan
+        );
+
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
         _clearFields();
 
         // Navigasi ke halaman MekanikPage setelah data berhasil disimpan
@@ -73,12 +91,25 @@ class _AddMekanikPageState extends State<AddMekanikPage> {
           MaterialPageRoute(builder: (context) => MekanikPage()),
         );
       }).catchError((error) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text('Terjadi kesalahan saat menyimpan data mekanik')));
+        final snackBar = SnackBar(
+          content: Text('Terjadi kesalahan saat menyimpan data mekanik'),
+          duration:
+              Duration(seconds: 2), // Durasi tampil snackbar selama 2 detik
+          behavior: SnackBarBehavior
+              .floating, // Mengatur snackbar agar muncul selama durasi yang ditentukan
+        );
+
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
       });
     } else {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Mohon lengkapi semua field')));
+      final snackBar = SnackBar(
+        content: Text('Mohon lengkapi semua field'),
+        duration: Duration(seconds: 2), // Durasi tampil snackbar selama 2 detik
+        behavior: SnackBarBehavior
+            .floating, // Mengatur snackbar agar muncul selama durasi yang ditentukan
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
   }
 

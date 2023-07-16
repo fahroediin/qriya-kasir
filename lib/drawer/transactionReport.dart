@@ -505,7 +505,6 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
                             'Jumlah Total Pendapatan',
                             style: TextStyle(
                               fontSize: 18,
-                              fontWeight: FontWeight.bold,
                             ),
                           ),
                           Text(

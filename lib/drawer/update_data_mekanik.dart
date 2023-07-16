@@ -1,5 +1,5 @@
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/services.dart';
 
 class UpdateRecord extends StatefulWidget {
@@ -34,12 +34,23 @@ class _UpdateRecordState extends State<UpdateRecord> {
     noHpController.text = mekanik['noHp'];
   }
 
+  void _showSnackBar(String message) {
+    final snackBar = SnackBar(
+      content: Text(message),
+      duration:
+          const Duration(seconds: 2), // Durasi muncul snackbar selama 2 detik
+      behavior: SnackBarBehavior.floating, // Mengatur snackbar menjadi floating
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Edit Mekanik'),
-        backgroundColor: Color.fromARGB(255, 219, 42, 15), // Ubah warna AppBar
+        backgroundColor:
+            const Color.fromARGB(255, 219, 42, 15), // Ubah warna AppBar
       ),
       body: Center(
         child: Padding(
@@ -122,35 +133,42 @@ class _UpdateRecordState extends State<UpdateRecord> {
               SizedBox(height: 10),
               MaterialButton(
                 onPressed: () {
-                  Map<String, dynamic> mekanik = {
-                    'namaMekanik': namaMekanikController.text,
-                    'alamat': alamatController.text,
-                    'noHp': noHpController.text,
-                  };
-                  dbRef.child(widget.mekanikKey).update(mekanik).then((_) {
-                    Navigator.pop(context);
-                  }).catchError((error) {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: const Text('Error'),
-                          content: Text('Failed to update record: $error'),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: const Text('OK'),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  });
+                  if (namaMekanikController.text.isEmpty ||
+                      alamatController.text.isEmpty ||
+                      noHpController.text.isEmpty) {
+                    _showSnackBar('Mohon lengkapi semua field');
+                  } else {
+                    Map<String, dynamic> mekanik = {
+                      'namaMekanik': namaMekanikController.text,
+                      'alamat': alamatController.text,
+                      'noHp': noHpController.text,
+                    };
+                    dbRef.child(widget.mekanikKey).update(mekanik).then((_) {
+                      _showSnackBar('Mekanik berhasil diperbarui');
+                      Navigator.pop(context);
+                    }).catchError((error) {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text('Error'),
+                            content: Text('Failed to update record: $error'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: const Text('OK'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    });
+                  }
                 },
                 child: const Text('Update Data'),
-                color: Color.fromARGB(255, 219, 42, 15),
+                color: const Color.fromARGB(255, 219, 42, 15),
                 textColor: Colors.white,
                 minWidth: 500,
                 height: 40,

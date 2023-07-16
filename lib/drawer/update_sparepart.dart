@@ -19,6 +19,15 @@ class _UpdateRecordState extends State<UpdateRecord> {
   late TextEditingController hargaSparepartController;
   late TextEditingController stokSparepartController;
 
+  void _showSnackBar(String message) {
+    final snackBar = SnackBar(
+      content: Text(message),
+      duration: const Duration(seconds: 2),
+      behavior: SnackBarBehavior.floating,
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -63,7 +72,7 @@ class _UpdateRecordState extends State<UpdateRecord> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Edit Sparepart'),
-        backgroundColor: Color.fromARGB(255, 219, 42, 15),
+        backgroundColor: const Color.fromARGB(255, 219, 42, 15),
       ),
       body: SingleChildScrollView(
         child: Center(
@@ -121,42 +130,52 @@ class _UpdateRecordState extends State<UpdateRecord> {
                 const SizedBox(height: 30),
                 MaterialButton(
                   onPressed: () {
-                    Map<String, dynamic> sparepart = {
-                      'namaSparepart': namaSparepartController.text,
-                      'merkSparepart': merkSparepartController.text,
-                      'specSparepart': specSparepartController.text,
-                      'hargaSparepart':
-                          int.parse(hargaSparepartController.text),
-                      'stokSparepart': int.parse(stokSparepartController.text),
-                    };
+                    if (namaSparepartController.text.isEmpty ||
+                        merkSparepartController.text.isEmpty ||
+                        specSparepartController.text.isEmpty ||
+                        hargaSparepartController.text.isEmpty ||
+                        stokSparepartController.text.isEmpty) {
+                      _showSnackBar('Mohon lengkapi semua field');
+                    } else {
+                      Map<String, dynamic> sparepart = {
+                        'namaSparepart': namaSparepartController.text,
+                        'merkSparepart': merkSparepartController.text,
+                        'specSparepart': specSparepartController.text,
+                        'hargaSparepart':
+                            int.parse(hargaSparepartController.text),
+                        'stokSparepart':
+                            int.parse(stokSparepartController.text),
+                      };
 
-                    dbRef
-                        .child(widget.sparepartKey)
-                        .update(sparepart)
-                        .then((_) {
-                      Navigator.pop(context);
-                    }).catchError((error) {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: const Text('Error'),
-                            content: Text('Failed to update record: $error'),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                child: const Text('OK'),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    });
+                      dbRef
+                          .child(widget.sparepartKey)
+                          .update(sparepart)
+                          .then((_) {
+                        _showSnackBar('Data berhasil diperbarui');
+                        Navigator.pop(context);
+                      }).catchError((error) {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text('Error'),
+                              content: Text('Failed to update record: $error'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text('OK'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      });
+                    }
                   },
                   child: const Text('Update Data'),
-                  color: Color.fromARGB(255, 219, 42, 15),
+                  color: const Color.fromARGB(255, 219, 42, 15),
                   textColor: Colors.white,
                   minWidth: 500,
                   height: 40,
