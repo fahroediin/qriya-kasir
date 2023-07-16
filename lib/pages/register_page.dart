@@ -57,6 +57,8 @@ class _RegisterPageState extends State<RegisterPage>
   void showSnackbar(String message) {
     final snackBar = SnackBar(
       content: Text(message),
+      duration: Duration(seconds: 2),
+      behavior: SnackBarBehavior.floating,
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }

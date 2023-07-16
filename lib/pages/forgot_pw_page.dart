@@ -1,9 +1,7 @@
 import 'dart:ffi';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import 'login_page.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
@@ -30,14 +28,18 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
     if (email.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text('Masukkan email anda terlebih dahulu'),
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
         ),
       );
     } else if (!emailRegex.hasMatch(email)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text('Format email tidak valid'),
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
         ),
       );
     } else {
@@ -45,8 +47,11 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Link reset password telah dikirim, cek email anda'),
+            duration: Duration(seconds: 2), // Durasi snackbar
+            behavior: SnackBarBehavior
+                .floating, // Menampilkan snackbar secara floating
           ),
         );
 

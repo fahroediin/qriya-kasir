@@ -742,6 +742,14 @@ class _HomePageState extends State<HomePage> {
                       ),
                       (route) => false,
                     );
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Berhasil logout'),
+                        duration: Duration(seconds: 2), // Durasi snackbar
+                        behavior: SnackBarBehavior
+                            .floating, // Tampilkan snackbar secara floating
+                      ),
+                    );
                   }
                 } catch (e) {
                   print('Error during logout: $e');
