@@ -157,8 +157,11 @@ class _TransaksiSuccessPageState extends State<TransaksiSuccessPage> {
             int quantity = item['jumlahSparepart'];
             int price = item['hargaSparepart'];
 
+            // Wrap the spare part name if it exceeds 18 characters
+            String wrappedItemName = wrapText(itemName, 18);
+
             // Pad the strings to align the columns
-            String paddedItemName = itemName.padRight(18);
+            String paddedItemName = wrappedItemName.padRight(18);
             String paddedQuantity = quantity.toString().padLeft(4);
             String paddedPrice = price.toString().padLeft(9);
 
@@ -251,6 +254,35 @@ class _TransaksiSuccessPageState extends State<TransaksiSuccessPage> {
         print(e.message);
       }
     }
+  }
+
+  // Function to wrap the text into multiple lines with a specified line length
+  String wrapText(String text, int lineLength) {
+    if (text.length <= lineLength) {
+      return text;
+    }
+
+    String wrappedText = '';
+    int start = 0;
+    int end = lineLength;
+
+    while (end < text.length) {
+      while (end > start && !text[end].contains(' ')) {
+        end--;
+      }
+
+      if (end == start) {
+        end += lineLength;
+      }
+
+      wrappedText += text.substring(start, end) + '\n';
+      start = end + 1;
+      end += lineLength;
+    }
+
+    wrappedText += text.substring(start);
+
+    return wrappedText;
   }
 
   @override

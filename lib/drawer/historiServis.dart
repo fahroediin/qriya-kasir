@@ -317,13 +317,18 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
             int quantity = item['jumlahSparepart'] ?? 0;
             int price = item['hargaSparepart'] ?? 0;
 
-            // Pad the strings to align the columns
-            String paddedItemName = itemName.padRight(18);
-            String paddedQuantity = quantity.toString().padLeft(4);
-            String paddedPrice = formatCurrency(price).padLeft(9);
+            // Wrap the spare part name if it exceeds 18 characters
+            String wrappedItemName = wrapText(itemName, 18);
+
+            // Calculate the indentation for quantity and price
+            int quantityIndentation = 9 - quantity.toString().length;
+            int priceIndentation = 16 - formatCurrency(price).length;
 
             // Create the final formatted line
-            String formattedLine = '$paddedItemName$paddedQuantity$paddedPrice';
+            String formattedLine = '${wrappedItemName.padRight(18)}';
+            formattedLine += '${' ' * quantityIndentation}$quantity';
+            formattedLine +=
+                '${' ' * priceIndentation}${formatCurrency(price)}';
 
             printer.printCustom(formattedLine, 1, 0);
           }
@@ -421,6 +426,35 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
     } on PlatformException catch (e) {
       print(e.message);
     }
+  }
+
+  // Function to wrap the text into multiple lines with a specified line length
+  String wrapText(String text, int lineLength) {
+    if (text.length <= lineLength) {
+      return text;
+    }
+
+    String wrappedText = '';
+    int start = 0;
+    int end = lineLength;
+
+    while (end < text.length) {
+      while (end > start && !text[end].contains(' ')) {
+        end--;
+      }
+
+      if (end == start) {
+        end += lineLength;
+      }
+
+      wrappedText += text.substring(start, end) + '\n';
+      start = end + 1;
+      end += lineLength;
+    }
+
+    wrappedText += text.substring(start);
+
+    return wrappedText;
   }
 
   @override

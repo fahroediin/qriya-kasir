@@ -335,22 +335,26 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
             int quantity = item['jumlahSparepart'];
             int price = item['hargaSparepart'];
 
-            // Pad the strings to align the columns
-            String paddedItemName = itemName.padRight(18);
-            String paddedQuantity = quantity.toString().padLeft(4);
-            String paddedPrice = price.toString().padLeft(9);
+            // Wrap the item name if it exceeds 18 characters
+            List<String> wrappedItemName = wrapText(itemName, 18);
 
-            // Calculate the indentation for quantity and price
-            int quantityIndentation = (5 - paddedQuantity.length) ~/ 2;
-            int priceIndentation = (16 - paddedPrice.length) ~/ 2;
+            for (var i = 0; i < wrappedItemName.length; i++) {
+              String paddedItemName = wrappedItemName[i].padRight(18);
 
-            // Create the final formatted line
-            String formattedLine = '$paddedItemName';
-            formattedLine += '${' ' * quantityIndentation}$paddedQuantity';
-            formattedLine +=
-                '${' ' * priceIndentation}${formatCurrency(price)}';
-
-            printer.printCustom(formattedLine, 1, 0);
+              // For the first line, include quantity and price columns
+              if (i == 0) {
+                String paddedQuantity = quantity.toString().padLeft(4);
+                String paddedPrice = price.toString().padLeft(9);
+                int quantityIndentation = (5 - paddedQuantity.length) ~/ 2;
+                int priceIndentation = (16 - paddedPrice.length) ~/ 2;
+                String formattedLine =
+                    '$paddedItemName${' ' * quantityIndentation}$paddedQuantity${' ' * priceIndentation}${formatCurrency(price)}';
+                printer.printCustom(formattedLine, 1, 0);
+              } else {
+                // For subsequent lines, only include the item name
+                printer.printCustom(paddedItemName, 1, 0);
+              }
+            }
           }
 
           printer.printNewLine();
@@ -429,6 +433,20 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
         print(e.message);
       }
     }
+  }
+
+  List<String> wrapText(String text, int maxLength) {
+    List<String> lines = [];
+    while (text.length > maxLength) {
+      int spaceIndex = text.lastIndexOf(' ', maxLength);
+      if (spaceIndex == -1) {
+        spaceIndex = maxLength;
+      }
+      lines.add(text.substring(0, spaceIndex));
+      text = text.substring(spaceIndex + 1);
+    }
+    lines.add(text);
+    return lines;
   }
 
   @override
