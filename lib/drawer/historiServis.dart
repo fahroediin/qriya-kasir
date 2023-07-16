@@ -317,20 +317,25 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
             int quantity = item['jumlahSparepart'] ?? 0;
             int price = item['hargaSparepart'] ?? 0;
 
-            // Wrap the spare part name if it exceeds 18 characters
-            String wrappedItemName = wrapText(itemName, 18);
+            // Wrap nama sparepart if it exceeds 18 characters
+            List<String> wrappedItemName = wrapText(itemName, 18);
 
-            // Calculate the indentation for quantity and price
-            int quantityIndentation = 9 - quantity.toString().length;
-            int priceIndentation = 16 - formatCurrency(price).length;
+            // Pad the strings to align the columns
+            String paddedItemName = wrappedItemName[0].padRight(18);
+            String paddedQuantity = quantity.toString().padLeft(4);
+            String paddedPrice = formatCurrency(price).padLeft(9);
 
             // Create the final formatted line
-            String formattedLine = '${wrappedItemName.padRight(18)}';
-            formattedLine += '${' ' * quantityIndentation}$quantity';
-            formattedLine +=
-                '${' ' * priceIndentation}${formatCurrency(price)}';
+            String formattedLine = '$paddedItemName$paddedQuantity$paddedPrice';
 
             printer.printCustom(formattedLine, 1, 0);
+
+            // Print additional wrapped lines, if any
+            if (wrappedItemName.length > 1) {
+              for (int i = 1; i < wrappedItemName.length; i++) {
+                printer.printCustom(wrappedItemName[i].padRight(18), 1, 0);
+              }
+            }
           }
         }
         printer.printNewLine();
@@ -428,33 +433,18 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
     }
   }
 
-  // Function to wrap the text into multiple lines with a specified line length
-  String wrapText(String text, int lineLength) {
-    if (text.length <= lineLength) {
-      return text;
-    }
-
-    String wrappedText = '';
-    int start = 0;
-    int end = lineLength;
-
-    while (end < text.length) {
-      while (end > start && !text[end].contains(' ')) {
-        end--;
+  List<String> wrapText(String text, int maxLength) {
+    List<String> lines = [];
+    while (text.length > maxLength) {
+      int spaceIndex = text.lastIndexOf(' ', maxLength);
+      if (spaceIndex == -1) {
+        spaceIndex = maxLength;
       }
-
-      if (end == start) {
-        end += lineLength;
-      }
-
-      wrappedText += text.substring(start, end) + '\n';
-      start = end + 1;
-      end += lineLength;
+      lines.add(text.substring(0, spaceIndex));
+      text = text.substring(spaceIndex + 1);
     }
-
-    wrappedText += text.substring(start);
-
-    return wrappedText;
+    lines.add(text);
+    return lines;
   }
 
   @override
