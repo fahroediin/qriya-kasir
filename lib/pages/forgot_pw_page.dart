@@ -109,8 +109,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           Padding(
             padding: const EdgeInsets.only(left: 30.0),
             child: Text(
-              'Mohon masukkan email anda:',
-              style: GoogleFonts.lato(
+              'Mohon masukkan email anda :',
+              style: TextStyle(
                 fontSize: 20,
                 wordSpacing: 2,
                 color: Color.fromARGB(255, 10, 10, 10),
@@ -124,7 +124,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               width: double.infinity,
               child: TextField(
                 controller: _emailController,
-                style: GoogleFonts.roboto(
+                style: TextStyle(
                   fontSize: 20,
                   color: Color.fromARGB(255, 10, 10, 10),
                 ),
