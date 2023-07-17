@@ -807,7 +807,7 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
                 },
                 validator: (value) {
                   if (value!.isEmpty) {
-                    return 'Jumlah bayar tidak boleh kosong';
+                    return 'Kolom bayar tidak boleh kosong';
                   }
                   return null;
                 },
