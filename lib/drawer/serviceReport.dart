@@ -231,7 +231,9 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
     // Show a SnackBar to inform the user that the PDF has been saved.
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Laporan servis dalam bentuk PDF berhasil disimpan.'),
+        content: Text('Laporan servis berhasil disimpan'),
+        behavior: SnackBarBehavior.floating, // Set behavior to floating
+        duration: Duration(seconds: 3), // Set duration to 3 seconds
         action: SnackBarAction(
           label: 'OK',
           onPressed: () {
