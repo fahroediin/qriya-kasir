@@ -122,13 +122,25 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
+      // Check if the buyer's name is empty or null
+      if (_namaPembeli == null || _namaPembeli!.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Nama pembeli tidak boleh kosong'),
+            behavior: SnackBarBehavior.floating,
+            duration: Duration(seconds: 2),
+          ),
+        );
+        return;
+      }
+
       // Check if there are any selected spare parts
       if (_items.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Pilih sparepart terlebih dahulu'),
-            behavior: SnackBarBehavior.floating, // Set the behavior to floating
-            duration: Duration(seconds: 2), // Set the duration to 2 seconds
+            behavior: SnackBarBehavior.floating,
+            duration: Duration(seconds: 2),
           ),
         );
         return; // Exit the method if there are no selected spare parts
