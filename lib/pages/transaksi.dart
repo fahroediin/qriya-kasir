@@ -677,6 +677,12 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
                   _namaPembeli = value ?? 'Anonim';
                 },
                 initialValue: 'Anonim',
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Nama Pembeli tidak boleh kosong';
+                  }
+                  return null; // Return null if the value is valid
+                },
               ),
               SizedBox(height: 10),
               Text(
