@@ -157,6 +157,19 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
         sparepartRef.update({'stokSparepart': stokSparepart - jumlahSparepart});
       }
 
+      // Check if the payment amount is sufficient
+      if (_totalHarga > _bayar) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Nominal Bayar Kurang'),
+            behavior: SnackBarBehavior.floating,
+            duration: Duration(seconds: 2),
+          ),
+        );
+
+        return; // Exit the method if the payment amount is insufficient
+      }
+
       // Save the transaction data
       saveTransaksiPenjualan();
     }

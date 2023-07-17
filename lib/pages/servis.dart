@@ -76,17 +76,67 @@ class _ServisPageState extends State<ServisPage> {
     });
   }
 
-  void submitForm() {
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
-      saveServisData();
-    }
-  }
-
   void updateDateTime() {
     setState(() {
       _formattedDateTime =
           DateFormat('dd/MM/yyyy HH:mm:ss').format(DateTime.now());
+    });
+  }
+
+  void submitForm() {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+
+      double totalAkhir =
+          calculateTotalPriceAfterDiscount(_diskon) + _biayaServis;
+
+      if (_bayar < totalAkhir) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Nominal Bayar Kurang'),
+            behavior: SnackBarBehavior.floating,
+            duration: Duration(seconds: 2),
+          ),
+        );
+        return;
+      }
+
+      saveServisData();
+    }
+  }
+
+// Calculate total price before discount
+  double calculateTotalPriceBeforeDiscount() {
+    double totalHarga = 0;
+    for (Map<String, dynamic> item in _items) {
+      int hargaSparepart = item['hargaSparepart'];
+      int jumlahSparepart = item['jumlahSparepart'];
+      totalHarga += hargaSparepart * jumlahSparepart;
+    }
+    return totalHarga;
+  }
+
+// Calculate total price after discount
+  double calculateTotalPriceAfterDiscount(double discount) {
+    double totalHarga = calculateTotalPriceBeforeDiscount();
+    double discountAmount = totalHarga * discount / 100;
+    return totalHarga - discountAmount;
+  }
+
+  void _calculateTotalHarga() {
+    double totalHarga = calculateTotalPriceBeforeDiscount();
+    double discountAmount = _diskon;
+    double totalHargaAfterDiscount = totalHarga - discountAmount;
+    setState(() {
+      _totalBayar = totalHargaAfterDiscount;
+      calculateKembalian(); // Menghitung kembalian saat totalBayar diperbarui
+    });
+  }
+
+  void calculateKembalian() {
+    double kembalian = _bayar - (_totalBayar + _biayaServis);
+    setState(() {
+      _kembalian = kembalian;
     });
   }
 
@@ -182,41 +232,6 @@ class _ServisPageState extends State<ServisPage> {
         );
       },
     );
-  }
-
-// Calculate total price before discount
-  double calculateTotalPriceBeforeDiscount() {
-    double totalHarga = 0;
-    for (Map<String, dynamic> item in _items) {
-      int hargaSparepart = item['hargaSparepart'];
-      int jumlahSparepart = item['jumlahSparepart'];
-      totalHarga += hargaSparepart * jumlahSparepart;
-    }
-    return totalHarga;
-  }
-
-// Calculate total price after discount
-  double calculateTotalPriceAfterDiscount(double discount) {
-    double totalHarga = calculateTotalPriceBeforeDiscount();
-    double discountAmount = totalHarga * discount / 100;
-    return totalHarga - discountAmount;
-  }
-
-  void _calculateTotalHarga() {
-    double totalHarga = calculateTotalPriceBeforeDiscount();
-    double discountAmount = _diskon;
-    double totalHargaAfterDiscount = totalHarga - discountAmount;
-    setState(() {
-      _totalBayar = totalHargaAfterDiscount;
-      calculateKembalian(); // Menghitung kembalian saat totalBayar diperbarui
-    });
-  }
-
-  void calculateKembalian() {
-    double kembalian = _bayar - (_totalBayar + _biayaServis);
-    setState(() {
-      _kembalian = kembalian;
-    });
   }
 
   void getMekanikList() {
