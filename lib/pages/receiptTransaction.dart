@@ -159,7 +159,7 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                     ),
                   ],
                 ),
-                pw.SizedBox(height: 10),
+                pw.SizedBox(height: 5),
                 pw.Row(
                   mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                   children: [
