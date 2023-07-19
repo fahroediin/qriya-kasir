@@ -87,10 +87,7 @@ class _ServisPageState extends State<ServisPage> {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
-      double totalAkhir =
-          calculateTotalPriceAfterDiscount(_diskon) + _biayaServis;
-
-      if (_bayar < totalAkhir) {
+      if (_bayar < (_totalBayar + _biayaServis)) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Nominal Bayar Kurang'),
@@ -569,26 +566,82 @@ class _ServisPageState extends State<ServisPage> {
     int stokSparepart = (sparepart['stokSparepart']) ?? 0;
 
     if (jumlahItem > 0 && jumlahItem <= stokSparepart) {
-      setState(() {
-        _items.add({
-          'idSparepart': sparepart['idSparepart'],
-          'namaSparepart': sparepart['namaSparepart'],
-          'hargaSparepart': sparepart['hargaSparepart'].toInt(),
-          'jumlahSparepart': jumlahItem,
-          'stokSparepart': stokSparepart,
-        });
-        sparepart['stokSparepart'] = (stokSparepart - jumlahItem).toString();
-      });
-      _calculateTotalHarga();
+      // Check if the sparepart already exists in the list
+      int existingItemIndex = _items.indexWhere(
+          (item) => item['idSparepart'] == sparepart['idSparepart']);
 
-      // Update stokSparepart in the database
-      DatabaseReference sparepartRef = FirebaseDatabase.instance
-          .reference()
-          .child('daftarSparepart')
-          .child(sparepart['idSparepart']);
-      sparepartRef.update({'stokSparepart': stokSparepart - jumlahItem});
-
-      Navigator.of(context).pop(); // Menutup dialog
+      if (existingItemIndex != -1) {
+        // If the sparepart already exists, update the quantity instead of adding a new item
+        int existingQuantity = _items[existingItemIndex]['jumlahSparepart'];
+        int newQuantity = existingQuantity + jumlahItem;
+        if (newQuantity <= stokSparepart) {
+          setState(() {
+            _items[existingItemIndex]['jumlahSparepart'] = newQuantity;
+          });
+          _calculateTotalHarga();
+          // Update stokSparepart in the database
+          _updateStokSparepart(
+              sparepart['idSparepart'], stokSparepart - jumlahItem);
+          Navigator.of(context).pop(); // Menutup dialog
+        } else {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Kesalahan'),
+                content: Text('Jumlah item lebih banyak dari stok yang ada'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
+          return; // Menambahkan return agar stok tidak dikurangi jika terjadi kesalahan
+        }
+      } else {
+        if (jumlahItem <= stokSparepart) {
+          // Menambahkan pengecekan stok sebelum menambah item baru
+          setState(() {
+            _items.add({
+              'idSparepart': sparepart['idSparepart'],
+              'namaSparepart': sparepart['namaSparepart'],
+              'hargaSparepart': sparepart['hargaSparepart'].toInt(),
+              'merkSparepart': sparepart['merkSparepart'],
+              'jumlahSparepart': jumlahItem,
+              'stokSparepart': stokSparepart,
+            });
+          });
+          _calculateTotalHarga();
+          // Update stokSparepart in the database
+          _updateStokSparepart(
+              sparepart['idSparepart'], stokSparepart - jumlahItem);
+          Navigator.of(context).pop(); // Menutup dialog
+        } else {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Kesalahan'),
+                content: Text('Jumlah item lebih banyak dari stok yang ada'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
+          return; // Menambahkan return agar stok tidak dikurangi jika terjadi kesalahan
+        }
+      }
     } else {
       showDialog(
         context: context,
