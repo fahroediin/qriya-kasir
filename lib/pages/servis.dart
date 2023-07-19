@@ -644,6 +644,10 @@ class _ServisPageState extends State<ServisPage> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
+            _items.forEach((item) {
+              _updateStokSparepart(item['idSparepart'], item['stokSparepart']);
+            });
+
             Navigator.pushReplacement(
               context,
               PageRouteBuilder(

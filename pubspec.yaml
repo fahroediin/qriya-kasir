@@ -58,6 +58,7 @@ dependencies:
   open_file: ^3.3.2
   number_to_words: ^1.0.0
   webview_flutter: ^4.0.0
+  connectivity: ^3.0.6
 dev_dependencies:
   flutter_test:
     sdk: flutter
