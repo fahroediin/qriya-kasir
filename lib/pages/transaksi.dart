@@ -548,6 +548,7 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
           // Update stokSparepart in the database
           _updateStokSparepart(
               sparepart['idSparepart'], stokSparepart - jumlahItem);
+          Navigator.of(context).pop(); // Menutup dialog
         } else {
           showDialog(
             context: context,
@@ -583,6 +584,7 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
         // Update stokSparepart in the database
         _updateStokSparepart(
             sparepart['idSparepart'], stokSparepart - jumlahItem);
+        Navigator.of(context).pop(); // Menutup dialog
       }
     } else {
       showDialog(
