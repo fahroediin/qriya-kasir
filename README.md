@@ -1,7 +1,7 @@
 # Qriya - Aplikasi Kasir
 
 Aplikasi Kasir Berbasis Android Menggunakan Firebase Realtime Database
-yang dibuat untuk salah satu syarat kelulusan gelar S.Kom 
+yang dirancang untuk salah satu syarat kelulusan gelar S.Kom 
 program Studi Teknik Informatika STMIK Komputama Majenang 2023
 
 ## Data Diri
