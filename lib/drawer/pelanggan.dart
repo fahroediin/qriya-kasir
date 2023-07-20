@@ -2,6 +2,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:project_s/drawer/sparepart.dart';
 import 'package:project_s/pages/home_page.dart';
 import 'update_pelanggan.dart';
 
@@ -17,6 +18,7 @@ class _PelangganState extends State<Pelanggan> {
   int itemCount = 0;
   TextEditingController searchController = TextEditingController();
   bool isSearching = false;
+  bool hasData = true;
 
   @override
   void initState() {
@@ -38,6 +40,12 @@ class _PelangganState extends State<Pelanggan> {
     if (snapshot.exists) {
       setState(() {
         itemCount = snapshot.children.length;
+        hasData = true;
+      });
+    } else {
+      setState(() {
+        itemCount = 0;
+        hasData = false;
       });
     }
   }
@@ -129,37 +137,39 @@ class _PelangganState extends State<Pelanggan> {
               ),
             ),
             Expanded(
-              child: FirebaseAnimatedList(
-                query: dbRef,
-                itemBuilder: (BuildContext context, DataSnapshot snapshot,
-                    Animation<double> animation, int index) {
-                  Map daftarPelanggan = snapshot.value as Map;
-                  daftarPelanggan['key'] = snapshot.key;
+              child: hasData
+                  ? FirebaseAnimatedList(
+                      query: dbRef,
+                      itemBuilder: (BuildContext context, DataSnapshot snapshot,
+                          Animation<double> animation, int index) {
+                        Map daftarPelanggan = snapshot.value as Map;
+                        daftarPelanggan['key'] = snapshot.key;
 
-                  if (isSearching &&
-                      daftarPelanggan['nopol'] !=
-                          searchController.text.toUpperCase()) {
-                    return SizedBox(); // Skip this item if it doesn't match the search query
-                  }
+                        if (isSearching &&
+                            daftarPelanggan['nopol'] !=
+                                searchController.text.toUpperCase()) {
+                          return SizedBox(); // Skip this item if it doesn't match the search query
+                        }
 
-                  return Column(
-                    children: [
-                      buildListItem(
-                        daftarPelanggan: daftarPelanggan,
-                        nopol: daftarPelanggan['nopol'],
-                        merkSpm: daftarPelanggan['merkSpm'],
-                        tipeSpm: daftarPelanggan['tipeSpm'],
-                        namaPelanggan: daftarPelanggan['namaPelanggan'],
-                        alamat: daftarPelanggan['alamat'],
-                        noHp: daftarPelanggan['noHp'],
-                        snapshot: snapshot,
-                      ),
-                      SizedBox(height: 8),
-                      Divider(color: Colors.grey[400]),
-                    ],
-                  );
-                },
-              ),
+                        return Column(
+                          children: [
+                            buildListItem(
+                              daftarPelanggan: daftarPelanggan,
+                              nopol: daftarPelanggan['nopol'],
+                              merkSpm: daftarPelanggan['merkSpm'],
+                              tipeSpm: daftarPelanggan['tipeSpm'],
+                              namaPelanggan: daftarPelanggan['namaPelanggan'],
+                              alamat: daftarPelanggan['alamat'],
+                              noHp: daftarPelanggan['noHp'],
+                              snapshot: snapshot,
+                            ),
+                            SizedBox(height: 8),
+                            Divider(color: Colors.grey[400]),
+                          ],
+                        );
+                      },
+                    )
+                  : buildNoDataWidget(), // Show buildNoDataWidget when there is no data
             ),
           ],
         ),
@@ -308,4 +318,29 @@ class _PelangganState extends State<Pelanggan> {
       ),
     );
   }
+}
+
+Widget buildNoDataWidget() {
+  return Column(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      Center(
+        child: Text(
+          'Data tidak ditemukan',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+      SizedBox(height: 5), // Jarak antara teks dan teks yang ditambahkan
+      Text(
+        'Pastikan ejaan dengan benar',
+        style: TextStyle(
+          fontSize: 14,
+          color: Colors.black38,
+        ),
+      ),
+    ],
+  );
 }

@@ -18,6 +18,7 @@ class _SparepartPageState extends State<SparepartPage> {
   int itemCount = 0;
   TextEditingController searchController = TextEditingController();
   bool isSearching = false;
+  bool hasData = true;
 
   String formatCurrency(int value) {
     final format = NumberFormat("#,###");
@@ -25,24 +26,66 @@ class _SparepartPageState extends State<SparepartPage> {
   }
 
   void searchList(String query) {
-    setState(() {
-      isSearching = query.isNotEmpty;
-    });
+    if (query.isNotEmpty) {
+      setState(() {
+        isSearching = true;
+      });
+    } else {
+      setState(() {
+        isSearching = false;
+      });
+    }
+
+    fetchData(); // Fetch data based on the search query
   }
 
   Future<void> fetchData() async {
     Query query = dbRef;
-
     if (isSearching) {
-      query = dbRef.orderByChild('namaSparepart');
-    }
+      String searchText = searchController.text.trim();
+      // Perform a compound query using 'idServis' OR 'nopol'
+      query = dbRef.orderByChild('namaSparepart').equalTo(searchText);
+      DataSnapshot snapshotBynamaSparepart = await query.get();
+      DataSnapshot snapshot = await query.get();
+      if (!snapshotBynamaSparepart.exists) {
+        query = dbRef.orderByChild('specSparepart').equalTo(searchText);
+        DataSnapshot snapshotByspec = await query.get();
 
-    DataSnapshot snapshot = await query.get();
+        if (snapshotByspec.exists) {
+          setState(() {
+            itemCount = snapshotByspec.children.length;
+            hasData = true; // Set the flag to true since data is found
+          });
+        } else {
+          setState(() {
+            itemCount =
+                0; // Reset the itemCount since there are no matching items
+            hasData = false; // Set the flag to false since no data is found
+          });
+        }
+      } else {
+        setState(() {
+          itemCount = snapshotBynamaSparepart.children.length;
+          hasData = true; // Set the flag to true since data is found
+        });
+      }
+    } else {
+      // When not searching, get the last 50 items
+      Query query = dbRef.orderByKey().limitToLast(50);
+      DataSnapshot snapshot = await query.get();
 
-    if (snapshot.value != null) {
-      setState(() {
-        itemCount = snapshot.children.length;
-      });
+      if (snapshot.exists) {
+        setState(() {
+          itemCount = snapshot.children.length;
+          hasData = true; // Set the flag to true since data is found
+        });
+      } else {
+        setState(() {
+          itemCount =
+              0; // Reset the itemCount since there are no matching items
+          hasData = false; // Set the flag to false since no data is found
+        });
+      }
     }
   }
 
@@ -283,32 +326,34 @@ class _SparepartPageState extends State<SparepartPage> {
             ),
             SizedBox(height: 10),
             Expanded(
-              child: FirebaseAnimatedList(
-                query: dbRef,
-                itemBuilder: (BuildContext context, DataSnapshot snapshot,
-                    Animation<double> animation, int index) {
-                  Map sparepart = snapshot.value as Map;
-                  sparepart['key'] = snapshot.key;
+              child: hasData
+                  ? FirebaseAnimatedList(
+                      query: dbRef,
+                      itemBuilder: (BuildContext context, DataSnapshot snapshot,
+                          Animation<double> animation, int index) {
+                        Map sparepart = snapshot.value as Map;
+                        sparepart['key'] = snapshot.key;
 
-                  if (!isSearching ||
-                      (sparepart['namaSparepart']
-                              .toLowerCase()
-                              .contains(searchController.text.toLowerCase()) ||
-                          sparepart['specSparepart']
-                              .toLowerCase()
-                              .contains(searchController.text.toLowerCase()))) {
-                    return Column(
-                      children: [
-                        listItem(sparepart: sparepart),
-                        SizedBox(height: 8),
-                        Divider(color: Colors.grey[400]),
-                      ],
-                    );
-                  } else {
-                    return SizedBox();
-                  }
-                },
-              ),
+                        if (!isSearching ||
+                            (sparepart['namaSparepart'].toLowerCase().contains(
+                                    searchController.text.toLowerCase()) ||
+                                sparepart['specSparepart']
+                                    .toLowerCase()
+                                    .contains(
+                                        searchController.text.toLowerCase()))) {
+                          return Column(
+                            children: [
+                              listItem(sparepart: sparepart),
+                              SizedBox(height: 8),
+                              Divider(color: Colors.grey[400]),
+                            ],
+                          );
+                        } else {
+                          return SizedBox();
+                        }
+                      },
+                    )
+                  : buildNoDataWidget(),
             ),
           ],
         ),
@@ -320,4 +365,29 @@ class _SparepartPageState extends State<SparepartPage> {
       ),
     );
   }
+}
+
+Widget buildNoDataWidget() {
+  return Column(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      Center(
+        child: Text(
+          'Data tidak ditemukan',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+      SizedBox(height: 5), // Jarak antara teks dan teks yang ditambahkan
+      Text(
+        'Pastikan ejaan dengan benar',
+        style: TextStyle(
+          fontSize: 14,
+          color: Colors.black38,
+        ),
+      ),
+    ],
+  );
 }

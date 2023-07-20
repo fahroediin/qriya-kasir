@@ -19,6 +19,7 @@ class _MekanikPageState extends State<MekanikPage> {
   int itemCount = 0;
   TextEditingController searchController = TextEditingController();
   bool isSearching = false;
+  bool hasData = true;
 
   @override
   void initState() {
@@ -38,6 +39,12 @@ class _MekanikPageState extends State<MekanikPage> {
     if (snapshot.exists) {
       setState(() {
         itemCount = snapshot.children.length;
+        hasData = true;
+      });
+    } else {
+      setState(() {
+        itemCount = 0;
+        hasData = false;
       });
     }
   }
@@ -147,30 +154,32 @@ class _MekanikPageState extends State<MekanikPage> {
               ),
             ),
             Expanded(
-              child: FirebaseAnimatedList(
-                query: dbRef,
-                itemBuilder: (BuildContext context, DataSnapshot snapshot,
-                    Animation<double> animation, int index) {
-                  Map mekanik = snapshot.value as Map;
-                  mekanik['key'] = snapshot.key;
+                child: hasData
+                    ? FirebaseAnimatedList(
+                        query: dbRef,
+                        itemBuilder: (BuildContext context,
+                            DataSnapshot snapshot,
+                            Animation<double> animation,
+                            int index) {
+                          Map mekanik = snapshot.value as Map;
+                          mekanik['key'] = snapshot.key;
 
-                  if (isSearching &&
-                      !mekanik['namaMekanik']
-                          .toLowerCase()
-                          .contains(searchController.text.toLowerCase())) {
-                    return SizedBox(); // Skip this item if it doesn't match the search query
-                  }
+                          if (isSearching &&
+                              !mekanik['namaMekanik'].toLowerCase().contains(
+                                  searchController.text.toLowerCase())) {
+                            return SizedBox(); // Skip this item if it doesn't match the search query
+                          }
 
-                  return Column(
-                    children: [
-                      listItem(mekanik: mekanik, snapshot: snapshot),
-                      SizedBox(height: 8),
-                      Divider(color: Colors.grey[400]),
-                    ],
-                  );
-                },
-              ),
-            ),
+                          return Column(
+                            children: [
+                              listItem(mekanik: mekanik, snapshot: snapshot),
+                              SizedBox(height: 8),
+                              Divider(color: Colors.grey[400]),
+                            ],
+                          );
+                        },
+                      )
+                    : buildNoDataWidget()),
           ],
         ),
       ),
@@ -297,4 +306,29 @@ class _MekanikPageState extends State<MekanikPage> {
       ),
     );
   }
+}
+
+Widget buildNoDataWidget() {
+  return Column(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      Center(
+        child: Text(
+          'Data tidak ditemukan',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+      SizedBox(height: 5), // Jarak antara teks dan teks yang ditambahkan
+      Text(
+        'Pastikan ejaan dengan benar',
+        style: TextStyle(
+          fontSize: 14,
+          color: Colors.black38,
+        ),
+      ),
+    ],
+  );
 }
