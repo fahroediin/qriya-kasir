@@ -135,11 +135,6 @@ class _ServisPageState extends State<ServisPage> {
         );
         return;
       }
-
-      setState(() {
-        _isLoading = true;
-      });
-
       // Check for internet connectivity
       var connectivityResult = await (Connectivity().checkConnectivity());
       if (connectivityResult == ConnectivityResult.none) {
@@ -150,18 +145,8 @@ class _ServisPageState extends State<ServisPage> {
             duration: Duration(seconds: 2),
           ),
         );
-        setState(() {
-          _isLoading = false;
-        });
         return;
       }
-
-      // Set connected status and call the method to save the data
-      setState(() {
-        _isConnected = true;
-        _isLoading = false;
-      });
-
       saveServisData();
     }
   }

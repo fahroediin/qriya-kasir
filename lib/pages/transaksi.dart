@@ -150,18 +150,6 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
   }
 
   void _submitForm() async {
-    // Check for internet connectivity
-    var connectivityResult = await (Connectivity().checkConnectivity());
-    if (connectivityResult == ConnectivityResult.none) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Tidak ada koneksi internet'),
-          behavior: SnackBarBehavior.floating,
-          duration: Duration(seconds: 2),
-        ),
-      );
-      return;
-    }
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
@@ -209,10 +197,20 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
             duration: Duration(seconds: 2),
           ),
         );
-
         return; // Exit the method if the payment amount is insufficient
       }
-
+      // Check for internet connectivity
+      var connectivityResult = await (Connectivity().checkConnectivity());
+      if (connectivityResult == ConnectivityResult.none) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Tidak ada koneksi internet'),
+            behavior: SnackBarBehavior.floating,
+            duration: Duration(seconds: 2),
+          ),
+        );
+        return;
+      }
       // Save the transaction data
       saveTransaksiPenjualan();
     }
