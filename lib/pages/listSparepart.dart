@@ -58,14 +58,27 @@ class _ListSparepartPageState extends State<ListSparepartPage> {
   }
 
   Widget buildNoDataWidget() {
-    return Center(
-      child: Text(
-        'Data tidak ada',
-        style: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Center(
+          child: Text(
+            'Data tidak ditemukan',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ),
-      ),
+        SizedBox(height: 5), // Jarak antara teks dan teks yang ditambahkan
+        Text(
+          'Pastikan ejaan dengan benar',
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.black38,
+          ),
+        ),
+      ],
     );
   }
 

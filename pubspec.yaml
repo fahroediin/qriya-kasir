@@ -39,7 +39,6 @@ dependencies:
   google_fonts:
   firebase_auth: ^3.3.14
   firebase_database: ^9.0.0
-  cloud_firestore: ^3.1.13
   google_sign_in: ^5.0.4
   flutter_svg: ^1.1.5
   intl: ^0.17.0
