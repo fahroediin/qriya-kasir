@@ -88,6 +88,8 @@ class _UpdateRecordState extends State<UpdateRecord> {
                     labelText: 'Nama Sparepart',
                     hintText: 'Masukkan Nama Sparepart',
                   ),
+                  textCapitalization: TextCapitalization
+                      .words, // Mengubah hanya huruf pertama pada setiap kata yang kapital
                 ),
                 const SizedBox(height: 30),
                 TextField(
@@ -97,6 +99,7 @@ class _UpdateRecordState extends State<UpdateRecord> {
                     labelText: 'Merk',
                     hintText: 'Masukkan Merk Sparepart',
                   ),
+                  textCapitalization: TextCapitalization.sentences,
                 ),
                 const SizedBox(height: 30),
                 TextField(
@@ -106,6 +109,8 @@ class _UpdateRecordState extends State<UpdateRecord> {
                     labelText: 'Spesifikasi',
                     hintText: 'Masukkan Spesifikasi Sparepart',
                   ),
+                  textCapitalization: TextCapitalization
+                      .sentences, // Mengubah hanya huruf pertama yang kapital
                 ),
                 const SizedBox(height: 30),
                 TextField(

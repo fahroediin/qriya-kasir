@@ -70,7 +70,32 @@ class _UpdateRecordState extends State<UpdateRecord> {
                   FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9 ]')),
                   LengthLimitingTextInputFormatter(255),
                 ],
-                textCapitalization: TextCapitalization.characters,
+                onChanged: (value) {
+                  String formattedValue = '';
+                  bool capitalizeNext = true;
+
+                  for (int i = 0; i < value.length; i++) {
+                    String char = value[i];
+                    if (char == ' ') {
+                      capitalizeNext = true;
+                    } else {
+                      if (capitalizeNext) {
+                        char = char.toUpperCase();
+                      } else {
+                        char = char.toLowerCase();
+                      }
+                      capitalizeNext = false;
+                    }
+                    formattedValue += char;
+                  }
+
+                  namaMekanikController.value =
+                      namaMekanikController.value.copyWith(
+                    text: formattedValue,
+                    selection:
+                        TextSelection.collapsed(offset: formattedValue.length),
+                  );
+                },
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Wajib diisi';

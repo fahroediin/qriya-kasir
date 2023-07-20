@@ -136,6 +136,8 @@ class _MekanikPageState extends State<MekanikPage> {
                       onChanged: (value) {
                         searchList(value);
                       },
+                      textCapitalization: TextCapitalization
+                          .sentences, // Mengubah hanya huruf pertama yang kapital
                       decoration: InputDecoration(
                         labelText: 'Cari Mekanik',
                         border: OutlineInputBorder(),

@@ -322,7 +322,8 @@ class _InputPelangganPageState extends State<InputPelangganPage>
                   FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z ]')),
                   LengthLimitingTextInputFormatter(255),
                 ],
-                textCapitalization: TextCapitalization.characters,
+                textCapitalization: TextCapitalization
+                    .words, // Mengubah hanya huruf pertama yang kapital
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Wajib diisi';
