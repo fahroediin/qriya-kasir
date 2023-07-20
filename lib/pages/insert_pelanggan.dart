@@ -86,7 +86,15 @@ class _InputPelangganPageState extends State<InputPelangganPage>
             behavior: SnackBarBehavior.floating,
           );
           ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+          // Clear fields and navigate to the homepage
           _clearFields();
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HomePage(),
+            ),
+          );
         }
       } catch (error) {
         final snackBar = SnackBar(
@@ -96,6 +104,14 @@ class _InputPelangganPageState extends State<InputPelangganPage>
         );
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }
+    } else {
+      // Show error messages for empty fields
+      final snackBar = SnackBar(
+        content: Text('Mohon isi semua data terlebih dahulu'),
+        duration: Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
   }
 
@@ -203,6 +219,12 @@ class _InputPelangganPageState extends State<InputPelangganPage>
                               TextSelection.collapsed(offset: value.length),
                         );
                       },
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Wajib diisi';
+                        }
+                        return null;
+                      },
                     ),
                   ),
                   SizedBox(width: 10),
@@ -250,6 +272,12 @@ class _InputPelangganPageState extends State<InputPelangganPage>
                               TextSelection.collapsed(offset: value.length),
                         );
                       },
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Wajib diisi';
+                        }
+                        return null;
+                      },
                     ),
                   ),
                 ],
@@ -277,6 +305,12 @@ class _InputPelangganPageState extends State<InputPelangganPage>
                   border: OutlineInputBorder(),
                   hintText: 'Merk Sepeda Motor',
                 ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Pilih Merk Sepeda Motor';
+                  }
+                  return null;
+                },
               ),
               SizedBox(height: 20),
               Text(
