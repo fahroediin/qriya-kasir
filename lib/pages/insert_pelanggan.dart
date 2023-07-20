@@ -65,8 +65,7 @@ class _InputPelangganPageState extends State<InputPelangganPage>
         if (snapshot.value != null) {
           // Data dengan nomor polisi tersebut telah terdaftar
           final snackBar = SnackBar(
-            content: Text(
-                'Data pelanggan dengan nomor polisi tersebut sudah terdaftar'),
+            content: Text('Nomor polisi sudah terdaftar'),
             duration: Duration(seconds: 2),
             behavior: SnackBarBehavior.floating,
           );
