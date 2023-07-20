@@ -21,6 +21,7 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
   BlueThermalPrinter printer = BlueThermalPrinter.instance;
   TextEditingController searchController = TextEditingController();
   bool isSearching = false;
+  bool hasData = false;
 
   @override
   void initState() {
@@ -33,8 +34,7 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
     Query query = dbRef;
 
     if (isSearching) {
-      query =
-          dbRef.orderByChild('nopol_idServis').equalTo(searchController.text);
+      query = dbRef.orderByChild('idServis').equalTo(searchController.text);
     } else {
       query = dbRef.orderByKey().limitToLast(50);
     }
@@ -44,6 +44,12 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
     if (snapshot.exists) {
       setState(() {
         itemCount = snapshot.children.length;
+        hasData = true; // Set the flag to true since data is found
+      });
+    } else {
+      setState(() {
+        itemCount = 0; // Reset the itemCount since there are no matching items
+        hasData = false; // Set the flag to false since no data is found
       });
     }
   }
@@ -176,27 +182,28 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
   }
 
   Widget buildNoDataWidget() {
-    if (isSearching) {
-      return Center(
-        child: Text(
-          'Tidak ada hasil pencarian',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Center(
+          child: Text(
+            'Data tidak ditemukan',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
-      );
-    } else {
-      return Center(
-        child: Text(
-          'Data tidak ada',
+        SizedBox(height: 5), // Jarak antara teks dan teks yang ditambahkan
+        Text(
+          'Pastikan ejaan dengan benar',
           style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
+            fontSize: 14,
+            color: Colors.black38,
           ),
         ),
-      );
-    }
+      ],
+    );
   }
 
   String formatCurrency(int value) {
@@ -533,14 +540,15 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
           ),
           SizedBox(height: 10),
           Expanded(
-            child: FirebaseAnimatedList(
-              query: dbRef,
-              itemBuilder: (BuildContext context, DataSnapshot snapshot,
-                  Animation<double> animation, int index) {
-                return buildListItem(snapshot);
-              },
-              defaultChild: buildNoDataWidget(),
-            ),
+            child: hasData
+                ? FirebaseAnimatedList(
+                    query: dbRef,
+                    itemBuilder: (BuildContext context, DataSnapshot snapshot,
+                        Animation<double> animation, int index) {
+                      return buildListItem(snapshot);
+                    },
+                  )
+                : buildNoDataWidget(),
           ),
         ],
       ),

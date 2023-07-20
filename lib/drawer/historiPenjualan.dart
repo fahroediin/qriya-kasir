@@ -31,6 +31,7 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
   int _hargaAkhir = 0;
   TextEditingController searchController = TextEditingController();
   bool isSearching = false;
+  bool hasData = false;
 
   @override
   void initState() {
@@ -43,7 +44,7 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
     Query query = dbRef;
 
     if (isSearching) {
-      query = dbRef.orderByChild('idPenjualan').equalTo(searchController.text);
+      query = dbRef.orderByChild('namaPembeli').equalTo(searchController.text);
     } else {
       query = dbRef.orderByKey().limitToLast(50);
     }
@@ -53,6 +54,12 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
     if (snapshot.exists) {
       setState(() {
         itemCount = snapshot.children.length;
+        hasData = true; // Set the flag to true since data is found
+      });
+    } else {
+      setState(() {
+        itemCount = 0; // Reset the itemCount since there are no matching items
+        hasData = false; // Set the flag to false since no data is found
       });
     }
   }
@@ -183,27 +190,28 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
   }
 
   Widget buildNoDataWidget() {
-    if (isSearching) {
-      return Center(
-        child: Text(
-          'Tidak ada hasil pencarian',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Center(
+          child: Text(
+            'Data tidak ditemukan',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
-      );
-    } else {
-      return Center(
-        child: Text(
-          'Data tidak ada',
+        SizedBox(height: 5), // Jarak antara teks dan teks yang ditambahkan
+        Text(
+          'Pastikan ejaan dengan benar',
           style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
+            fontSize: 14,
+            color: Colors.black38,
           ),
         ),
-      );
-    }
+      ],
+    );
   }
 
   void searchList(String query) {
@@ -533,14 +541,15 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
           ),
           SizedBox(height: 10),
           Expanded(
-            child: FirebaseAnimatedList(
-              query: dbRef,
-              itemBuilder: (BuildContext context, DataSnapshot snapshot,
-                  Animation<double> animation, int index) {
-                return buildListItem(snapshot);
-              },
-              defaultChild: buildNoDataWidget(),
-            ),
+            child: hasData
+                ? FirebaseAnimatedList(
+                    query: dbRef,
+                    itemBuilder: (BuildContext context, DataSnapshot snapshot,
+                        Animation<double> animation, int index) {
+                      return buildListItem(snapshot);
+                    },
+                  )
+                : buildNoDataWidget(),
           ),
         ],
       ),
