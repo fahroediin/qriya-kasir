@@ -41,26 +41,59 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
   }
 
   Future<void> fetchData() async {
-    Query query = dbRef;
-
     if (isSearching) {
-      query = dbRef.orderByChild('namaPembeli').equalTo(searchController.text);
-    } else {
-      query = dbRef.orderByKey().limitToLast(50);
-    }
+      String searchText = searchController.text.trim();
 
-    DataSnapshot snapshot = await query.get();
+      Query query = dbRef.orderByKey().limitToLast(50);
 
-    if (snapshot.exists) {
-      setState(() {
-        itemCount = snapshot.children.length;
-        hasData = true; // Set the flag to true since data is found
-      });
+      // Perform a compound query using 'idServis' OR 'nopol'
+      query =
+          dbRef.orderByChild('idPenjualan').equalTo(searchText).limitToLast(50);
+      DataSnapshot snapshotByIdServis = await query.get();
+
+      // If no data found with 'idServis', then search by 'nopol'
+      if (!snapshotByIdServis.exists) {
+        query = dbRef
+            .orderByChild('namaPembeli')
+            .equalTo(searchText)
+            .limitToLast(50);
+        DataSnapshot snapshotByNopol = await query.get();
+
+        if (snapshotByNopol.exists) {
+          setState(() {
+            itemCount = snapshotByNopol.children.length;
+            hasData = true; // Set the flag to true since data is found
+          });
+        } else {
+          setState(() {
+            itemCount =
+                0; // Reset the itemCount since there are no matching items
+            hasData = false; // Set the flag to false since no data is found
+          });
+        }
+      } else {
+        setState(() {
+          itemCount = snapshotByIdServis.children.length;
+          hasData = true; // Set the flag to true since data is found
+        });
+      }
     } else {
-      setState(() {
-        itemCount = 0; // Reset the itemCount since there are no matching items
-        hasData = false; // Set the flag to false since no data is found
-      });
+      // When not searching, get the last 50 items
+      Query query = dbRef.orderByKey().limitToLast(50);
+      DataSnapshot snapshot = await query.get();
+
+      if (snapshot.exists) {
+        setState(() {
+          itemCount = snapshot.children.length;
+          hasData = true; // Set the flag to true since data is found
+        });
+      } else {
+        setState(() {
+          itemCount =
+              0; // Reset the itemCount since there are no matching items
+          hasData = false; // Set the flag to false since no data is found
+        });
+      }
     }
   }
 
