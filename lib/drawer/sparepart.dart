@@ -312,6 +312,8 @@ class _SparepartPageState extends State<SparepartPage> {
               onChanged: (value) {
                 searchList(value);
               },
+              textCapitalization: TextCapitalization
+                  .sentences, // Ini akan mengkapitalkan setiap kata pertama di awal kalimat.
               decoration: InputDecoration(
                 labelText: 'Cari Nama atau Spesifikasi',
                 border: OutlineInputBorder(),

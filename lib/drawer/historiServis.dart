@@ -114,14 +114,17 @@ class _HistoriServisPageState extends State<HistoriServisPage> {
       child: Stack(
         children: [
           ListTile(
-            title: Text('ID Servis: $idServis'),
+            title: Text('ID Servis: $idServis',
+                style: TextStyle(
+                    fontWeight: FontWeight.bold, color: Colors.black54)),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Tanggal dan Waktu: $dateTime'),
                 Text('ID Mekanik: $idMekanik'),
                 Text('Nama Mekanik: $namaMekanik'),
-                Text('Nomor Polisi: $nopol'),
+                Text('Nomor Polisi: $nopol',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
                 Text('Nama Pelanggan: $namaPelanggan'),
                 Text('Merk SPM: $merkSpm'),
                 Text('Tipe SPM: $tipeSpm'),

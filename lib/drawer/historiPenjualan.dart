@@ -120,12 +120,15 @@ class _HistoriPenjualanPageState extends State<HistoriPenjualanPage> {
       child: Stack(
         children: [
           ListTile(
-            title: Text('ID Penjualan: $idPenjualan'),
+            title: Text('ID Penjualan: $idPenjualan',
+                style: TextStyle(
+                    fontWeight: FontWeight.bold, color: Colors.black54)),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Tanggal dan Waktu: $dateTime'),
-                Text('Nama Pembeli: $namaPembeli'),
+                Text('Nama Pembeli: $namaPembeli',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
                 Text('Items:'),
                 if (items != null && items.isNotEmpty)
                   Column(

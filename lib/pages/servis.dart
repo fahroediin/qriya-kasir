@@ -381,7 +381,7 @@ class _ServisPageState extends State<ServisPage> {
                       controller:
                           searchController, // Tambahkan controller ke TextField pencarian
                       decoration: InputDecoration(
-                        labelText: 'Cari Sparepart',
+                        labelText: 'Cari Nama atau Spesifikasi',
                       ),
                       onChanged: (value) {
                         updateFilteredSparepartList();
@@ -418,8 +418,29 @@ class _ServisPageState extends State<ServisPage> {
                             }
 
                             if (filteredSparepartList.isEmpty) {
-                              return Center(
-                                child: Text('Tidak ada data sparepart'),
+                              return Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Center(
+                                    child: Text(
+                                      'Data tidak ditemukan',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                      height:
+                                          5), // Jarak antara teks dan teks yang ditambahkan
+                                  Text(
+                                    'Pastikan ejaan dengan benar',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.black38,
+                                    ),
+                                  ),
+                                ],
                               );
                             }
                             return ListView.separated(
@@ -567,7 +588,7 @@ class _ServisPageState extends State<ServisPage> {
                             );
                           } else {
                             return Center(
-                              child: Text('Tidak ada data sparepart'),
+                              child: Text('Data tidak ditemukan'),
                             );
                           }
                         },
