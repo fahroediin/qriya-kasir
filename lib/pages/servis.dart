@@ -1,3 +1,4 @@
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -47,6 +48,8 @@ class _ServisPageState extends State<ServisPage> {
   List<Map<dynamic, dynamic>> filteredSparepartList = [];
   List<Map<String, dynamic>> selectedSpareparts = [];
   TextEditingController diskonController = TextEditingController();
+  bool _isLoading = false;
+  bool _isConnected = false;
 
   @override
   void initState() {
@@ -83,25 +86,6 @@ class _ServisPageState extends State<ServisPage> {
     });
   }
 
-  void submitForm() {
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
-
-      if (_bayar < (_totalBayar + _biayaServis)) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Nominal Bayar Kurang'),
-            behavior: SnackBarBehavior.floating,
-            duration: Duration(seconds: 2),
-          ),
-        );
-        return;
-      }
-
-      saveServisData();
-    }
-  }
-
 // Calculate total price before discount
   double calculateTotalPriceBeforeDiscount() {
     double totalHarga = 0;
@@ -135,6 +119,51 @@ class _ServisPageState extends State<ServisPage> {
     setState(() {
       _kembalian = kembalian;
     });
+  }
+
+  void submitForm() async {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+
+      if (_bayar < (_totalBayar + _biayaServis)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Nominal Bayar Kurang'),
+            behavior: SnackBarBehavior.floating,
+            duration: Duration(seconds: 2),
+          ),
+        );
+        return;
+      }
+
+      setState(() {
+        _isLoading = true;
+      });
+
+      // Check for internet connectivity
+      var connectivityResult = await (Connectivity().checkConnectivity());
+      if (connectivityResult == ConnectivityResult.none) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Tidak ada koneksi internet'),
+            behavior: SnackBarBehavior.floating,
+            duration: Duration(seconds: 2),
+          ),
+        );
+        setState(() {
+          _isLoading = false;
+        });
+        return;
+      }
+
+      // Set connected status and call the method to save the data
+      setState(() {
+        _isConnected = true;
+        _isLoading = false;
+      });
+
+      saveServisData();
+    }
   }
 
   void saveServisData() {
@@ -980,7 +1009,14 @@ class _ServisPageState extends State<ServisPage> {
                     calculateKembalian();
                   });
                 },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Kolom bayar tidak boleh kosong';
+                  }
+                  return null;
+                },
               ),
+
               SizedBox(height: 8.0),
               TextFormField(
                 controller: diskonController,
@@ -1052,8 +1088,12 @@ class _ServisPageState extends State<ServisPage> {
                 style: ElevatedButton.styleFrom(
                   primary: Color.fromARGB(255, 219, 42, 15),
                 ),
-                child: Text('Proses Servis'),
-                onPressed: submitForm,
+                child: _isLoading
+                    ? CircularProgressIndicator() // Show loading indicator if _isLoading is true
+                    : Text('Proses Servis'),
+                onPressed: _isLoading
+                    ? null
+                    : submitForm, // Disable button when loading
               ),
             ],
           ),

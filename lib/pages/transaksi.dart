@@ -1,5 +1,6 @@
 import 'dart:ffi';
 import 'dart:math';
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -118,7 +119,49 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
     });
   }
 
-  void _submitForm() {
+  void _calculateTotalHarga() {
+    double totalHarga = 0;
+    for (var item in _items) {
+      double harga = double.tryParse(item['hargaSparepart'].toString()) ?? 0;
+      int jumlah = int.tryParse(item['jumlahSparepart'].toString()) ?? 0;
+      totalHarga += harga * jumlah;
+    }
+
+    double diskon = double.tryParse(diskonController.text) ?? 0;
+    double diskonAmount =
+        totalHarga * (diskon / 100); // Mengubah diskon menjadi persen
+    totalHarga -= diskonAmount;
+
+    setState(() {
+      _totalHarga = totalHarga;
+    });
+  }
+
+  void _calculateKembalian(double jumlahBayar) {
+    double kembalian = jumlahBayar - _totalHarga;
+    setState(() {
+      _kembalian = max(0, kembalian);
+    });
+  }
+
+  String formatCurrency(int value) {
+    final format = NumberFormat("#,###");
+    return format.format(value);
+  }
+
+  void _submitForm() async {
+    // Check for internet connectivity
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.none) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Tidak ada koneksi internet'),
+          behavior: SnackBarBehavior.floating,
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
@@ -173,36 +216,6 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
       // Save the transaction data
       saveTransaksiPenjualan();
     }
-  }
-
-  void _calculateTotalHarga() {
-    double totalHarga = 0;
-    for (var item in _items) {
-      double harga = double.tryParse(item['hargaSparepart'].toString()) ?? 0;
-      int jumlah = int.tryParse(item['jumlahSparepart'].toString()) ?? 0;
-      totalHarga += harga * jumlah;
-    }
-
-    double diskon = double.tryParse(diskonController.text) ?? 0;
-    double diskonAmount =
-        totalHarga * (diskon / 100); // Mengubah diskon menjadi persen
-    totalHarga -= diskonAmount;
-
-    setState(() {
-      _totalHarga = totalHarga;
-    });
-  }
-
-  void _calculateKembalian(double jumlahBayar) {
-    double kembalian = jumlahBayar - _totalHarga;
-    setState(() {
-      _kembalian = max(0, kembalian);
-    });
-  }
-
-  String formatCurrency(int value) {
-    final format = NumberFormat("#,###");
-    return format.format(value);
   }
 
   void saveTransaksiPenjualan() {
