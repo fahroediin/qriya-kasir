@@ -290,7 +290,7 @@ class _TransactionReportPageState extends State<TransactionReportPage> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 20),
+                    SizedBox(height: 10),
                     Row(
                       children: [
                         Expanded(

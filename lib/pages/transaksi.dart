@@ -265,8 +265,7 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
       'items': items,
       'totalHarga': totalHarga,
       'hargaAkhir': hargaAkhir,
-      'jumlahItem':
-          totalJumlahSparepart, // Menggunakan totalJumlahSparepart sebagai jumlahItem
+      'jumlahItem': totalJumlahSparepart,
       'bayar': _bayar,
       'kembalian': _kembalian,
       'diskon': diskon.toInt(),
@@ -329,7 +328,7 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
                       controller:
                           searchController, // Tambahkan controller ke TextField pencarian
                       decoration: InputDecoration(
-                        labelText: 'Cari Nama atau Spesifikasi',
+                        labelText: 'Cari Nama atau Nomor Part',
                       ),
                       onChanged: (value) {
                         updateFilteredSparepartList();

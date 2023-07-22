@@ -131,7 +131,7 @@ class _ListSparepartPageState extends State<ListSparepartPage> {
                 searchList(value);
               },
               decoration: InputDecoration(
-                labelText: 'Cari Nama atau Spesifikasi',
+                labelText: 'Cari Nama atau Nomor Part',
                 border: OutlineInputBorder(),
                 suffixIcon: IconButton(
                   icon: Icon(Icons.clear),

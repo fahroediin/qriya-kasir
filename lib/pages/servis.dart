@@ -366,7 +366,7 @@ class _ServisPageState extends State<ServisPage> {
                       controller:
                           searchController, // Tambahkan controller ke TextField pencarian
                       decoration: InputDecoration(
-                        labelText: 'Cari Nama atau Spesifikasi',
+                        labelText: 'Cari Nama atau Nomor Part',
                       ),
                       onChanged: (value) {
                         updateFilteredSparepartList();

@@ -47,7 +47,7 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
         Map<String, int> nopolCountMap = {};
 
         (snapshot.value as Map<dynamic, dynamic>).forEach((key, value) {
-          totalBiayaServis += (value['biayaServis'] ?? 0) as int;
+          totalBiayaServis += (value['totalAkhir'] ?? 0) as int;
           String nopol = value['nopol'];
           String namaPelanggan = value['namaPelanggan'];
           int jumlah = value['jumlah'] ?? 0;
@@ -116,6 +116,11 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
     return distinctMonths;
   }
 
+  String formatCurrency(int value) {
+    final format = NumberFormat("#,###");
+    return format.format(value);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -176,7 +181,7 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
             ),
             pdfWidgets.Paragraph(
               text:
-                  'Total Pendapatan Servis: Rp ${NumberFormat.decimalPattern('id_ID').format(totalPendapatan)}',
+                  'Total Pendapatan Servis: ${formatCurrency(totalPendapatan)}',
             ),
             pdfWidgets.Header(
               level: 2,
@@ -301,7 +306,7 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Bulan:',
+                          'Bulan',
                           style: TextStyle(fontSize: 18),
                         ),
                         Text(
@@ -316,7 +321,7 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Jumlah Servis:',
+                          'Jumlah Servis',
                           style: TextStyle(fontSize: 18),
                         ),
                         Text(
@@ -331,13 +336,15 @@ class _ServiceReportPageState extends State<ServiceReportPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Total Pendapatan Servis:',
+                          'Total Pendapatan Servis',
                           style: TextStyle(fontSize: 18),
                         ),
                         Text(
-                          'Rp ${NumberFormat.decimalPattern('id_ID').format(totalPendapatan)}',
+                          'Rp ${formatCurrency(totalPendapatan)}',
                           style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 18),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
                         ),
                       ],
                     ),
