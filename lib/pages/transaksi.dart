@@ -328,7 +328,7 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
                       controller:
                           searchController, // Tambahkan controller ke TextField pencarian
                       decoration: InputDecoration(
-                        labelText: 'Cari Nama atau Nomor Part',
+                        labelText: 'Cari Nama atau Spesifikasi',
                       ),
                       onChanged: (value) {
                         updateFilteredSparepartList();

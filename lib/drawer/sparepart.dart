@@ -141,7 +141,7 @@ class _SparepartPageState extends State<SparepartPage> {
           ),
           SizedBox(height: 4),
           Text(
-            'No.Part: ${sparepart['specSparepart']}',
+            'Spesifikasi: ${sparepart['specSparepart']}',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w400,
@@ -315,7 +315,7 @@ class _SparepartPageState extends State<SparepartPage> {
               textCapitalization: TextCapitalization
                   .words, // Ini akan mengkapitalkan setiap kata pertama di awal kalimat.
               decoration: InputDecoration(
-                labelText: 'Cari Nama atau Nomor Part',
+                labelText: 'Cari Nama atau Spesifikasi',
                 border: OutlineInputBorder(),
                 suffixIcon: IconButton(
                   icon: Icon(Icons.clear),

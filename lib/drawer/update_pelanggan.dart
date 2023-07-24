@@ -14,26 +14,14 @@ class UpdatePelanggan extends StatefulWidget {
 
 class _UpdatePelangganState extends State<UpdatePelanggan> {
   final TextEditingController nopolController = TextEditingController();
+  final TextEditingController merkSpmController = TextEditingController();
   final TextEditingController namaPelangganController = TextEditingController();
   final TextEditingController alamatController = TextEditingController();
   final TextEditingController noHpController = TextEditingController();
   final TextEditingController tipeSpmController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>(); // Add a GlobalKey for the form
-
   late DatabaseReference dbRef;
-  List<String> merkSepedaMotor = [
-    'HONDA',
-    'YAMAHA',
-    'SUZUKI',
-    'KAWASAKI',
-    'TVS',
-    'BAJAJ',
-    'KTM',
-    'VESPA',
-    'KYMCO',
-  ];
-  String? selectedMerkSepedaMotor;
 
   @override
   void initState() {
@@ -47,7 +35,7 @@ class _UpdatePelangganState extends State<UpdatePelanggan> {
     Map pelanggan = snapshot.value as Map;
 
     nopolController.text = pelanggan['nopol'];
-    selectedMerkSepedaMotor = pelanggan['merkSpm'];
+    merkSpmController.text = pelanggan['merkSpm'];
     tipeSpmController.text = pelanggan['tipeSpm'];
     namaPelangganController.text = pelanggan['namaPelanggan'];
     alamatController.text = pelanggan['alamat'];
@@ -77,7 +65,6 @@ class _UpdatePelangganState extends State<UpdatePelanggan> {
                     controller: nopolController,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(),
-                      hintText: 'Contoh NMAX 2022',
                     ),
                     inputFormatters: [
                       FilteringTextInputFormatter.allow(
@@ -94,33 +81,32 @@ class _UpdatePelangganState extends State<UpdatePelanggan> {
                       }
                       return null;
                     },
+                    enabled: false,
                   ),
                   const SizedBox(
                     height: 30,
                   ),
-                  DropdownButtonFormField<String>(
-                    value: selectedMerkSepedaMotor,
-                    items: merkSepedaMotor.map((merk) {
-                      return DropdownMenuItem<String>(
-                        value: merk,
-                        child: Text(merk),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        selectedMerkSepedaMotor = value;
-                      });
-                    },
+                  TextFormField(
+                    controller: merkSpmController,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(),
-                      hintText: 'Merk Sepeda Motor',
                     ),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(
+                          RegExp(r'[a-zA-Z0-9 ]')),
+                      LengthLimitingTextInputFormatter(255),
+                    ],
+                    textCapitalization: TextCapitalization.characters,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Merk Sepeda Motor harus dipilih';
+                        return 'Wajib diisi';
+                      }
+                      if (value.length < 3) {
+                        return 'Minimal terdiri dari 3 karakter';
                       }
                       return null;
                     },
+                    enabled: false,
                   ),
                   const SizedBox(
                     height: 30,
@@ -146,6 +132,7 @@ class _UpdatePelangganState extends State<UpdatePelanggan> {
                       }
                       return null;
                     },
+                    enabled: false,
                   ),
                   const SizedBox(
                     height: 30,
@@ -217,7 +204,7 @@ class _UpdatePelangganState extends State<UpdatePelanggan> {
                         // Validate the form using the GlobalKey
                         Map<String, dynamic> pelanggan = {
                           'nopol': nopolController.text,
-                          'merkSpm': selectedMerkSepedaMotor!,
+                          'merkSpm': merkSpmController.text,
                           'tipeSpm': tipeSpmController.text,
                           'namaPelanggan': namaPelangganController.text,
                           'alamat': alamatController.text,

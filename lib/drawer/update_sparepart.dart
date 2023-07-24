@@ -106,8 +106,8 @@ class _UpdateRecordState extends State<UpdateRecord> {
                   controller: specSparepartController,
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
-                    labelText: 'Nomor Part',
-                    hintText: 'Masukkan Nomor Part',
+                    labelText: 'Spesifikasi',
+                    hintText: 'Masukkan Spesifikasi',
                   ),
                   textCapitalization: TextCapitalization
                       .sentences, // Mengubah hanya huruf pertama yang kapital

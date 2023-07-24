@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "782396408412",
+    "project_id": "aira-motor-padangjaya",
+    "storage_bucket": "aira-motor-padangjaya.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:782396408412:android:c60e551057451320e8dc99",
+        "android_client_info": {
+          "package_name": "com.company.project_s"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "782396408412-ec4mu52mp3hevv5u65hjvmmf4bo06grv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDJNayRTOUWUoRpmujMj-ofqeeZODpBPEs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "782396408412-ec4mu52mp3hevv5u65hjvmmf4bo06grv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -97,10 +97,15 @@ class _ServisPageState extends State<ServisPage> {
     return totalHarga;
   }
 
-// Calculate total price after discount
+  /// Calculate total price after discount
   double calculateTotalPriceAfterDiscount(double discount) {
+    const double minDiscountPercentage = 0.0;
+    const double maxDiscountPercentage = 20.0;
+    double validDiscount =
+        discount.clamp(minDiscountPercentage, maxDiscountPercentage);
+
     double totalHarga = calculateTotalPriceBeforeDiscount();
-    double discountAmount = totalHarga * discount / 100;
+    double discountAmount = totalHarga * validDiscount / 100;
     return totalHarga - discountAmount;
   }
 
@@ -366,7 +371,7 @@ class _ServisPageState extends State<ServisPage> {
                       controller:
                           searchController, // Tambahkan controller ke TextField pencarian
                       decoration: InputDecoration(
-                        labelText: 'Cari Nama atau Nomor Part',
+                        labelText: 'Cari Nama atau Spesifikasi',
                       ),
                       onChanged: (value) {
                         updateFilteredSparepartList();
@@ -1032,7 +1037,8 @@ class _ServisPageState extends State<ServisPage> {
                 ),
                 keyboardType: TextInputType.number,
                 inputFormatters: <TextInputFormatter>[
-                  FilteringTextInputFormatter.digitsOnly
+                  FilteringTextInputFormatter.allow(
+                      RegExp(r'^0*(?:[0-9][0-9]?|20)$')),
                 ],
                 onChanged: (value) {
                   double discount = double.tryParse(value) ?? 0;
@@ -1042,6 +1048,7 @@ class _ServisPageState extends State<ServisPage> {
                   });
                 },
               ),
+
               SizedBox(height: 8.0),
               TextFormField(
                 decoration: InputDecoration(labelText: 'Bayar'),

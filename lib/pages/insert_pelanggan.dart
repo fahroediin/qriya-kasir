@@ -40,6 +40,49 @@ class _InputPelangganPageState extends State<InputPelangganPage>
   ];
   String? selectedMerkSepedaMotor;
 
+  @override
+  void initState() {
+    super.initState();
+    _nopolNomorController.addListener(_onNopolChanged);
+    _nopolAkhiranController.addListener(_onNopolChanged);
+  }
+
+  @override
+  void dispose() {
+    _nopolNomorController.removeListener(_onNopolChanged);
+    _nopolAkhiranController.removeListener(_onNopolChanged);
+    super.dispose();
+  }
+
+  void _onNopolChanged() {
+    String nopolAwalan = _nopolAwalanController.text.trim();
+    String nopolNomor = _nopolNomorController.text.trim();
+    String nopolAkhiran = _nopolAkhiranController.text.trim();
+    String nopol = nopolAwalan + nopolNomor + nopolAkhiran;
+
+    DatabaseReference pelangganRef =
+        _databaseReference.child('daftarPelanggan').child(nopol);
+    pelangganRef.get().then((DataSnapshot snapshot) {
+      if (snapshot.value != null) {
+        Map<dynamic, dynamic>? values = snapshot.value as Map?;
+        setState(() {
+          _namaPelangganController.text = values?['namaPelanggan'];
+          _tipeSpmController.text = values?['tipeSpm'];
+          _alamatController.text = values?['alamat'];
+          _noHpController.text = values?['noHp'];
+          selectedMerkSepedaMotor = values?['merkSpm'];
+        });
+      }
+    }).catchError((error) {
+      final snackBar = SnackBar(
+        content: Text('Gagal mengambil data pelanggan'),
+        duration: Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    });
+  }
+
   Future<void> saveData() async {
     String nopolAwalan = _nopolAwalanController.text.trim();
     String nopolNomor = _nopolNomorController.text.trim();
@@ -127,19 +170,6 @@ class _InputPelangganPageState extends State<InputPelangganPage>
     setState(() {
       selectedMerkSepedaMotor = null;
     });
-  }
-
-  @override
-  void dispose() {
-    _idPelangganController.dispose();
-    _namaPelangganController.dispose();
-    _nopolAwalanController.dispose();
-    _nopolNomorController.dispose();
-    _nopolAkhiranController.dispose();
-    _tipeSpmController.dispose();
-    _alamatController.dispose();
-    _noHpController.dispose();
-    super.dispose();
   }
 
   String? _validateInput(String? value) {

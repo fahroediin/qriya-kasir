@@ -30,6 +30,8 @@ class _ListSparepartPageState extends State<ListSparepartPage> {
       setState(() {
         sparepartList = List<Map>.from(
             (snapshot.value as Map<dynamic, dynamic>).values.toList());
+        sparepartList
+            .sort((a, b) => a['namaSparepart'].compareTo(b['namaSparepart']));
         filteredSparepartList = sparepartList;
       });
     }
@@ -131,7 +133,7 @@ class _ListSparepartPageState extends State<ListSparepartPage> {
                 searchList(value);
               },
               decoration: InputDecoration(
-                labelText: 'Cari Nama atau Nomor Part',
+                labelText: 'Cari Nama atau Spesifikasi',
                 border: OutlineInputBorder(),
                 suffixIcon: IconButton(
                   icon: Icon(Icons.clear),

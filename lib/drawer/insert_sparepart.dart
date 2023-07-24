@@ -195,7 +195,7 @@ class _InputSparepartPageState extends State<InputSparepartPage>
               controller: _specSparepartController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
-                labelText: 'Nomor Part',
+                labelText: 'Spec Sparepart',
               ),
               textCapitalization: TextCapitalization.sentences,
             ),
