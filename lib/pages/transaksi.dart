@@ -506,7 +506,7 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
                                                           title:
                                                               Text('Kesalahan'),
                                                           content: Text(
-                                                              'Jumlah item lebih banyak / kurang dari stok yang ada'),
+                                                              'Jumlah item lebih banyak dari stok yang ada'),
                                                           actions: [
                                                             TextButton(
                                                               onPressed: () {
@@ -623,8 +623,7 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text('Kesalahan'),
-            content:
-                Text('Jumlah item lebih banyak / kurang dari stok yang ada'),
+            content: Text('Jumlah item lebih banyak dari stok yang ada'),
             actions: [
               TextButton(
                 onPressed: () {
@@ -852,14 +851,30 @@ class _TransaksiPenjualanPageState extends State<TransaksiPenjualanPage> {
               TextFormField(
                 controller: diskonController,
                 decoration: InputDecoration(
-                  labelText: 'Diskon',
-                  hintText: 'Masukkan diskon dalam 10/20/dst',
+                  labelText: 'Diskon (%)',
+                  hintText: 'Maksimal diskon 0 s/d 25',
                 ),
                 keyboardType: TextInputType.number,
                 inputFormatters: <TextInputFormatter>[
-                  FilteringTextInputFormatter.digitsOnly
+                  FilteringTextInputFormatter.allow(
+                      RegExp(r'^0*(?:[0-9][0-9]?|25)$')),
                 ],
                 onChanged: (value) {
+                  double discount = double.tryParse(value) ?? 0;
+
+                  if (discount > 25) {
+                    diskonController.text =
+                        ''; // Reset to empty if the value exceeds the limit
+                    discount = 0;
+                    // Show the snackbar when the discount exceeds 25
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Maksimal diskon adalah 25%'),
+                        behavior: SnackBarBehavior.floating,
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                  }
                   setState(() {
                     _calculateTotalHarga();
                   });

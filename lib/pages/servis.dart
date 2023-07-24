@@ -1008,8 +1008,7 @@ class _ServisPageState extends State<ServisPage> {
                   ),
                 ],
               ),
-
-              SizedBox(height: 8.0),
+              SizedBox(height: 10),
               TextFormField(
                 decoration: InputDecoration(labelText: 'Biaya Servis'),
                 keyboardType: TextInputType.number,
@@ -1028,20 +1027,34 @@ class _ServisPageState extends State<ServisPage> {
                 },
               ),
 
-              SizedBox(height: 8.0),
+              SizedBox(height: 10),
               TextFormField(
                 controller: diskonController,
                 decoration: InputDecoration(
-                  labelText: 'Diskon',
-                  hintText: 'Masukkan diskon dalam 10/20/dst',
+                  labelText: 'Diskon (%)',
+                  hintText: 'Maksimal diskon 0 s/d 25',
                 ),
                 keyboardType: TextInputType.number,
                 inputFormatters: <TextInputFormatter>[
                   FilteringTextInputFormatter.allow(
-                      RegExp(r'^0*(?:[0-9][0-9]?|20)$')),
+                      RegExp(r'^0*(?:[0-9][0-9]?|25)$')),
                 ],
                 onChanged: (value) {
                   double discount = double.tryParse(value) ?? 0;
+
+                  if (discount > 25) {
+                    diskonController.text =
+                        ''; // Reset to empty if the value exceeds the limit
+                    discount = 0;
+                    // Show the snackbar when the discount exceeds 25
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Maksimal diskon adalah 25%'),
+                        behavior: SnackBarBehavior.floating,
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                  }
                   setState(() {
                     _totalBayar = calculateTotalPriceAfterDiscount(discount);
                     calculateKembalian();
@@ -1049,7 +1062,7 @@ class _ServisPageState extends State<ServisPage> {
                 },
               ),
 
-              SizedBox(height: 8.0),
+              SizedBox(height: 10),
               TextFormField(
                 decoration: InputDecoration(labelText: 'Bayar'),
                 keyboardType: TextInputType.number,
