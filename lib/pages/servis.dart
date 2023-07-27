@@ -549,7 +549,7 @@ class _ServisPageState extends State<ServisPage> {
                                                           title:
                                                               Text('Kesalahan'),
                                                           content: Text(
-                                                              'Jumlah item lebih banyak / kurang dari stok yang ada'),
+                                                              'Jumlah item lebih banyak dari stok yang ada'),
                                                           actions: [
                                                             TextButton(
                                                               onPressed: () {

@@ -507,7 +507,7 @@ class _ReceiptTransactionPageState extends State<ReceiptTransactionPage> {
                                 ),
                               ],
                             ),
-                            SizedBox(height: 10),
+                            SizedBox(height: 5),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [

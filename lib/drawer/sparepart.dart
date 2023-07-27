@@ -47,6 +47,7 @@ class _SparepartPageState extends State<SparepartPage> {
       query = dbRef.orderByChild('namaSparepart').equalTo(searchText);
       DataSnapshot snapshotBynamaSparepart = await query.get();
       DataSnapshot snapshot = await query.get();
+
       if (!snapshotBynamaSparepart.exists) {
         query = dbRef.orderByChild('specSparepart').equalTo(searchText);
         DataSnapshot snapshotByspec = await query.get();
